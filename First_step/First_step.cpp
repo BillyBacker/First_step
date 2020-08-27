@@ -3,8 +3,10 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <math.h>
+#include <iostream>
 
 using namespace sf;
+using namespace std;
 
 class Object {
 	private:
@@ -54,7 +56,7 @@ class Object {
 		}
 };
 
-class objectSlot { //This is a class for item keeping slot in player backpack or chest.
+class objectSlot { //This is a class for Object that will display on the ground.
 private:
 	int slotNum = 1024;
 	Object objectSlot[1024];
@@ -87,7 +89,7 @@ public:
 	}
 };
 
-class map { //This a class that will store every object that on the ground in game.
+class Map { //This a class that will store every object that on the ground in game.
 	private:
 		objectSlot Object_on_ground;
 		int objectNumber = 0;
@@ -102,6 +104,9 @@ class map { //This a class that will store every object that on the ground in ga
 			this->Object_on_ground.remove(Index);
 			this->objectNumber -= 1;
 		}
+		objectSlot ObjectSlot(int Index) {
+			return this->Object_on_ground;
+		 }
 };
 
 class itemStack { //This is a class of a stack of item in inventory or on a floor.
@@ -166,7 +171,7 @@ class inventory { //This is a class for item keeping slot in player backpack or 
 		}
 };
 
-class player { //This is a class of player stat, position, and player's inventory.
+class Charactor { //This is a class of player stat, position, and player's inventory.
 	private:
 		inventory backpack;
 		char action = 'I';
@@ -199,6 +204,12 @@ class player { //This is a class of player stat, position, and player's inventor
 		float* getPos() {
 			return this->Position;
 		}
+		float getPosX() {
+			return this->Position[0];
+		}
+		float getPosY() {
+			return this->Position[1];
+		}
 		int getHP() {
 			return this->health;
 		}
@@ -214,9 +225,9 @@ class player { //This is a class of player stat, position, and player's inventor
 		void Action(char act) {
 			this->action = act;
 		}
-		void setPos(float Pos[2]) {
-			setPosX(Pos[0]);
-			setPosY(Pos[1]);
+		void setPos(int X, int Y) {
+			setPosX(X);
+			setPosY(Y);
 		}
 		void lossHP(int amount) {
 			this->health -= amount;
@@ -241,87 +252,46 @@ class player { //This is a class of player stat, position, and player's inventor
 		}
 };
 
-class resource { //class that store quantity of each resource. now unused.
+class Player {
 	private:
-		int power = 0;
-		int water = 0;
-		int food = 0;
+		Charactor action;
+		Sprite body;
+		Texture texture;
+		float posX;
+		float posY;
+		int step = 0;
 
-		int metal = 0;
-		int mineral = 0;
-		int concrete = 0;
-		int composite_metal = 0;
-		int PLA = 0;
-		int ABS = 0;
-		int rock = 0;
-		int dirt = 0;
-
+		void Init() {
+			if (!texture.loadFromFile("assets\\alien\\PNG\\alien_red\\red__0000_idle_1.png")) {
+				printf("Error");
+			}
+			this->body.setScale(0.2, 0.2);
+			this->body.setTexture(texture);
+			
+		}
 	public:
-		int get_power() {
-			return power;
+		Player() {
+			this->Init();
 		}
-		int get_water() {
-			return water;
+		Sprite Body() {
+			return body;
 		}
-		int get_food() {
-			return food;
+		void setPos(float X, float Y) {
+			this->body.setPosition(X, Y);
+			this->posX = X;
+			this->posY = Y;
 		}
-		int get_metal() {
-			return metal;
+		void move(float X, float Y) {
+			setPos(this->posX + X, this->posY + Y);
 		}
-		int get_mineral() {
-			return mineral;
+		Charactor Action() {
+			return action;
 		}
-		int get_concrete() {
-			return concrete;
+		float getPosX() {
+			return this->posX;
 		}
-		int get_composite_metal() {
-			return composite_metal;
-		}
-		int get_PLA() {
-			return PLA;
-		}
-		int get_ABS() {
-			return ABS;
-		}
-		int get_rock() {
-			return rock;
-		}
-		int get_dirt() {
-			return dirt;
-		}
-		void loss_power(int amount) {
-			power -= amount;
-		}
-		void loss_water(int amount) {
-			water -= amount;
-		}
-		void loss_food(int amount) {
-			food -= amount;
-		}
-		void loss_metal(int amount) {
-			metal -= amount;
-		}
-		void loss_mineral(int amount) {
-			mineral -= amount;
-		}
-		void loss_concrete(int amount) {
-			concrete -= amount;
-		}
-		void loss_composite_metal(int amount) {
-			composite_metal -= amount;
-		}
-		void loss_PLA(int amount) {
-			PLA -= amount;
-		}
-		void loss_ABS(int amount) {
-			ABS -= amount;
-		}
-		void loss_rock(int amount) {
-			rock -= amount;
-		}
-		void loss_dirt(int amount) {
-			dirt -= amount;
+		float getPosY() {
+			return this->posY;
 		}
 };
 
@@ -335,6 +305,9 @@ class gameEngine { //this a main class of this game. resposibility for render ob
 		Event ev;
 		VideoMode mode;
 		RectangleShape monster;
+		Player Billy;
+		Map Mars;
+		int i = 0;
 
 		void initVar() {
 			this->window = nullptr;
@@ -346,7 +319,6 @@ class gameEngine { //this a main class of this game. resposibility for render ob
 			this->window->setFramerateLimit(75);
 		}
 		void initMonster() {
-			RectangleShape monster;
 			this->monster.setPosition(50, 50);
 			this->monster.setSize(Vector2f(1000.f, 1000.f));
 			this->monster.setFillColor(Color::Green);
@@ -373,17 +345,21 @@ class gameEngine { //this a main class of this game. resposibility for render ob
 			return this->window->isOpen();
 		}
 		void pollEvents() {
-			while (this->window->pollEvent(this->ev)) {
-				switch (this->ev.type) {
-				case Event::Closed:
-					this->window->close();
-					break;
-				case Event::KeyPressed:
-					if (ev.key.code == Keyboard::Escape) {
-						this->window->close();
-					}
-					break;
-				}
+			int move_speed = 10;
+			if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+				this->window->close();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::W)) {
+				Billy.move(0, -1* move_speed);
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::S)) {
+				Billy.move(0, 1* move_speed);
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::A)) {
+				Billy.move(-1* move_speed, 0);
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::D)) {
+				Billy.move(1* move_speed, 0);
 			}
 		}
 		void update() {
@@ -402,7 +378,9 @@ class gameEngine { //this a main class of this game. resposibility for render ob
 			3. draw
 
 			*/
-			this->window->draw(this->monster);
+			this->window->draw(this->Billy.Body());
+			//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
+	
 			this->window->display();
 		}
 };
