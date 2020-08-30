@@ -16,22 +16,25 @@ class strTuple { // string tuple for store array of string.
 	public:
 		vector<string> Tuple;
 		string var(int i){
-			return Tuple[i];
+			return this->Tuple[i];
 		}
 		void append(string In) {
-			Tuple.push_back(In);
+			this->Tuple.push_back(In);
 		}
 		void remove(string In) {
-			Tuple.erase(std::remove(Tuple.begin(), Tuple.end(), In), Tuple.end());
+			this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
+		}
+		void popOut(int index) {
+			this->Tuple.erase(Tuple.begin() + index);
 		}
 		unsigned __int64 length() {
-			return Tuple.size();
+			return this->Tuple.size();
 		}
 		unsigned __int64 index(string In) {
 			unsigned __int64 num = 0;
-			auto pos = find(Tuple.begin(), Tuple.end(), In);
-			if (pos != Tuple.end()) {
-				unsigned __int64 index = distance(Tuple.begin(), pos);
+			auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
+			if (pos != this->Tuple.end()) {
+				unsigned __int64 index = distance(this->Tuple.begin(), pos);
 				return index;
 			}
 			else {
@@ -40,13 +43,33 @@ class strTuple { // string tuple for store array of string.
 		}
 };
 
+class strDic { // string tuple for store array of string.
+public:
+	strTuple Key;
+	strTuple Tuple;
+	string get(string keyIn) {
+		return this->Tuple.var(Key.index(keyIn));
+	}
+	void append(string keyIn, string In) {
+		this->Key.append(keyIn);
+		this->Tuple.append(In);
+	}
+	void remove(string keyIn) {
+		this->Tuple.popOut(Key.index(keyIn));
+		this->Key.popOut(Key.index(keyIn));
+	}
+	unsigned __int64 length() {
+		return this->Tuple.length();
+	}
+};
+
 int main(){
-	strTuple A;
-	A.append("Hello");
-	A.append("Hi");
-	A.append("How are you");
-	printf("%d\n", A.index("Hi"));
-	A.remove("Hi");
-	printf("%d\n", A.index("Hi"));
+	strDic A;
+	A.append("Name", "Billy");
+	A.append("Age", "18");
+	cout << A.get("Age") << '\n';
+	A.remove("Age");
+	A.append("Gender", "Male");
+	cout << A.get("Gender") << '\n';
 	return 0;
 }
