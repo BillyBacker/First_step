@@ -12,7 +12,7 @@
 using namespace sf;
 using namespace std;
 
-class strTuple {
+class strTuple { // string tuple for store array of string.
 	public:
 		vector<string> Tuple;
 		string var(int i){
@@ -39,8 +39,6 @@ class strTuple {
 			}
 		}
 };
-
-
 
 int main(){
 	strTuple A;
