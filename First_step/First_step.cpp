@@ -132,11 +132,38 @@ class Object{
 		Sprite sprite;
 		Texture texture;
 	public:
+		void setSpriteTexture(string Path) {
+			if (!this->texture.loadFromFile(Path)) {
+				printf("Error");
+			}
+			this->sprite.setTexture(this->texture);
+		}
+		void setSpriteSize(float scale) {
+			this->sprite.setScale(scale, scale);
+		}
 		void addStat(string KeyIn, float val) {
 			Stat.append(KeyIn, val);
 		}
 		float getStat(string KeyIn) {
 			return Stat.get(KeyIn);
+		}
+		void setPosX(float X) {
+			this->posX = X;
+		}
+		void setPosY(float Y) {
+			this->posY = Y;
+		}
+		void moveX(float amount) {
+			this->posX += amount;
+		}
+		void moveY(float amount) {
+			this->posY += amount;
+		}
+		float posX() {
+			return this->posX;
+		}
+		float posY() {
+			return this->posY;
 		}
 		string type() {
 			return this->Type;
@@ -158,6 +185,7 @@ int main(){
 	Pump.Is("Building");
 	Pump.addStat("Durability", 128);
 	cout << Pump.getStat("Durability") << '\n';
+	cout << Pump.nowIs() << '\n';
 	
 	return 0;
 }
