@@ -126,16 +126,25 @@ class fltDic { // string tuple for store array of string.
 
 class Object{
 	private:
+		string Type;
 		unsigned __int64 ID;
 		string Name;
 		fltDic Stat;
-		float posX = 1;
-		float posY = 1;
+		float posX = 0;
+		float posY = 0;
+		float offsetPosX = 0;
+		float offsetPosY = 0;
 		Sprite sprite;
 		Texture texture;
 	public:
 		Object(unsigned __int64 ID) {
 			this->ID = ID;
+		}
+		string type() {
+			return Type;
+		}
+		void setType(string In) {
+			this->Type = In;
 		}
 		unsigned __int64 getID() {
 			return this->ID;
@@ -155,29 +164,42 @@ class Object{
 		float getStat(string KeyIn) {
 			return Stat.get(KeyIn);
 		}
+		void setOffsetPosX(float offx) {
+			this->offsetPosX = offx*100;
+		}
+		void setOffsetPosY(float offy) {
+			this->offsetPosY = offy*100;
+		}
 		void setPosX(float x) {
 			this->posX = x;
+			this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + this->offsetPosY);
 		}
 		void setPosY(float y) {
 			this->posY = y;
+			this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + this->offsetPosY);
 		}
 		void moveX(float amount) {
+			this->sprite.setPosition(this->posX + amount + this->offsetPosX, this->posY + this->offsetPosY);
 			this->posX += amount;
 		}
 		void moveY(float amount) {
+			this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + amount + this->offsetPosY);
 			this->posY += amount;
 		}
 		float PosX() {
-			return this->posX;
+			return this->posX+this->offsetPosX;
 		}
 		float PosY() {
-			return this->posY;
+			return this->posY + this->offsetPosY;
 		}
 		void Is(string name) {
 			this->Name = name;
 		}
 		string nowIs() {
 			return this->Name;
+		}
+		Sprite getSprite() {
+			return this->sprite;
 		}
 };
 
@@ -251,18 +273,209 @@ public:
 	}
 };
 
-int main(){
+class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
+private:
+	//Add a variable down here.
 	Map Field;
+	int move_speed = 10;
+	int h = 900;
+	int w = 1600;
+	RenderWindow* window;
+	Event ev;
+	VideoMode mode;
+	Map Mars;
+	int i = 0;
 
-	Field.registerObject("Billy");
-	Field.object("Billy")->Is("Human");
-	Field.object("Billy")->addStat("Health", 100);
+	void initVar() {
+		this->window = nullptr;
+	}
+	void initWindow() {
+		this->mode.height = h;
+		this->mode.width = w;
+		this->window = new RenderWindow(this->mode, "First Step", Style::Titlebar | Style::Close);
+		this->window->setFramerateLimit(75);
+	}
+	void initObject() {
+		this->Field.registerObject("Anchor");
+		this->Field.object("Anchor")->Is("Position_manager");
+		this->Field.object("Anchor")->setType("Dynamic");
 
+		this->Field.registerObject("BG");
+		this->Field.object("BG")->Is("BG");
+		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
+		this->Field.object("BG")->setSpriteSize(10);
+		this->Field.object("BG")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.object("BG")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.object("BG")->setType("Dynamic");
 
-	cout << Field.object("Billy")->getStat("Health") << '\n';
-	cout << Field.object("Billy")->nowIs() << '\n';
-	cout << Field.entityNumber() << '\n';
-	cout << Field.objectNameAt(0) << '\n';
-	cout << Field.objectTypeAt(0) << '\n';
-	return 0;
+		this->Field.registerObject("Stone1");
+		this->Field.object("Stone1")->Is("Asset");
+		this->Field.object("Stone1")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
+		this->Field.object("Stone1")->setSpriteSize(0.1);
+		this->Field.object("Stone1")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.object("Stone1")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.object("Stone1")->setType("Dynamic");
+		this->Field.object("Stone1")->setOffsetPosX(10);
+		this->Field.object("Stone1")->setOffsetPosY(10);
+
+		this->Field.registerObject("Stone2");
+		this->Field.object("Stone2")->Is("Asset");
+		this->Field.object("Stone2")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
+		this->Field.object("Stone2")->setSpriteSize(0.5);
+		this->Field.object("Stone2")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.object("Stone2")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.object("Stone2")->setType("Dynamic");
+		this->Field.object("Stone2")->setOffsetPosX(15);
+		this->Field.object("Stone2")->setOffsetPosY(10);
+
+		this->Field.registerObject("Elon");
+		this->Field.object("Elon")->Is("Player");
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
+		this->Field.object("Elon")->setSpriteSize(0.3);
+		this->Field.object("Elon")->addStat("Health", 100);
+		this->Field.object("Elon")->addStat("Hunger", 100);
+		this->Field.object("Elon")->addStat("Air", 100);
+		this->Field.object("Elon")->setPosX(750);
+		this->Field.object("Elon")->setPosY(450);
+		this->Field.object("Elon")->setType("Static");
+
+		this->Field.registerObject("Health_Bar");
+		this->Field.object("Health_Bar")->Is("Stat_Bar");
+		this->Field.object("Health_Bar")->addStat("Value", 100);
+		this->Field.object("Health_Bar")->setSpriteTexture("assets\\red.jpg");
+		this->Field.object("Health_Bar")->setSpriteSize(0.01);
+		this->Field.object("Health_Bar")->setPosX(this->Field.object("Elon")->PosX());
+		this->Field.object("Health_Bar")->setPosY(this->Field.object("Elon")->PosY());
+		this->Field.object("Health_Bar")->getSprite().scale(100, 1);
+		this->Field.object("Health_Bar")->setType("Static");
+
+	}
+public:
+	gameEngine() {
+		this->initVar();
+		this->initWindow();
+		this->initObject();
+	}
+	virtual ~gameEngine() {
+		delete this->window;
+	}
+	const bool isRuning() {
+		return this->window->isOpen();
+	}
+	void W_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
+		this->Field.object("Anchor")->moveY(1 * this->move_speed);
+	}
+	void A_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5reverse.png");
+		this->Field.object("Anchor")->moveX(1 * this->move_speed);
+	}
+	void S_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
+		this->Field.object("Anchor")->moveY(-1 * this->move_speed);
+	}
+	void D_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
+		this->Field.object("Anchor")->moveX(-1 * this->move_speed);
+	}
+	void Idle() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
+	}
+	void pollEvents() {
+		int move_speed = 10;
+		if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+			this->window->close();
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::W)) {
+			W_key();
+			if (Keyboard::isKeyPressed(Keyboard::A)) {
+				A_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::D)) {
+				D_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::S)) {
+				Idle();
+				this->Field.object("Anchor")->moveY(-1 * this->move_speed);
+			}
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::S)) {
+			S_key();
+			if (Keyboard::isKeyPressed(Keyboard::A)) {
+				A_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::D)) {
+				D_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::W)) {
+				Idle();
+				this->Field.object("Anchor")->moveY(1 * this->move_speed);
+			}
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::A)) {
+			A_key();
+			if (Keyboard::isKeyPressed(Keyboard::S)) {
+				S_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::W)) {
+				W_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::D)) {
+				Idle();
+				this->Field.object("Anchor")->moveX(-1 * this->move_speed);
+			}
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::D)) {
+			D_key();
+			if (Keyboard::isKeyPressed(Keyboard::S)) {
+				S_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::W)) {
+				W_key();
+			}
+			else if (Keyboard::isKeyPressed(Keyboard::A)) {
+				Idle();
+				this->Field.object("Anchor")->moveX(1 * this->move_speed);
+			}
+		}
+		else {
+			this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
+		}
+	}
+	void update() {
+		this->pollEvents();
+		for (int i = 0; i < Field.entityNumber(); i++) {
+			if (this->Field.objectAt(i)->type() == "Dynamic") {
+				this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
+				this->Field.objectAt(i)->setPosY(this->Field.object("Anchor")->PosY());
+			}
+		}
+		/*
+		This part is for update game event.
+		*/
+	}
+	void render() {
+		this->window->clear();
+		/*
+		This part is for drawing graphic.
+		1. clear old frame
+		2. render object
+		3. draw
+		*/
+		for (int i = 0; i < Field.entityNumber(); i++) {
+			printf("%d; %f, %f\n", i, this->Field.objectAt(i)->PosX(), this->Field.objectAt(i)->PosY());
+			this->window->draw(this->Field.objectAt(i)->getSprite());
+		}
+		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
+
+		this->window->display();
+	}
+};
+
+int main() { // Game loop
+	gameEngine First_step;
+	while (First_step.isRuning()) {
+		First_step.update();
+		First_step.render();
+	}
 }
