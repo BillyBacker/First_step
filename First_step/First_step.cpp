@@ -15,7 +15,7 @@ using namespace std;
 class strTuple { // string tuple for store array of string.
 public:
 		vector<string> Tuple;
-		string var(int i){
+		string var(unsigned __int64 i){
 			return this->Tuple[i];
 		}
 		void set(unsigned __int64 Index, string In) {
@@ -27,7 +27,7 @@ public:
 		void remove(string In) {
 			this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
 		}
-		void popOut(int index) {
+		void popOut(unsigned __int64 index) {
 			this->Tuple.erase(Tuple.begin() + index);
 		}
 		unsigned __int64 length() {
@@ -48,7 +48,7 @@ public:
 class fltTuple { // string tuple for store array of string.
 public:
 	vector<float> Tuple;
-	float var(int i) {
+	float var(unsigned __int64 i) {
 		return this->Tuple[i];
 	}
 	void set(unsigned __int64 Index, float In) {
@@ -60,7 +60,7 @@ public:
 	void remove(float In) {
 		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
 	}
-	void popOut(int index) {
+	void popOut(unsigned __int64 index) {
 		this->Tuple.erase(Tuple.begin() + index);
 	}
 	unsigned __int64 length() {
@@ -77,6 +77,7 @@ public:
 		}
 	}
 };
+
 class strDic { // string tuple for store array of string.
 public:
 	strTuple Key;
@@ -125,13 +126,20 @@ class fltDic { // string tuple for store array of string.
 
 class Object{
 	private:
-		string Type;
+		unsigned __int64 ID;
+		string Name;
 		fltDic Stat;
-		float posX;
-		float posY;
+		float posX = 1;
+		float posY = 1;
 		Sprite sprite;
 		Texture texture;
 	public:
+		Object(unsigned __int64 ID) {
+			this->ID = ID;
+		}
+		unsigned __int64 getID() {
+			return this->ID;
+		}
 		void setSpriteTexture(string Path) {
 			if (!this->texture.loadFromFile(Path)) {
 				printf("Error");
@@ -147,11 +155,11 @@ class Object{
 		float getStat(string KeyIn) {
 			return Stat.get(KeyIn);
 		}
-		void setPosX(float X) {
-			this->posX = X;
+		void setPosX(float x) {
+			this->posX = x;
 		}
-		void setPosY(float Y) {
-			this->posY = Y;
+		void setPosY(float y) {
+			this->posY = y;
 		}
 		void moveX(float amount) {
 			this->posX += amount;
@@ -159,33 +167,102 @@ class Object{
 		void moveY(float amount) {
 			this->posY += amount;
 		}
-		float posX() {
+		float PosX() {
 			return this->posX;
 		}
-		float posY() {
+		float PosY() {
 			return this->posY;
 		}
-		string type() {
-			return this->Type;
-		}
-		void Is(string type) {
-			this->Type = type;
+		void Is(string name) {
+			this->Name = name;
 		}
 		string nowIs() {
-			return this->Type;
+			return this->Name;
 		}
 };
 
+class objPtrTuple {
+public:
+	vector<Object*> Tuple;
+	Object* var(unsigned __int64 i) {
+		return this->Tuple[i];
+	}
+	void set(unsigned __int64 Index, Object* In) {
+		this->Tuple.at(Index) = In;
+	}
+	void append(Object* In) {
+		this->Tuple.push_back(In);
+	}
+	void remove(Object* In) {
+		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
+	}
+	void popOut(unsigned __int64 index) {
+		this->Tuple.erase(Tuple.begin() + index);
+	}
+	unsigned __int64 length() {
+		return this->Tuple.size();
+	}
+	unsigned __int64 index(Object* In) {
+		auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
+		if (pos != this->Tuple.end()) {
+			unsigned __int64 index = distance(this->Tuple.begin(), pos);
+			return index;
+		}
+		else {
+			return -1;
+		}
+	}
+};
+
+class Map {
+public:
+	strTuple Key;
+	objPtrTuple Tuple;
+	void registerObject(string Type) {
+		Object* p = new Object(this->Tuple.length());
+		this->Key.append(Type);
+		this->Tuple.append(p);
+	}
+	Object* object(string keyIn) {
+		return this->Tuple.var(Key.index(keyIn));
+	}
+	Object* objectAt(unsigned __int64 Index) {
+		return this->Tuple.var(Index);
+	}
+	void set(string keyIn, Object* In) {
+		this->Tuple.set(Key.index(keyIn), In);
+	}
+	void append(string keyIn, Object* In) {
+		this->Key.append(keyIn);
+		this->Tuple.append(In);
+	}
+	void remove(string keyIn) {
+		this->Tuple.popOut(Key.index(keyIn));
+		this->Key.popOut(Key.index(keyIn));
+	}
+	unsigned __int64 entityNumber() {
+		return this->Tuple.length();
+	}
+	string objectNameAt(int Index) {
+		return this->Key.var(Index);
+	}
+	string objectTypeAt(int Index) {
+		return this->Tuple.var(Index)->nowIs();
+	}
+};
+
 int main(){
-	Object Billy, Pump;
-	Billy.Is("Human");
-	Billy.addStat("Health", 100);
-	Billy.addStat("Mana", 500);
-	cout << Billy.getStat("Health") << '\n';
-	Pump.Is("Building");
-	Pump.addStat("Durability", 128);
-	cout << Pump.getStat("Durability") << '\n';
-	cout << Pump.nowIs() << '\n';
-	
+	Map Field;
+
+	Field.registerObject("Billy");
+	Field.object("Billy")->Is("Human");
+	Field.object("Billy")->addStat("Health", 100);
+
+
+	cout << Field.object("Billy")->getStat("Health") << '\n';
+	cout << Field.object("Billy")->nowIs() << '\n';
+	cout << Field.entityNumber() << '\n';
+	cout << Field.objectNameAt(0) << '\n';
+	cout << Field.objectTypeAt(0) << '\n';
 	return 0;
 }
