@@ -280,6 +280,10 @@ private:
 	int move_speed = 10;
 	int h = 900;
 	int w = 1600;
+	bool W = false;
+	bool A = false;
+	bool S = false;
+	bool D = false;
 	RenderWindow* window;
 	Event ev;
 	VideoMode mode;
@@ -382,68 +386,56 @@ public:
 		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
 	}
 	void pollEvents() {
-		int move_speed = 10;
-		if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-			this->window->close();
-		}
-		else if (Keyboard::isKeyPressed(Keyboard::W)) {
-			W_key();
-			if (Keyboard::isKeyPressed(Keyboard::A)) {
-				A_key();
+		while (this->window->pollEvent(this->ev)) {
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
+				this->window->close();
 			}
-			else if (Keyboard::isKeyPressed(Keyboard::D)) {
-				D_key();
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
+				W = true;
 			}
-			else if (Keyboard::isKeyPressed(Keyboard::S)) {
-				Idle();
-				this->Field.object("Anchor")->moveY(-1 * this->move_speed);
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::W) {
+				W = false;
 			}
-		}
-		else if (Keyboard::isKeyPressed(Keyboard::S)) {
-			S_key();
-			if (Keyboard::isKeyPressed(Keyboard::A)) {
-				A_key();
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::A) {
+				A = true;
 			}
-			else if (Keyboard::isKeyPressed(Keyboard::D)) {
-				D_key();
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::A) {
+				A = false;
 			}
-			else if (Keyboard::isKeyPressed(Keyboard::W)) {
-				Idle();
-				this->Field.object("Anchor")->moveY(1 * this->move_speed);
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::S) {
+				S = true;
 			}
-		}
-		else if (Keyboard::isKeyPressed(Keyboard::A)) {
-			A_key();
-			if (Keyboard::isKeyPressed(Keyboard::S)) {
-				S_key();
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::S) {
+				S = false;
 			}
-			else if (Keyboard::isKeyPressed(Keyboard::W)) {
-				W_key();
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::D) {
+				D = true;
 			}
-			else if (Keyboard::isKeyPressed(Keyboard::D)) {
-				Idle();
-				this->Field.object("Anchor")->moveX(-1 * this->move_speed);
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
+				D = false;
 			}
 		}
-		else if (Keyboard::isKeyPressed(Keyboard::D)) {
-			D_key();
-			if (Keyboard::isKeyPressed(Keyboard::S)) {
-				S_key();
-			}
-			else if (Keyboard::isKeyPressed(Keyboard::W)) {
-				W_key();
-			}
-			else if (Keyboard::isKeyPressed(Keyboard::A)) {
-				Idle();
-				this->Field.object("Anchor")->moveX(1 * this->move_speed);
-			}
-		}
-		else {
-			this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
-		}
+		
 	}
 	void update() {
 		this->pollEvents();
+		if (W || A || S || D) {
+			if (S) {
+				S_key();
+			}
+			if (W) {
+				W_key();
+			}
+			if (D) {
+				D_key();
+			}
+			if (A) {
+				A_key();
+			}
+		}
+		else {
+			Idle();
+		}
 		for (int i = 0; i < Field.entityNumber(); i++) {
 			if (this->Field.objectAt(i)->type() == "Dynamic") {
 				this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
