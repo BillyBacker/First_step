@@ -414,6 +414,12 @@ public:
 			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
 				D = false;
 			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
+				this->move_speed = 20;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
+				this->move_speed = 10;
+			}
 		}
 		
 	}
