@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include<thread>
 #include <math.h>
 #include <iostream>
 #include <string>
@@ -255,8 +256,18 @@ public:
 class Map {
 public:
 	objPtrTuple Tuple;
-	void registerObject(string Name) {
+	objPtrTuple Templ;
+	unsigned __int64 getIndex(string name) {
+		return this->Tuple.index(this->object(name));
+	}
+	void createTemplate(string name) {
+		Object* p = new Object(this->Templ.length());
+		p->Is(name);
+		this->Templ.append(p);
+	}
+	void registerObject(string Name, string Template) {
 		Object* p = new Object(this->Tuple.length());
+		*p = *this->Template(Template);
 		p->Is(Name);
 		this->Tuple.append(p);
 	}
@@ -264,6 +275,13 @@ public:
 		for (int i = 0; i < this->Tuple.length(); i++) {
 			if (Tuple.var(i)->nowIs() == keyIn) {
 				return Tuple.var(i);
+			}
+		}
+	}
+	Object* Template(string keyIn) {
+		for (int i = 0; i < this->Templ.length(); i++) {
+			if (Templ.var(i)->nowIs() == keyIn) {
+				return Templ.var(i);
 			}
 		}
 	}
@@ -302,7 +320,6 @@ public:
 class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
 private:
 	//Add a variable down here.
-	Map Field;
 	int move_speed = 5;
 	int h = 900;
 	int w = 1600;
@@ -310,12 +327,12 @@ private:
 	bool A = false;
 	bool S = false;
 	bool D = false;
+	bool running = true;
 	RenderWindow* window;
 	Event ev;
 	VideoMode mode;
 	Map Mars;
 	int i = 0;
-
 	void initVar() {
 		this->window = nullptr;
 	}
@@ -323,62 +340,37 @@ private:
 		this->mode.height = h;
 		this->mode.width = w;
 		this->window = new RenderWindow(this->mode, "First Step", Style::Titlebar | Style::Close);
-		this->window->setFramerateLimit(75);
+		this->window->setFramerateLimit(240);
 	}
 	void initObject() {
-		this->Field.registerObject("Anchor");
-		this->Field.object("Anchor")->setPosX(0);
-		this->Field.object("Anchor")->setPosY(0);
-		this->Field.object("Anchor")->setType("Dynamic");
+		this->Field.createTemplate("Blank");
+		
+		this->Field.createTemplate("BG_Element");
+		this->Field.Template("BG_Element")->setType("Dynamic");
+		this->Field.Template("BG_Element")->setPosX(0);
+		this->Field.Template("BG_Element")->setPosY(0);
+		
+		this->Field.registerObject("Anchor", "BG_Element");
+		
+		this->Field.createTemplate("Structure");
+		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.Template("Structure")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.Template("Structure")->setType("Dynamic");
 
-		this->Field.registerObject("BG");
+		this->Field.registerObject("BG", "BG_Element");
 		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
 		this->Field.object("BG")->setSpriteSize(10);
-		this->Field.object("BG")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.object("BG")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.object("BG")->setType("Dynamic");
 
-		this->Field.registerObject("Stone1");
-		this->Field.object("Stone1")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
-		this->Field.object("Stone1")->setSpriteSize(0.6);
-		this->Field.object("Stone1")->setImgHeight(428);
-		this->Field.object("Stone1")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.object("Stone1")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.object("Stone1")->setType("Dynamic");
-		this->Field.object("Stone1")->setOffsetPosX(10);
-		this->Field.object("Stone1")->setOffsetPosY(10);
+		for (int i = 0; i < 10; i++) {
+			this->Field.registerObject(to_string(i), "Structure");
+			this->Field.object(to_string(i))->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
+			this->Field.object(to_string(i))->setSpriteSize(0.6);
+			this->Field.object(to_string(i))->setImgHeight(428);
+			this->Field.object(to_string(i))->setOffsetPosX(10+i);
+			this->Field.object(to_string(i))->setOffsetPosY(10);
+		}
 
-		this->Field.registerObject("Stone2");
-		this->Field.object("Stone2")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
-		this->Field.object("Stone2")->setSpriteSize(0.4);
-		this->Field.object("Stone2")->setImgHeight(428);
-		this->Field.object("Stone2")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.object("Stone2")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.object("Stone2")->setType("Dynamic");
-		this->Field.object("Stone2")->setOffsetPosX(15);
-		this->Field.object("Stone2")->setOffsetPosY(10);
-
-		this->Field.registerObject("Stone3");
-		this->Field.object("Stone3")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
-		this->Field.object("Stone3")->setSpriteSize(0.3);
-		this->Field.object("Stone3")->setImgHeight(428);
-		this->Field.object("Stone3")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.object("Stone3")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.object("Stone3")->setType("Dynamic");
-		this->Field.object("Stone3")->setOffsetPosX(20);
-		this->Field.object("Stone3")->setOffsetPosY(10);
-
-		this->Field.registerObject("Stone4");
-		this->Field.object("Stone4")->setSpriteTexture("assets\\stone.jpg");
-		this->Field.object("Stone4")->setSpriteSize(1);
-		this->Field.object("Stone4")->setImgHeight(1365);
-		this->Field.object("Stone4")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.object("Stone4")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.object("Stone4")->setType("Dynamic");
-		this->Field.object("Stone4")->setOffsetPosX(30);
-		this->Field.object("Stone4")->setOffsetPosY(10);
-
-		this->Field.registerObject("Elon");
+		this->Field.registerObject("Elon", "Blank");
 		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
 		this->Field.object("Elon")->setSpriteSize(0.3);
 		this->Field.object("Elon")->setImgHeight(428);
@@ -389,7 +381,7 @@ private:
 		this->Field.object("Elon")->setPosY(450);
 		this->Field.object("Elon")->setType("Static");
 
-		this->Field.registerObject("Health_Bar");
+		this->Field.registerObject("Health_Bar", "Blank");
 		this->Field.object("Health_Bar")->addStat("Value", 100);
 		this->Field.object("Health_Bar")->setSpriteTexture("assets\\red.jpg");
 		this->Field.object("Health_Bar")->setSpriteSize(0.01);
@@ -399,6 +391,28 @@ private:
 		this->Field.object("Health_Bar")->setType("Static");
 
 	}
+	double ObjectDis(Object* A, Object* B) {
+		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
+	}
+	const bool ObjIsOnSight(Object* charactor, Object* B, double range) {
+		if (abs(charactor->PosX() - B->PosX()) < range || abs(charactor->PosY() - B->PosY()) < range) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+public:
+	Map Field;
+	gameEngine() {
+		this->initVar();
+		this->initWindow();
+		this->initObject();
+		
+	}
+	virtual ~gameEngine() { 
+		delete this->window;
+	}
 	void Swap(unsigned __int64 ID1, unsigned __int64 ID2) {
 		Object* ptr1 = this->Field.objectAt(ID1);
 		Object* ptr2 = this->Field.objectAt(ID2);
@@ -406,15 +420,6 @@ private:
 		this->Field.insertQuene(ID1, ptr2);
 		this->Field.removeObjAt(ID2);
 		this->Field.insertQuene(ID2, ptr1);
-	}
-public:
-	gameEngine() {
-		this->initVar();
-		this->initWindow();
-		this->initObject();
-	}
-	virtual ~gameEngine() {
-		delete this->window;
 	}
 	const bool isRuning() {
 		return this->window->isOpen();
@@ -442,6 +447,7 @@ public:
 		while (this->window->pollEvent(this->ev)) {
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
 				this->window->close();
+				running = false;
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
 				W = true;
@@ -495,16 +501,17 @@ public:
 		else {
 			Idle();
 		}
+		printf("%.0llf | %.0llf, %.0llf | %.0llf, %.0llf |  \n", ObjectDis(this->Field.object("Elon"), this->Field.object("0")), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
+		for (int i = 2; i < this->Field.entityNumber() - 2; i++) {
+			if (ObjIsOnSight(this->Field.object("Elon"), this->Field.objectAt(i), 500) && this->Field.objectAt(i)->PosY() + (this->Field.objectAt(i)->getImgHeight() * this->Field.objectAt(i)->getSize()) > this->Field.objectAt(i + 1)->PosY() + (this->Field.objectAt(i + 1)->getImgHeight() * this->Field.objectAt(i + 1)->getSize())) {
+				printf("++++++++++++++++++++++++++++++++++ Swap 1 %d %d\n", i, i + 1);
+				this->Swap(i, i + 1);
+			}
+		}
 		for (int i = 0; i < Field.entityNumber(); i++) {
 			if (this->Field.objectAt(i)->type() == "Dynamic") {
 				this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
 				this->Field.objectAt(i)->setPosY(this->Field.object("Anchor")->PosY());
-			}
-		}
-		for (int i = 2; i < this->Field.entityNumber()-2; i++) {
-			if (this->Field.objectAt(i)->PosY() + (this->Field.objectAt(i)->getImgHeight() * this->Field.objectAt(i)->getSize()) > this->Field.objectAt(i + 1)->PosY() + (this->Field.objectAt(i + 1)->getImgHeight()* this->Field.objectAt(i + 1)->getSize())) {
-				printf("++++++++++++++++++++++++++++++++++ Swap 1 %d %d\n", i, i + 1);
-				this->Swap(i, i + 1);
 			}
 		}
 		/*
@@ -519,14 +526,16 @@ public:
 		2. render object
 		3. draw
 		*/
-		for (int i = 0; i < Field.entityNumber(); i++) {
-			cout << i << '\t';
-			cout << this->Field.objectAt(i)->nowIs() << '\n';
-		}
-		cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
+		//for (int i = 0; i < Field.entityNumber(); i++) {
+			//cout << i << '\t';
+			//cout << this->Field.objectAt(i)->nowIs() << '\n';
+		//}
+		//cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
 		for (int i = 0; i < Field.entityNumber(); i++) {
 			//printf("%d; %f, %f\n", i, this->Field.objectAt(i)->PosX(), this->Field.objectAt(i)->PosY());
-			this->window->draw(this->Field.objectAt(i)->getSprite());
+			if (ObjectDis(this->Field.object("Elon"), this->Field.objectAt(i)) < 1000 || i == 0 || i == 1) {
+				this->window->draw(this->Field.objectAt(i)->getSprite());
+			}
 		}
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
 
@@ -534,11 +543,13 @@ public:
 	}
 };
 
+gameEngine First_step;
+
 int main() { // Game loop
-	gameEngine First_step;
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
 	}
+	return 0;
 }
 
