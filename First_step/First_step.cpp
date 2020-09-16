@@ -292,9 +292,9 @@ public:
 		this->Tuple.append(In);
 	}
 	void remove(string keyIn) {
-		Object* ptr = this->Tuple.var(0);
+		vector<Object*> ptr = this->Tuple.Tuple;
 		for (int i = 0; i < this->Tuple.length(); i++) {
-			if ((ptr + i)->nowIs() == keyIn) {
+			if ((ptr[i])->nowIs() == keyIn) {
 				this->Tuple.popOut(i);
 			}
 		}
@@ -361,7 +361,7 @@ private:
 		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 20; i++) {
 			this->Field.registerObject(to_string(i), "Structure");
 			this->Field.object(to_string(i))->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
 			this->Field.object(to_string(i))->setSpriteSize(0.6);
@@ -504,7 +504,7 @@ public:
 		printf("%.0llf | %.0llf, %.0llf | %.0llf, %.0llf |  \n", ObjectDis(this->Field.object("Elon"), this->Field.object("0")), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
 		for (int i = 2; i < this->Field.entityNumber() - 2; i++) {
 			if (ObjIsOnSight(this->Field.object("Elon"), this->Field.objectAt(i), 500) && this->Field.objectAt(i)->PosY() + (this->Field.objectAt(i)->getImgHeight() * this->Field.objectAt(i)->getSize()) > this->Field.objectAt(i + 1)->PosY() + (this->Field.objectAt(i + 1)->getImgHeight() * this->Field.objectAt(i + 1)->getSize())) {
-				printf("++++++++++++++++++++++++++++++++++ Swap 1 %d %d\n", i, i + 1);
+				//printf("++++++++++++++++++++++++++++++++++ Swap 1 %d %d\n", i, i + 1);
 				this->Swap(i, i + 1);
 			}
 		}
