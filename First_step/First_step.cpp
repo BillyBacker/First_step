@@ -361,16 +361,12 @@ private:
 		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int j = 0; j < 5; j++) {
-			for (int i = 0; i < 10; i++) {
-				this->Field.registerObject(to_string(i) + to_string(j), "Structure");
-				this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
-				this->Field.object(to_string(i) + to_string(j))->setSpriteSize(0.6);
-				this->Field.object(to_string(i) + to_string(j))->setImgHeight(428);
-				this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(10+i*2);
-				this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(10+j*2);
-			}
-		}
+		this->Field.registerObject("pebble", "Structure");
+		this->Field.object("pebble")->setSpriteTexture("assets\\pebble.png");
+		this->Field.object("pebble")->setSpriteSize(0.6);
+		this->Field.object("pebble")->setImgHeight(428);
+		this->Field.object("pebble")->setOffsetPosX(10);
+		this->Field.object("pebble")->setOffsetPosY(10);
 
 		this->Field.registerObject("Elon", "Blank");
 		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
@@ -379,18 +375,9 @@ private:
 		this->Field.object("Elon")->addStat("Health", 100);
 		this->Field.object("Elon")->addStat("Hunger", 100);
 		this->Field.object("Elon")->addStat("Air", 100);
-		this->Field.object("Elon")->setPosX(750);
-		this->Field.object("Elon")->setPosY(450);
+		this->Field.object("Elon")->setPosX(700);
+		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
-
-		this->Field.registerObject("Health_Bar", "Blank");
-		this->Field.object("Health_Bar")->addStat("Value", 100);
-		this->Field.object("Health_Bar")->setSpriteTexture("assets\\red.jpg");
-		this->Field.object("Health_Bar")->setSpriteSize(0.01);
-		this->Field.object("Health_Bar")->setPosX(this->Field.object("Elon")->PosX());
-		this->Field.object("Health_Bar")->setPosY(this->Field.object("Elon")->PosY());
-		this->Field.object("Health_Bar")->getSprite().scale(100, 1);
-		this->Field.object("Health_Bar")->setType("Static");
 
 	}
 	double ObjectDis(Object* A, Object* B) {
@@ -536,6 +523,10 @@ public:
 				cout << this->DrawField[i]->nowIs() << '\t';
 				cout << this->DrawField[i + 1]->nowIs() << '\n';
 				iter_swap(DrawField.begin() + i, DrawField.begin() + i + 1);
+				for (int j = 0; j < this->DrawField.size(); j++) {
+					printf("%d ", j);
+					cout << this->DrawField[j]->nowIs() << '\n';
+				}
 			}
 		}
 		for (int i = 0; i < Field.entityNumber(); i++) {
