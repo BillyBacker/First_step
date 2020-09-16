@@ -361,13 +361,15 @@ private:
 		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int i = 0; i < 20; i++) {
-			this->Field.registerObject(to_string(i), "Structure");
-			this->Field.object(to_string(i))->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
-			this->Field.object(to_string(i))->setSpriteSize(0.6);
-			this->Field.object(to_string(i))->setImgHeight(428);
-			this->Field.object(to_string(i))->setOffsetPosX(10+i);
-			this->Field.object(to_string(i))->setOffsetPosY(10);
+		for (int j = 0; j < 5; j++) {
+			for (int i = 0; i < 10; i++) {
+				this->Field.registerObject(to_string(i) + to_string(j), "Structure");
+				this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
+				this->Field.object(to_string(i) + to_string(j))->setSpriteSize(0.6);
+				this->Field.object(to_string(i) + to_string(j))->setImgHeight(428);
+				this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(10+i*2);
+				this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(10+j*2);
+			}
 		}
 
 		this->Field.registerObject("Elon", "Blank");
@@ -395,7 +397,7 @@ private:
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
 	}
 	const bool ObjIsOnSight(Object* charactor, Object* B, double range) {
-		if (abs(charactor->PosX() - B->PosX()) < range || abs(charactor->PosY() - B->PosY()) < range) {
+		if (sqrt(pow(charactor->PosX()-B->PosX(),2)+pow(charactor->PosY() - B->PosY(),2)) < range) {
 			return true;
 		}
 		else {
@@ -404,6 +406,8 @@ private:
 	}
 public:
 	Map Field;
+	vector<Object*> DrawField;
+	bool pass = true;
 	gameEngine() {
 		this->initVar();
 		this->initWindow();
@@ -448,6 +452,12 @@ public:
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
 				this->window->close();
 				running = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Q && pass) {
+				pass = false;
+				for (int i = 1; i < 40; i++) {
+					this->Field.remove(to_string(i));
+				}
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
 				W = true;
@@ -501,11 +511,31 @@ public:
 		else {
 			Idle();
 		}
-		printf("%.0llf | %.0llf, %.0llf | %.0llf, %.0llf |  \n", ObjectDis(this->Field.object("Elon"), this->Field.object("0")), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
-		for (int i = 2; i < this->Field.entityNumber() - 2; i++) {
-			if (ObjIsOnSight(this->Field.object("Elon"), this->Field.objectAt(i), 500) && this->Field.objectAt(i)->PosY() + (this->Field.objectAt(i)->getImgHeight() * this->Field.objectAt(i)->getSize()) > this->Field.objectAt(i + 1)->PosY() + (this->Field.objectAt(i + 1)->getImgHeight() * this->Field.objectAt(i + 1)->getSize())) {
-				//printf("++++++++++++++++++++++++++++++++++ Swap 1 %d %d\n", i, i + 1);
-				this->Swap(i, i + 1);
+		for (int i = 0; i < this->Field.entityNumber(); i++) {
+			if (!(std::find(DrawField.begin(), DrawField.end(), this->Field.objectAt(i)) != DrawField.end()) && (ObjIsOnSight(this->Field.object("Elon"), this->Field.objectAt(i), 1000) || this->Field.objectAt(i)->nowIs() == "Anchor" || this->Field.objectAt(i)->nowIs() == "BG" || this->Field.objectAt(i)->nowIs() == "Elon")) {
+				printf("Added ");
+				cout << this->Field.objectAt(i)->nowIs() << '\n';
+				this->DrawField.push_back(this->Field.objectAt(i));
+			}
+			if (this->Field.objectAt(i)->type() == "Dynamic") {
+				this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
+				this->Field.objectAt(i)->setPosY(this->Field.object("Anchor")->PosY());
+			}
+		}
+		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
+		for (int i = 0; i < this->DrawField.size()-1; i++) {
+			if (!(ObjIsOnSight(this->Field.object("Elon"), this->DrawField[i], 1000) || this->DrawField[i]->nowIs() == "Anchor" || this->DrawField[i]->nowIs() == "BG" || this->DrawField[i]->nowIs() == "Elon")) {
+				printf("removed ");
+				cout << this->DrawField[i]->nowIs() << '\n';
+				this->DrawField.erase(this->DrawField.begin() + i);
+			}
+		}
+		for (int i = 0; i < this->DrawField.size()-1; i++) {
+			if ((this->DrawField[i]->PosY() + (this->DrawField[i]->getImgHeight() * this->DrawField[i]->getSize()) > this->DrawField[i + 1]->PosY() + (this->DrawField[i + 1]->getImgHeight() * this->DrawField[i + 1]->getSize()))) {
+				printf("++++++++++++++++++++++++++++++++++ Swap		");
+				cout << this->DrawField[i]->nowIs() << '\t';
+				cout << this->DrawField[i + 1]->nowIs() << '\n';
+				iter_swap(DrawField.begin() + i, DrawField.begin() + i + 1);
 			}
 		}
 		for (int i = 0; i < Field.entityNumber(); i++) {
@@ -531,11 +561,9 @@ public:
 			//cout << this->Field.objectAt(i)->nowIs() << '\n';
 		//}
 		//cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
-		for (int i = 0; i < Field.entityNumber(); i++) {
+		for (int i = 0; i < DrawField.size(); i++) {
 			//printf("%d; %f, %f\n", i, this->Field.objectAt(i)->PosX(), this->Field.objectAt(i)->PosY());
-			if (ObjectDis(this->Field.object("Elon"), this->Field.objectAt(i)) < 1000 || i == 0 || i == 1) {
-				this->window->draw(this->Field.objectAt(i)->getSprite());
-			}
+				this->window->draw(this->DrawField[i]->getSprite());
 		}
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
 
