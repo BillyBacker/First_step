@@ -10,10 +10,28 @@
 #include <algorithm>
 #include <typeinfo>
 #include<windows.h>
+#include<ctime>
+#include<fstream>
 
 using namespace sf;
 using namespace std;
 
+struct stopWatch {
+	unsigned __int64 timeRecord;
+
+	void Start() {
+		timeRecord = clock();
+	}
+	unsigned __int64 Round() {
+		unsigned __int64 result = clock() - timeRecord;
+		return result;
+	}
+	unsigned __int64 Stop() {
+		unsigned __int64 result = clock() - timeRecord;
+		timeRecord = 0;
+		return result;
+	}
+};
 class strTuple { // string tuple for store array of string.
 public:
 		vector<string> Tuple;
@@ -252,7 +270,6 @@ public:
 		this->Tuple.insert(Tuple.begin() + pos, In);
 	}
 };
-
 class Map {
 public:
 	objPtrTuple Tuple;
