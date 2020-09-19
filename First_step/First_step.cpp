@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <typeinfo>
 #include<windows.h>
+#include<random>
 
 using namespace sf;
 using namespace std;
@@ -80,36 +81,26 @@ public:
 	}
 };
 
-class mapTuple { // string tuple for store array of string.
+class strDic { // string tuple for store array of string.
 public:
-	vector<Map> Tuple;
-	Map var(unsigned __int64 i) {
-		return this->Tuple[i];
+	strTuple Key;
+	strTuple Tuple;
+	string get(string keyIn) {
+		return this->Tuple.var(Key.index(keyIn));
 	}
-	void set(unsigned __int64 Index, Map In) {
-		this->Tuple.at(Index) = In;
+	void set(string keyIn, string In) {
+		this->Tuple.set(Key.index(keyIn), In);
 	}
-	void append(Map In) {
-		this->Tuple.push_back(In);
+	void append(string keyIn, string In) {
+		this->Key.append(keyIn);
+		this->Tuple.append(In);
 	}
-	void remove(float In) {
-		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
-	}
-	void popOut(unsigned __int64 index) {
-		this->Tuple.erase(Tuple.begin() + index);
+	void remove(string keyIn) {
+		this->Tuple.popOut(Key.index(keyIn));
+		this->Key.popOut(Key.index(keyIn));
 	}
 	unsigned __int64 length() {
-		return this->Tuple.size();
-	}
-	unsigned __int64 index(float In) {
-		auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
-		if (pos != this->Tuple.end()) {
-			unsigned __int64 index = distance(this->Tuple.begin(), pos);
-			return index;
-		}
-		else {
-			return -1;
-		}
+		return this->Tuple.length();
 	}
 };
 
@@ -138,48 +129,470 @@ public:
 
 class Object {
 private:
+	string Type;
+	unsigned __int64 ID;
+	string Name;
 	fltDic Stat;
-	vector<float> Pos;
-
+	float posX = 0;
+	float posY = 0;
+	float offsetPosX = 0;
+	float offsetPosY = 0;
+	Sprite sprite;
+	Texture texture;
+	float Size;
+	int imgHeight;
 public:
+	Object(unsigned __int64 ID) {
+		this->ID = ID;
+	}
+	int getImgHeight() {
+		return imgHeight;
+	}
+	void setImgHeight(int Height) {
+		this->imgHeight = Height;
+	}
+	string type() {
+		return Type;
+	}
+	void setType(string In) {
+		this->Type = In;
+	}
+	unsigned __int64 getID() {
+		return this->ID;
+	}
+	void setSpriteTexture(string Path) {
+		if (!this->texture.loadFromFile(Path)) {
+			printf("Error");
+		}
+		this->sprite.setTexture(this->texture);
+	}
+	void setSpriteSize(float scale) {
+		this->sprite.setScale(scale, scale);
+		this->Size = scale;
+	}
+	float getSize() {
+		return this->Size;
+	}
 	void addStat(string KeyIn, float val) {
 		Stat.append(KeyIn, val);
 	}
 	float getStat(string KeyIn) {
 		return Stat.get(KeyIn);
 	}
-
+	void setOffsetPosX(float offx) {
+		this->offsetPosX = offx * 100;
+	}
+	void setOffsetPosY(float offy) {
+		this->offsetPosY = offy * 100;
+	}
+	void setPosX(float x) {
+		this->posX = x;
+		this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + this->offsetPosY);
+	}
+	void setPosY(float y) {
+		this->posY = y;
+		this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + this->offsetPosY);
+	}
+	void moveX(float amount) {
+		this->sprite.setPosition(this->posX + amount + this->offsetPosX, this->posY + this->offsetPosY);
+		this->posX += amount;
+	}
+	void moveY(float amount) {
+		this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + amount + this->offsetPosY);
+		this->posY += amount;
+	}
+	float PosX() {
+		return this->posX + this->offsetPosX;
+	}
+	float PosY() {
+		return this->posY + this->offsetPosY;
+	}
+	void Is(string name) {
+		this->Name = name;
+	}
+	string nowIs() {
+		return this->Name;
+	}
+	Sprite getSprite() {
+		return this->sprite;
+	}
 };
 
-struct Map {
-	vector<Object*> object;
-	vector<Object*> objectOnscreen;
-	void createNewObject() {
-		Object* ptr = new Object();
-		object.push_back(ptr);
-	}
-	unsigned long long entitiesNumber() {
-		return object.size();
-	}
-};
-
-class dataBase {
-private:
-	vector<Map*> Field;
-	unsigned long long currentFieldIndex;
+class objPtrTuple {
 public:
-	void updator(Object* obj) {
-
+	vector<Object*> Tuple;
+	Object* var(unsigned __int64 i) {
+		return this->Tuple[i];
 	}
-	void loadMap(int Index) {
-		currentFieldIndex = Index;
-		for (int entitiesNumber = 0; entitiesNumber < (*Field[currentFieldIndex]).entitiesNumber(); entitiesNumber++) {
-
+	void set(unsigned __int64 Index, Object* In) {
+		this->Tuple.at(Index) = In;
+	}
+	void append(Object* In) {
+		this->Tuple.push_back(In);
+	}
+	void remove(Object* In) {
+		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
+	}
+	void popOut(unsigned __int64 index) {
+		this->Tuple.erase(Tuple.begin() + index);
+	}
+	unsigned __int64 length() {
+		return this->Tuple.size();
+	}
+	unsigned __int64 index(Object* In) {
+		auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
+		if (pos != this->Tuple.end()) {
+			unsigned __int64 index = distance(this->Tuple.begin(), pos);
+			return index;
+		}
+		else {
+			return -1;
 		}
 	}
+	void insert(unsigned __int64 pos, Object* In) {
+		this->Tuple.insert(Tuple.begin() + pos, In);
+	}
 };
 
+class Map {
+public:
+	objPtrTuple Tuple;
+	objPtrTuple Templ;
+	unsigned __int64 getIndex(string name) {
+		return this->Tuple.index(this->object(name));
+	}
+	void createTemplate(string name) {
+		Object* p = new Object(this->Templ.length());
+		p->Is(name);
+		this->Templ.append(p);
+	}
+	void registerObject(string Name, string Template) {
+		Object* p = new Object(this->Tuple.length());
+		*p = *this->Template(Template);
+		p->Is(Name);
+		this->Tuple.append(p);
+	}
+	Object* object(string keyIn) {
+		for (int i = 0; i < this->Tuple.length(); i++) {
+			if (Tuple.var(i)->nowIs() == keyIn) {
+				return Tuple.var(i);
+			}
+		}
+	}
+	Object* Template(string keyIn) {
+		for (int i = 0; i < this->Templ.length(); i++) {
+			if (Templ.var(i)->nowIs() == keyIn) {
+				return Templ.var(i);
+			}
+		}
+	}
+	Object* objectAt(unsigned __int64 Index) {
+		return this->Tuple.var(Index);
+	}
+	void append(Object* In) {
+		this->Tuple.append(In);
+	}
+	void remove(string keyIn) {
+		vector<Object*> ptr = this->Tuple.Tuple;
+		for (int i = 0; i < this->Tuple.length(); i++) {
+			if ((ptr[i])->nowIs() == keyIn) {
+				this->Tuple.popOut(i);
+			}
+		}
+	}
+	void removeObjAt(unsigned __int64 Index) {
+		this->Tuple.popOut(Index);
+	}
+	void insertQuene(unsigned __int64 Index, Object* In) {
+		this->Tuple.insert(Index, In);
+	}
+	unsigned __int64 entityNumber() {
+		return this->Tuple.length();
+	}
+	string objectTypeAt(unsigned __int64 Index) {
+		return this->Tuple.var(Index)->nowIs();
+	}
+	vector<Object*> getTuple() {
+		return this->Tuple.Tuple;
+	}
+
+};
+
+class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
+private:
+	//Add a variable down here.
+	int move_speed = 5;
+	int h = 900;
+	int w = 1600;
+	bool W = false;
+	bool A = false;
+	bool S = false;
+	bool D = false;
+	bool running = true;
+	RenderWindow* window;
+	Event ev;
+	VideoMode mode;
+	Map Mars;
+	int i = 0;
+	void initVar() {
+		this->window = nullptr;
+	}
+	void initWindow() {
+		this->mode.height = h;
+		this->mode.width = w;
+		this->window = new RenderWindow(this->mode, "First Step", Style::Titlebar | Style::Close);
+		this->window->setFramerateLimit(240);
+	}
+	void initObject() {
+		this->Field.createTemplate("Blank");
+
+		this->Field.createTemplate("BG_Element");
+		this->Field.Template("BG_Element")->setType("Dynamic");
+		this->Field.Template("BG_Element")->setPosX(0);
+		this->Field.Template("BG_Element")->setPosY(0);
+
+		this->Field.registerObject("Anchor", "BG_Element");
+
+		this->Field.createTemplate("Structure");
+		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.Template("Structure")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.Template("Structure")->setType("Dynamic");
+
+		this->Field.registerObject("BG", "BG_Element");
+		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
+		this->Field.object("BG")->setSpriteSize(10);
+
+		for (int j = 0; j < 50; j++) {
+			float size = rand() % 10;
+			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
+			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\pebble.png");
+			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(size/10);
+			this->Field.object(to_string(i) + to_string(j))->setImgHeight(428);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand()%100);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 100);
+		}
+		for (int j = 51; j < 100; j++) {
+			float size = rand() % 10;
+			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
+			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\pebble0.png");
+			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(size / 10);
+			this->Field.object(to_string(i) + to_string(j))->setImgHeight(615);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 100);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 100);
+		}
+
+		this->Field.registerObject("Elon", "Blank");
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
+		this->Field.object("Elon")->setSpriteSize(0.3);
+		this->Field.object("Elon")->setImgHeight(428);
+		this->Field.object("Elon")->addStat("Health", 100);
+		this->Field.object("Elon")->addStat("Hunger", 100);
+		this->Field.object("Elon")->addStat("Air", 100);
+		this->Field.object("Elon")->setPosX(700);
+		this->Field.object("Elon")->setPosY(400);
+		this->Field.object("Elon")->setType("Static");
+
+	}
+	double ObjectDis(Object* A, Object* B) {
+		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
+	}
+public:
+	Map Field;
+	vector<Object*> DrawField;
+	bool pass = true;
+	gameEngine() {
+		this->initVar();
+		this->initWindow();
+		this->initObject();
+
+	}
+	virtual ~gameEngine() {
+		delete this->window;
+	}
+	const bool ObjIsOnSight(Object* charactor, Object* B, double range) {
+		if (abs(charactor->PosX() - B->PosX()) < range && abs(charactor->PosY() - B->PosY()) < range) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	void Swap(unsigned __int64 ID1, unsigned __int64 ID2) {
+		Object* ptr1 = this->Field.objectAt(ID1);
+		Object* ptr2 = this->Field.objectAt(ID2);
+		this->Field.removeObjAt(ID1);
+		this->Field.insertQuene(ID1, ptr2);
+		this->Field.removeObjAt(ID2);
+		this->Field.insertQuene(ID2, ptr1);
+	}
+	const bool isRuning() {
+		return this->window->isOpen();
+	}
+	void W_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
+		this->Field.object("Anchor")->moveY(1 * this->move_speed);
+	}
+	void A_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5reverse.png");
+		this->Field.object("Anchor")->moveX(1 * this->move_speed);
+	}
+	void S_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
+		this->Field.object("Anchor")->moveY(-1 * this->move_speed);
+	}
+	void D_key() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
+		this->Field.object("Anchor")->moveX(-1 * this->move_speed);
+	}
+	void Idle() {
+		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
+	}
+	void pollEvents() {
+		while (this->window->pollEvent(this->ev)) {
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
+				this->window->close();
+				running = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Q && pass) {
+				pass = false;
+				for (int i = 1; i < 40; i++) {
+					this->Field.remove(to_string(i));
+				}
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
+				W = true;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::W) {
+				W = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::A) {
+				A = true;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::A) {
+				A = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::S) {
+				S = true;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::S) {
+				S = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::D) {
+				D = true;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
+				D = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
+				this->move_speed = 6 * 1.5;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
+				this->move_speed = 6;
+			}
+		}
+
+	}
+	void update() {
+		this->pollEvents();
+		if (W || A || S || D) {
+			if (S) {
+				S_key();
+			}
+			if (W) {
+				W_key();
+			}
+			if (D) {
+				D_key();
+			}
+			if (A) {
+				A_key();
+			}
+		}
+		else {
+			Idle();
+		}
+		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
+		for (int i = 0; i < Field.entityNumber(); i++) {
+				if (this->Field.objectAt(i)->type() == "Dynamic" && i < Field.entityNumber()) {
+					this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
+					this->Field.objectAt(i)->setPosY(this->Field.object("Anchor")->PosY());
+				}
+		}
+		/*
+		This part is for update game event.
+		*/
+	}
+	void render() {
+		this->window->clear();
+		/*
+		This part is for drawing graphic.
+		1. clear old frame
+		2. render object
+		3. draw
+		*/
+		//for (int i = 0; i < Field.entityNumber(); i++) {
+			//cout << i << '\t';
+			//cout << this->Field.objectAt(i)->nowIs() << '\n';
+		//}
+		//cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
+		for (int i = 0; i < DrawField.size(); i++) {
+			//printf("%d; %f, %f\n", i, this->Field.objectAt(i)->PosX(), this->Field.objectAt(i)->PosY());
+			this->window->draw(this->DrawField[i]->getSprite());
+		}
+		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
+
+		this->window->display();
+	}
+	void sort() {
+
+	}
+};
+
+gameEngine First_step;
+
+void SortObj() {
+	while (First_step.isRuning()) {
+		while (First_step.DrawField.size() == 0) {
+			Sleep(1);
+		}
+		for (int i = 0; i < First_step.DrawField.size() - 1; i++) {
+			if ( i < First_step.DrawField.size() - 1 && (First_step.DrawField[i]->PosY() + (First_step.DrawField[i]->getImgHeight() * First_step.DrawField[i]->getSize()) > First_step.DrawField[i + 1]->PosY() + (First_step.DrawField[i + 1]->getImgHeight() * First_step.DrawField[i + 1]->getSize()))) {
+				iter_swap(&First_step.DrawField[i], &First_step.DrawField[i + 1]);
+			}
+		}
+	}
+}
+
+void CheckInsight() {
+	while (First_step.isRuning()) {
+		while (First_step.Field.entityNumber() == 0) {
+			Sleep(1);
+		}
+		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
+			if (!(std::find(First_step.DrawField.begin(), First_step.DrawField.end(), First_step.Field.objectAt(i)) != First_step.DrawField.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1500) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
+				First_step.DrawField.push_back(First_step.Field.objectAt(i));
+			}
+		}
+		for (int i = 0; i < First_step.DrawField.size(); i++) {
+			if (!(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField[i], 1500) || First_step.DrawField[i]->nowIs() == "Anchor" || First_step.DrawField[i]->nowIs() == "BG" || First_step.DrawField[i]->nowIs() == "Elon")) {
+				First_step.DrawField.erase(First_step.DrawField.begin() + i);
+			}
+		}
+		for (int i = 0; i < First_step.DrawField.size() - 1; i++) {
+			if (i < First_step.DrawField.size() - 1 && (First_step.DrawField[i]->PosY() + (First_step.DrawField[i]->getImgHeight() * First_step.DrawField[i]->getSize()) > First_step.DrawField[i + 1]->PosY() + (First_step.DrawField[i + 1]->getImgHeight() * First_step.DrawField[i + 1]->getSize()))) {
+				iter_swap(&First_step.DrawField[i], &First_step.DrawField[i + 1]);
+			}
+		}
+	}
+}
+
 int main() { // Game loop
-	
+	Thread CheckInsight_Thread1(&CheckInsight);
+	CheckInsight_Thread1.launch();
+	//CheckInsight_Thread2.launch();
+	while (First_step.isRuning()) {
+		First_step.update();
+		First_step.render();
+	}
 	return 0;
 }
