@@ -141,7 +141,13 @@ private:
 	Texture texture;
 	float Size;
 	int imgHeight;
+	int imgWidth;
+
+	int time = 0, Index = 0;
+	vector<Texture*> textureArray;
+	vector<int> duration;
 public:
+	bool loop = false;
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
 	}
@@ -151,6 +157,9 @@ public:
 	void setImgHeight(int Height) {
 		this->imgHeight = Height;
 	}
+	void setImgWidth(int Width) {
+		this->imgWidth = Width;
+	}
 	string type() {
 		return Type;
 	}
@@ -159,6 +168,15 @@ public:
 	}
 	unsigned __int64 getID() {
 		return this->ID;
+	}
+	void addTexture(string Path, int durt) {
+		Texture* ptr = new Texture;
+		if (!(*ptr).loadFromFile(Path)) {
+			printf("Error");
+		}
+		this->textureArray.push_back(ptr);
+		this->duration.push_back(durt);
+		
 	}
 	void setSpriteTexture(string Path) {
 		if (!this->texture.loadFromFile(Path)) {
@@ -215,6 +233,24 @@ public:
 	}
 	Sprite getSprite() {
 		return this->sprite;
+	}
+	void UpdateAnimation(int speed) {
+		this->time+=speed;
+		if (this->loop && this->Index >= this->textureArray.size()) {
+			this->Index = 0;
+		}
+		if (this->Index < this->textureArray.size() && this->time >= duration[this->Index]) {
+			this->sprite.setTexture(*(this->textureArray[Index]));
+			this->Index++;
+			this->time = 0;
+		}
+	}
+	void resetTimeSeq() {
+		this->time == 0;
+	}
+	void flipTexture(int rev) {
+		this->sprite.setScale(rev*this->Size, this->Size);
+		this->setPosX(700 - this->imgWidth*this->Size*rev/2);
 	}
 };
 
@@ -321,7 +357,7 @@ public:
 class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
 private:
 	//Add a variable down here.
-	int move_speed = 5;
+	int move_speed = 1;
 	int h = 900;
 	int w = 1600;
 	bool W = false;
@@ -362,33 +398,42 @@ private:
 		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int j = 0; j < 50; j++) {
+		for (int j = 0; j < 5; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
 			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\pebble.png");
 			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(size/10);
 			this->Field.object(to_string(i) + to_string(j))->setImgHeight(428);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand()%100);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 100);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand()%10);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 10);
 		}
-		for (int j = 51; j < 100; j++) {
+		for (int j = 6; j < 10; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
 			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\pebble0.png");
 			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(size / 10);
 			this->Field.object(to_string(i) + to_string(j))->setImgHeight(615);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 100);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 100);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 10);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 10);
 		}
 
 		this->Field.registerObject("Elon", "Blank");
-		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0001_idle_2.png");
-		this->Field.object("Elon")->setSpriteSize(0.3);
-		this->Field.object("Elon")->setImgHeight(428);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 20);
+		this->Field.object("Elon")->loop = true;
+		this->Field.object("Elon")->setSpriteSize(0.1);
+		this->Field.object("Elon")->setImgHeight(1500);
+		this->Field.object("Elon")->setImgWidth(1000);
 		this->Field.object("Elon")->addStat("Health", 100);
 		this->Field.object("Elon")->addStat("Hunger", 100);
 		this->Field.object("Elon")->addStat("Air", 100);
-		this->Field.object("Elon")->setPosX(700);
+		this->Field.object("Elon")->setPosX(700 - 1000 * 0.1 * 1 / 2);
 		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
 
@@ -429,23 +474,21 @@ public:
 		return this->window->isOpen();
 	}
 	void W_key() {
-		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
 		this->Field.object("Anchor")->moveY(1 * this->move_speed);
 	}
 	void A_key() {
-		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5reverse.png");
 		this->Field.object("Anchor")->moveX(1 * this->move_speed);
+		this->Field.object("Elon")->flipTexture(-1);
 	}
 	void S_key() {
-		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
 		this->Field.object("Anchor")->moveY(-1 * this->move_speed);
 	}
 	void D_key() {
-		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0016_run_5.png");
 		this->Field.object("Anchor")->moveX(-1 * this->move_speed);
+		this->Field.object("Elon")->flipTexture(1);
 	}
 	void Idle() {
-		this->Field.object("Elon")->setSpriteTexture("assets\\alien\\PNG\\alien_armor\\armor__0000_idle_1.png");
+		this->Field.object("Elon")->setSpriteTexture("assets\\Elon\\Elon_Idle.png");
 	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
@@ -484,32 +527,55 @@ public:
 				D = false;
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
-				this->move_speed = 6 * 1.5;
+				this->move_speed = 1 * 2;
+
 			}
 			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
-				this->move_speed = 6;
+				this->move_speed = 1;
+
 			}
 		}
 
 	}
 	void update() {
+		int updated = false;
 		this->pollEvents();
 		if (W || A || S || D) {
+			if (this->move_speed == 1 * 2) {
+				this->Field.object("Elon")->UpdateAnimation(2);
+			}
 			if (S) {
 				S_key();
+				if (!updated) {
+					updated = true;
+					this->Field.object("Elon")->UpdateAnimation(1);
+				}
 			}
 			if (W) {
 				W_key();
+				if (!updated) {
+					updated = true;
+					this->Field.object("Elon")->UpdateAnimation(1);
+				}
 			}
 			if (D) {
 				D_key();
+				if (!updated) {
+					updated = true;
+					this->Field.object("Elon")->UpdateAnimation(1);
+				}
 			}
 			if (A) {
 				A_key();
+				if (!updated) {
+					updated = true;
+					this->Field.object("Elon")->UpdateAnimation(1);
+				}
 			}
 		}
 		else {
 			Idle();
+			this->Field.object("Elon")->resetTimeSeq();
 		}
 		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
 		for (int i = 0; i < Field.entityNumber(); i++) {
