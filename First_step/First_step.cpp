@@ -382,6 +382,18 @@ private:
 	void initObject() {
 		this->Field.createTemplate("Blank");
 
+		this->Field.createTemplate("Item");
+		this->Field.Template("Item")->setType("Static");
+
+		this->Field.createTemplate("Rocky");
+		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", 0, 1000);
+		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
+		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", 2, 1000);
+		this->Field.Template("Rocky")->setSpriteTexture(0, 0);
+		this->Field.Template("Rocky")->setSpriteSize(0.1);
+		this->Field.Template("Rocky")->setImgHeight(900);
+		this->Field.Template("Rocky")->setType("Dynamic");
+
 		this->Field.createTemplate("BG_Element");
 		this->Field.Template("BG_Element")->setType("Dynamic");
 		this->Field.Template("BG_Element")->setPosX(0);
@@ -399,13 +411,10 @@ private:
 		this->Field.object("BG")->setSpriteTexture(0, 0);
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int j = 0; j < 50; j++) {
+		for (int j = 0; j < 200; j++) {
 			float size = rand() % 10;
-			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
-			this->Field.object(to_string(i) + to_string(j))->addTexture("assets\\Prop\\Rock\\Rock"+to_string((rand()%3)+1)+".png", 0, 1000);
-			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture(0, 0);
-			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(0.1);
-			this->Field.object(to_string(i) + to_string(j))->setImgHeight(900);
+			this->Field.registerObject(to_string(i) + to_string(j), "Rocky");
+			this->Field.Template("Rocky")->setSpriteTexture(0, rand()%3);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 50);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 50);
 		}
@@ -439,13 +448,30 @@ private:
 		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
 
+		this->Field.registerObject("Apple", "Item");
+		this->Field.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
+		this->Field.object("Apple")->setSpriteTexture(0, 0);
+		this->Field.object("Apple")->setSpriteSize(0.05);
+		this->Field.object("Apple")->setImgHeight(1000);
+		this->Field.object("Apple")->setImgWidth(1000);
+		this->Field.object("Apple")->setPosX(700 - 1000 * 0.1 * 1 / 2);
+		this->Field.object("Apple")->setOffsetPosX(0.25);
+		this->Field.object("Apple")->setPosY(400-5);
+
+		for (int i = 0; i < this->Field.entityNumber(); i++) {
+			if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
+				this->DrawField_Static.push_back(this->Field.objectAt(i));
+			}
+		}
+
 	}
 	double ObjectDis(Object* A, Object* B) {
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
 	}
 public:
 	Map Field;
-	vector<Object*> DrawField;
+	vector<Object*> DrawField_Dynamic;
+	vector<Object*> DrawField_Static;
 	bool pass = true;
 	gameEngine() {
 		this->initVar();
@@ -603,9 +629,11 @@ public:
 			//cout << this->Field.objectAt(i)->nowIs() << '\n';
 		//}
 		//cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
-		for (int i = 0; i < DrawField.size(); i++) {
-			//printf("%d; %f, %f\n", i, this->Field.objectAt(i)->PosX(), this->Field.objectAt(i)->PosY());
-			this->window->draw(this->DrawField[i]->getSprite());
+		for (int i = 0; i < DrawField_Dynamic.size() && DrawField_Dynamic[i]; i++) {
+			this->window->draw(this->DrawField_Dynamic[i]->getSprite());
+		}
+		for (int i = 0; i < DrawField_Static.size() && DrawField_Static[i]; i++) {
+			this->window->draw(this->DrawField_Static[i]->getSprite());
 		}
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
 
@@ -620,12 +648,12 @@ gameEngine First_step;
 
 void SortObj() {
 	while (First_step.isRuning()) {
-		while (First_step.DrawField.size() == 0) {
+		while (First_step.DrawField_Dynamic.size() == 0) {
 			Sleep(1);
 		}
-		for (int i = 0; i < First_step.DrawField.size() - 1; i++) {
-			if ( i < First_step.DrawField.size() - 1 && (First_step.DrawField[i]->PosY() + (First_step.DrawField[i]->getImgHeight() * First_step.DrawField[i]->getSize()) > First_step.DrawField[i + 1]->PosY() + (First_step.DrawField[i + 1]->getImgHeight() * First_step.DrawField[i + 1]->getSize()))) {
-				iter_swap(&First_step.DrawField[i], &First_step.DrawField[i + 1]);
+		for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
+			if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSize()) > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSize()))) {
+				iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
 			}
 		}
 	}
@@ -637,18 +665,18 @@ void CheckInsight() {
 			Sleep(1);
 		}
 		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
-			if (!(std::find(First_step.DrawField.begin(), First_step.DrawField.end(), First_step.Field.objectAt(i)) != First_step.DrawField.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1500) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
-				First_step.DrawField.push_back(First_step.Field.objectAt(i));
+			if ((First_step.Field.objectAt(i)->type() != "Static" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1500) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
+				First_step.DrawField_Dynamic.push_back(First_step.Field.objectAt(i));
 			}
 		}
-		for (int i = 0; i < First_step.DrawField.size(); i++) {
-			if (!(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField[i], 1500) || First_step.DrawField[i]->nowIs() == "Anchor" || First_step.DrawField[i]->nowIs() == "BG" || First_step.DrawField[i]->nowIs() == "Elon")) {
-				First_step.DrawField.erase(First_step.DrawField.begin() + i);
+		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
+			if (!(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1500) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")) {
+				First_step.DrawField_Dynamic.erase(First_step.DrawField_Dynamic.begin() + i);
 			}
 		}
-		for (int i = 0; i < First_step.DrawField.size() - 1; i++) {
-			if (i < First_step.DrawField.size() - 1 && (First_step.DrawField[i]->PosY() + (First_step.DrawField[i]->getImgHeight() * First_step.DrawField[i]->getSize()) > First_step.DrawField[i + 1]->PosY() + (First_step.DrawField[i + 1]->getImgHeight() * First_step.DrawField[i + 1]->getSize()))) {
-				iter_swap(&First_step.DrawField[i], &First_step.DrawField[i + 1]);
+		for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
+			if (i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSize()) > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSize()))) {
+				iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
 			}
 		}
 	}
