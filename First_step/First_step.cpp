@@ -138,18 +138,21 @@ private:
 	float offsetPosX = 0;
 	float offsetPosY = 0;
 	Sprite sprite;
-	Texture texture;
 	float Size;
 	int imgHeight;
 	int imgWidth;
 
 	int time = 0, Index = 0;
-	vector<Texture*> textureArray;
-	vector<int> duration;
+	vector<Texture*> textureArray[10];
+	vector<int> duration[10];
+	int slot = 0;
 public:
 	bool loop = false;
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
+	}
+	void setAnimationSeq(int Slot) {
+		this->slot = Slot;
 	}
 	int getImgHeight() {
 		return imgHeight;
@@ -169,20 +172,17 @@ public:
 	unsigned __int64 getID() {
 		return this->ID;
 	}
-	void addTexture(string Path, int durt) {
+	void addTexture(string Path,int slot , int durt) {
 		Texture* ptr = new Texture;
 		if (!(*ptr).loadFromFile(Path)) {
 			printf("Error");
 		}
-		this->textureArray.push_back(ptr);
-		this->duration.push_back(durt);
+		this->textureArray[slot].push_back(ptr);
+		this->duration[slot].push_back(durt);
 		
 	}
-	void setSpriteTexture(string Path) {
-		if (!this->texture.loadFromFile(Path)) {
-			printf("Error");
-		}
-		this->sprite.setTexture(this->texture);
+	void setSpriteTexture(unsigned long long Index, int slot) {
+		this->sprite.setTexture(*this->textureArray[slot][Index]);
 	}
 	void setSpriteSize(float scale) {
 		this->sprite.setScale(scale, scale);
@@ -236,11 +236,11 @@ public:
 	}
 	void UpdateAnimation(int speed) {
 		this->time+=speed;
-		if (this->loop && this->Index >= this->textureArray.size()) {
+		if (this->loop && this->Index >= this->textureArray[this->slot].size()) {
 			this->Index = 0;
 		}
-		if (this->Index < this->textureArray.size() && this->time >= duration[this->Index]) {
-			this->sprite.setTexture(*(this->textureArray[Index]));
+		if (this->Index < this->textureArray[this->slot].size() && this->time >= duration[this->slot][this->Index]) {
+			this->sprite.setTexture(*(this->textureArray[this->slot][this->Index]));
 			this->Index++;
 			this->time = 0;
 		}
@@ -395,37 +395,39 @@ private:
 		this->Field.Template("Structure")->setType("Dynamic");
 
 		this->Field.registerObject("BG", "BG_Element");
-		this->Field.object("BG")->setSpriteTexture("assets\\graph.jpg");
+		this->Field.object("BG")->addTexture("assets\\graph.jpg", 0, 1000);
+		this->Field.object("BG")->setSpriteTexture(0, 0);
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int j = 0; j < 5; j++) {
+		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\pebble.png");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(size/10);
-			this->Field.object(to_string(i) + to_string(j))->setImgHeight(428);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand()%10);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 10);
-		}
-		for (int j = 6; j < 10; j++) {
-			float size = rand() % 10;
-			this->Field.registerObject(to_string(i) + to_string(j), "Structure");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("assets\\pebble0.png");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(size / 10);
-			this->Field.object(to_string(i) + to_string(j))->setImgHeight(615);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 10);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 10);
+			this->Field.object(to_string(i) + to_string(j))->addTexture("assets\\Prop\\Rock\\Rock"+to_string((rand()%3)+1)+".png", 0, 1000);
+			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture(0, 0);
+			this->Field.object(to_string(i) + to_string(j))->setSpriteSize(0.1);
+			this->Field.object(to_string(i) + to_string(j))->setImgHeight(900);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 50);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 50);
 		}
 
+		this->Field.registerObject("Pump", "Structure");
+		this->Field.object("Pump")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
+		this->Field.object("Pump")->setSpriteTexture(0, 0);
+		this->Field.object("Pump")->setSpriteSize(0.1);
+		this->Field.object("Pump")->setImgHeight(1000);
+		this->Field.object("Pump")->setOffsetPosX(10);
+		this->Field.object("Pump")->setOffsetPosY(10);
+
 		this->Field.registerObject("Elon", "Blank");
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 20);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 0, 20);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", 1, 20);
 		this->Field.object("Elon")->loop = true;
 		this->Field.object("Elon")->setSpriteSize(0.1);
 		this->Field.object("Elon")->setImgHeight(1500);
@@ -488,7 +490,7 @@ public:
 		this->Field.object("Elon")->flipTexture(1);
 	}
 	void Idle() {
-		this->Field.object("Elon")->setSpriteTexture("assets\\Elon\\Elon_Idle.png");
+		this->Field.object("Elon")->setSpriteTexture(0,1);
 	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
