@@ -135,8 +135,6 @@ private:
 	fltDic Stat;
 	float posX = 0;
 	float posY = 0;
-	float offsetPosX = 0;
-	float offsetPosY = 0;
 	Sprite sprite;
 	float Size;
 	int imgHeight;
@@ -148,8 +146,17 @@ private:
 	int slot = 0;
 public:
 	bool loop = false;
+	bool passable = true;
+	bool fliping = false;
+	float offsetPosX = 0;
+	float offsetPosY = 0;
+	float xy1[2] = { this->PosX() + this->offsetPosX, (this->PosY()+this->offsetPosY)+(this->imgHeight)*this->getSize()*3/4 };
+	float xy2[2] = { this->PosX() + this->offsetPosX + this->imgWidth, this->PosY()+this->offsetPosY+this->imgHeight*this->getSize() };
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
+	}
+	void isPassable(bool In) {
+		this->passable = In;
 	}
 	void setAnimationSeq(int Slot) {
 		this->slot = Slot;
@@ -157,11 +164,16 @@ public:
 	int getImgHeight() {
 		return imgHeight;
 	}
+	int getImgWigth() {
+		return imgWidth;
+	}
 	void setImgHeight(int Height) {
 		this->imgHeight = Height;
 	}
 	void setImgWidth(int Width) {
 		this->imgWidth = Width;
+		const float half = Width/2; // setOrigin required it.
+		this->sprite.setOrigin({half , 0 });
 	}
 	string type() {
 		return Type;
@@ -225,6 +237,12 @@ public:
 	float PosY() {
 		return this->posY + this->offsetPosY;
 	}
+	float OrigPosX() {
+		return this->posX;
+	}
+	float OrigPosY() {
+		return this->posY;
+	}
 	void Is(string name) {
 		this->Name = name;
 	}
@@ -249,8 +267,8 @@ public:
 		this->time == 0;
 	}
 	void flipTexture(int rev) {
+		this->fliping = ! this->fliping;
 		this->sprite.setScale(rev*this->Size, this->Size);
-		this->setPosX(700 - this->imgWidth*this->Size*rev/2);
 	}
 };
 
@@ -357,15 +375,9 @@ public:
 class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
 private:
 	//Add a variable down here.
-	int move_speed = 1;
 	int h = 900;
 	int w = 1600;
-	bool W = false;
-	bool A = false;
-	bool S = false;
-	bool D = false;
 	bool running = true;
-	RenderWindow* window;
 	Event ev;
 	VideoMode mode;
 	Map Mars;
@@ -383,6 +395,11 @@ private:
 		this->Field.createTemplate("Blank");
 
 		this->Field.createTemplate("Item");
+		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
+		this->Field.Template("Item")->setSpriteTexture(0, 0);
+		this->Field.Template("Item")->setSpriteSize(0.005);
+		this->Field.Template("Item")->setImgHeight(1000);
+		this->Field.Template("Item")->setImgWidth(1000);
 		this->Field.Template("Item")->setType("Static");
 
 		this->Field.createTemplate("Rocky");
@@ -390,8 +407,9 @@ private:
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", 2, 1000);
 		this->Field.Template("Rocky")->setSpriteTexture(0, 0);
-		this->Field.Template("Rocky")->setSpriteSize(0.1);
+		this->Field.Template("Rocky")->setSpriteSize(0.05);
 		this->Field.Template("Rocky")->setImgHeight(900);
+		this->Field.Template("Rocky")->isPassable(false);
 		this->Field.Template("Rocky")->setType("Dynamic");
 
 		this->Field.createTemplate("BG_Element");
@@ -405,16 +423,17 @@ private:
 		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
 		this->Field.Template("Structure")->setPosY(this->Field.object("Anchor")->PosY());
 		this->Field.Template("Structure")->setType("Dynamic");
+		this->Field.Template("Structure")->isPassable(false);
 
 		this->Field.registerObject("BG", "BG_Element");
 		this->Field.object("BG")->addTexture("assets\\graph.jpg", 0, 1000);
 		this->Field.object("BG")->setSpriteTexture(0, 0);
 		this->Field.object("BG")->setSpriteSize(10);
 
-		for (int j = 0; j < 200; j++) {
+		for (int j = 0; j < 0; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Rocky");
-			this->Field.Template("Rocky")->setSpriteTexture(0, rand()%3);
+			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture(0, rand()%3);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 50);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 50);
 		}
@@ -424,8 +443,18 @@ private:
 		this->Field.object("Pump")->setSpriteTexture(0, 0);
 		this->Field.object("Pump")->setSpriteSize(0.1);
 		this->Field.object("Pump")->setImgHeight(1000);
+		this->Field.object("Pump")->setImgWidth(1000);
 		this->Field.object("Pump")->setOffsetPosX(10);
 		this->Field.object("Pump")->setOffsetPosY(10);
+
+		this->Field.registerObject("Pump1", "Structure");
+		this->Field.object("Pump1")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
+		this->Field.object("Pump1")->setSpriteTexture(0, 0);
+		this->Field.object("Pump1")->setSpriteSize(0.1);
+		this->Field.object("Pump1")->setImgHeight(1000);
+		this->Field.object("Pump1")->setImgWidth(1000);
+		this->Field.object("Pump1")->setOffsetPosX(20);
+		this->Field.object("Pump1")->setOffsetPosY(10);
 
 		this->Field.registerObject("Elon", "Blank");
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 0, 20);
@@ -439,7 +468,7 @@ private:
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", 1, 20);
 		this->Field.object("Elon")->loop = true;
 		this->Field.object("Elon")->setSpriteSize(0.1);
-		this->Field.object("Elon")->setImgHeight(1500);
+		this->Field.object("Elon")->setImgHeight(1600);
 		this->Field.object("Elon")->setImgWidth(1000);
 		this->Field.object("Elon")->addStat("Health", 100);
 		this->Field.object("Elon")->addStat("Hunger", 100);
@@ -448,15 +477,13 @@ private:
 		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
 
-		this->Field.registerObject("Apple", "Item");
-		this->Field.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
-		this->Field.object("Apple")->setSpriteTexture(0, 0);
-		this->Field.object("Apple")->setSpriteSize(0.05);
-		this->Field.object("Apple")->setImgHeight(1000);
-		this->Field.object("Apple")->setImgWidth(1000);
-		this->Field.object("Apple")->setPosX(700 - 1000 * 0.1 * 1 / 2);
-		this->Field.object("Apple")->setOffsetPosX(0.25);
-		this->Field.object("Apple")->setPosY(400-5);
+		for (int i = 0; i < 11; i++) {
+			for (int j = 0; j < 17; j++) {
+				this->Field.registerObject(to_string(i)+to_string(j), "Item");
+				this->Field.object(to_string(i) + to_string(j))->setPosX(j*100);
+				this->Field.object(to_string(i) + to_string(j))->setPosY(i*100);
+			}
+		}
 
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
 			if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
@@ -469,10 +496,15 @@ private:
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
 	}
 public:
+	RenderWindow* window;
 	Map Field;
 	vector<Object*> DrawField_Dynamic;
 	vector<Object*> DrawField_Static;
 	bool pass = true;
+	bool movable = true;
+	int move_speed = 1;
+	bool W = false, A = false, S = false, D = false;
+	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	gameEngine() {
 		this->initVar();
 		this->initWindow();
@@ -502,21 +534,29 @@ public:
 		return this->window->isOpen();
 	}
 	void W_key() {
-		this->Field.object("Anchor")->moveY(1 * this->move_speed);
+		if (this->W_moveable) {
+			this->Field.object("Anchor")->moveY(1 * this->move_speed);
+		}
 	}
 	void A_key() {
-		this->Field.object("Anchor")->moveX(1 * this->move_speed);
-		this->Field.object("Elon")->flipTexture(-1);
+		if (this->A_moveable) {
+			this->Field.object("Anchor")->moveX(1 * this->move_speed);
+			this->Field.object("Elon")->flipTexture(-1);
+		}
 	}
 	void S_key() {
-		this->Field.object("Anchor")->moveY(-1 * this->move_speed);
+		if (this->S_moveable) {
+			this->Field.object("Anchor")->moveY(-1 * this->move_speed);
+		}
 	}
 	void D_key() {
-		this->Field.object("Anchor")->moveX(-1 * this->move_speed);
-		this->Field.object("Elon")->flipTexture(1);
+		if (this->D_moveable) {
+			this->Field.object("Anchor")->moveX(-1 * this->move_speed);
+			this->Field.object("Elon")->flipTexture(1);
+		}
 	}
 	void Idle() {
-		this->Field.object("Elon")->setSpriteTexture(0,1);
+		this->Field.object("Elon")->setSpriteTexture(0, 1);
 	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
@@ -573,31 +613,39 @@ public:
 				this->Field.object("Elon")->UpdateAnimation(2);
 			}
 			if (S) {
-				S_key();
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
+				}
+				if (S_moveable) {
+					S_key();
 				}
 			}
 			if (W) {
-				W_key();
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
+				}
+				if (W_moveable) {
+					W_key();
 				}
 			}
 			if (D) {
-				D_key();
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
 				}
+				if (D_moveable) {
+					D_key();
+				}
 			}
 			if (A) {
-				A_key();
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
+				}
+				if (A_moveable) {
+					A_key();
 				}
 			}
 		}
@@ -682,10 +730,110 @@ void CheckInsight() {
 	}
 }
 
+bool anyBetween(float* x1, float* x2) {
+	bool ans = false;
+	for (int i = 0; i < 2; i++) {
+		if ((x1[i] < x2[1] && x1[i] > x2[0])) {
+			ans = true;
+		}
+	}
+	return ans;
+}
+
+bool hitBoxhit(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+	float setX1[2] = { x1,x2 };
+	float setX2[2] = { x3,x4 };
+	float setY1[2] = { y1,y2 };
+	float setY2[2] = { y3,y4 };
+	return (anyBetween(setX1, setX2) && anyBetween(setY1, setY2)) || (anyBetween(setX2, setX1) && anyBetween(setY2, setY1));
+}
+
+void isMovable() {
+	Event ev;
+	float AnchorX, AnchorY, ElonX, ElonY, ElonHight, ElonWidth, ElonSize, ObjX, ObjY, ObjHight, ObjWidth, ObjSize;
+	int hitBoxXoffset = 20;
+	bool bump = false;
+	bool W_isbump = false, A_isbump = false, S_isbump = false, D_isbump = false;
+	while (First_step.isRuning()) {
+		bump = false;
+		while (First_step.Field.entityNumber() == 0) {
+			Sleep(1);
+		}
+		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
+			AnchorX = First_step.Field.object("Anchor")->PosX(), AnchorY = First_step.Field.object("Anchor")->PosY();
+			ElonX = First_step.Field.object("Elon")->PosX(), ElonY = First_step.Field.object("Elon")->PosY(), ElonWidth = First_step.Field.object("Elon")->getImgWigth(), ElonHight = First_step.Field.object("Elon")->getImgHeight(), ElonSize = First_step.Field.object("Elon")->getSize();
+			ObjX = First_step.Field.objectAt(i)->PosX(), ObjY = First_step.Field.objectAt(i)->PosY(), ObjWidth = First_step.Field.objectAt(i)->getImgWigth(), ObjHight = First_step.Field.objectAt(i)->getImgHeight(), ObjSize = First_step.Field.objectAt(i)->getSize();
+			printf("%.1f %.1f %.1f %.1f \t", ElonX - ElonWidth * ElonSize*0.5, ElonY + ElonHight * ElonSize * 0.8, ElonX + ElonWidth * ElonSize * 0.5, ElonY + ElonHight * ElonSize);
+			printf("%.1f %.1f %.1f %.1f \t", ObjX - ObjWidth * ObjSize*0.5, ObjY + ObjHight * ObjSize * 0.8, ObjX + ObjWidth * ObjSize * 0.5, ObjY + ObjHight * ObjSize);
+			cout << First_step.Field.objectAt(i)->nowIs() << '\t';
+			printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
+			if (!First_step.DrawField_Dynamic[i]->passable && First_step.Field.objectAt(i)->nowIs() != "Elon" && hitBoxhit(ElonX - ElonWidth*ElonSize*0.5 + hitBoxXoffset, ElonY + ElonHight*ElonSize*0.8, ElonX + ElonWidth*ElonSize*0.5 - hitBoxXoffset, ElonY + ElonHight*ElonSize,    ObjX - ObjWidth*ObjSize*0.5, ObjY + ObjHight*ObjSize*0.8, ObjX + ObjWidth*ObjSize*0.5, ObjY + ObjHight*ObjSize)) {
+				if (First_step.W) {
+					W_isbump = true;
+				}
+				if (First_step.A) {
+					A_isbump = true;
+				}
+				if (First_step.S) {
+					S_isbump = true;
+				}
+				if (First_step.D) {
+					D_isbump = true;
+				}
+				printf("************************************ with ");
+				cout << First_step.Field.objectAt(i)->nowIs() << endl;
+				break;
+			}
+		}
+		if (First_step.S && W_isbump) {
+			First_step.W_moveable = true;
+			W_isbump = false;
+		}
+		if (First_step.D && A_isbump) {
+			First_step.A_moveable = true;
+			A_isbump = false;
+		}
+		if (First_step.W && S_isbump) {
+			First_step.S_moveable = true;
+			S_isbump = false;
+		}
+		if (First_step.A && D_isbump) {
+			First_step.D_moveable = true;
+			D_isbump = false;
+		}
+		if (W_isbump) {
+			First_step.W_moveable = false;
+
+		}
+		else {
+			First_step.W_moveable = true;
+		}
+		if (A_isbump) {
+			First_step.A_moveable = false;
+		}
+		else {
+			First_step.A_moveable = true;
+		}
+		if (S_isbump) {
+			First_step.S_moveable = false;
+		}
+		else {
+			First_step.S_moveable = true;
+		}
+		if (D_isbump) {
+			First_step.D_moveable = false;
+		}
+		else {
+			First_step.D_moveable = true;
+		}
+		printf("\n\n");
+	}
+}
+
 int main() { // Game loop
-	Thread CheckInsight_Thread1(&CheckInsight);
+	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable);
 	CheckInsight_Thread1.launch();
-	//CheckInsight_Thread2.launch();
+	CheckBump.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
