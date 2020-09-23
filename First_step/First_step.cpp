@@ -167,13 +167,12 @@ public:
 	int getImgWigth() {
 		return imgWidth;
 	}
-	void setImgHeight(int Height) {
+	void setImgDim(int Width, int Height) {
 		this->imgHeight = Height;
-	}
-	void setImgWidth(int Width) {
 		this->imgWidth = Width;
-		const float half = Width/2; // setOrigin required it.
-		this->sprite.setOrigin({half , 0 });
+		const float halfW = Width / 2; // setOrigin required it.
+		const float halfH = Height / 2; // setOrigin required it.
+		this->sprite.setOrigin({ halfW , halfH });
 	}
 	string type() {
 		return Type;
@@ -398,8 +397,7 @@ private:
 		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
 		this->Field.Template("Item")->setSpriteTexture(0, 0);
 		this->Field.Template("Item")->setSpriteSize(0.005);
-		this->Field.Template("Item")->setImgHeight(1000);
-		this->Field.Template("Item")->setImgWidth(1000);
+		this->Field.Template("Item")->setImgDim(1000,1000);
 		this->Field.Template("Item")->setType("Static");
 
 		this->Field.createTemplate("Rocky");
@@ -408,7 +406,7 @@ private:
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", 2, 1000);
 		this->Field.Template("Rocky")->setSpriteTexture(0, 0);
 		this->Field.Template("Rocky")->setSpriteSize(0.05);
-		this->Field.Template("Rocky")->setImgHeight(900);
+		this->Field.Template("Rocky")->setImgDim(900,900);
 		this->Field.Template("Rocky")->isPassable(false);
 		this->Field.Template("Rocky")->setType("Dynamic");
 
@@ -442,17 +440,23 @@ private:
 		this->Field.object("Pump")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
 		this->Field.object("Pump")->setSpriteTexture(0, 0);
 		this->Field.object("Pump")->setSpriteSize(0.1);
-		this->Field.object("Pump")->setImgHeight(1000);
-		this->Field.object("Pump")->setImgWidth(1000);
+		this->Field.object("Pump")->setImgDim(1000, 1000);
 		this->Field.object("Pump")->setOffsetPosX(10);
 		this->Field.object("Pump")->setOffsetPosY(10);
+
+		this->Field.registerObject("Pump0", "Structure");
+		this->Field.object("Pump0")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
+		this->Field.object("Pump0")->setSpriteTexture(0, 0);
+		this->Field.object("Pump0")->setSpriteSize(0.1);
+		this->Field.object("Pump0")->setImgDim(1000, 1000);
+		this->Field.object("Pump0")->setOffsetPosX(5);
+		this->Field.object("Pump0")->setOffsetPosY(10);
 
 		this->Field.registerObject("Pump1", "Structure");
 		this->Field.object("Pump1")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
 		this->Field.object("Pump1")->setSpriteTexture(0, 0);
 		this->Field.object("Pump1")->setSpriteSize(0.1);
-		this->Field.object("Pump1")->setImgHeight(1000);
-		this->Field.object("Pump1")->setImgWidth(1000);
+		this->Field.object("Pump1")->setImgDim(1000, 1000);
 		this->Field.object("Pump1")->setOffsetPosX(20);
 		this->Field.object("Pump1")->setOffsetPosY(10);
 
@@ -468,8 +472,7 @@ private:
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", 1, 20);
 		this->Field.object("Elon")->loop = true;
 		this->Field.object("Elon")->setSpriteSize(0.1);
-		this->Field.object("Elon")->setImgHeight(1600);
-		this->Field.object("Elon")->setImgWidth(1000);
+		this->Field.object("Elon")->setImgDim(1000,1600);
 		this->Field.object("Elon")->addStat("Health", 100);
 		this->Field.object("Elon")->addStat("Hunger", 100);
 		this->Field.object("Elon")->addStat("Air", 100);
@@ -502,7 +505,7 @@ public:
 	vector<Object*> DrawField_Static;
 	bool pass = true;
 	bool movable = true;
-	int move_speed = 1;
+	float move_speed = 1;
 	bool W = false, A = false, S = false, D = false;
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	gameEngine() {
@@ -538,10 +541,12 @@ public:
 			this->Field.object("Anchor")->moveY(1 * this->move_speed);
 		}
 	}
-	void A_key() {
+	void A_key(bool Flip) {
 		if (this->A_moveable) {
 			this->Field.object("Anchor")->moveX(1 * this->move_speed);
-			this->Field.object("Elon")->flipTexture(-1);
+			if (Flip) {
+				this->Field.object("Elon")->flipTexture(-1);
+			}
 		}
 	}
 	void S_key() {
@@ -549,10 +554,12 @@ public:
 			this->Field.object("Anchor")->moveY(-1 * this->move_speed);
 		}
 	}
-	void D_key() {
+	void D_key(bool Flip) {
 		if (this->D_moveable) {
 			this->Field.object("Anchor")->moveX(-1 * this->move_speed);
-			this->Field.object("Elon")->flipTexture(1);
+			if (Flip) {
+				this->Field.object("Elon")->flipTexture(1);
+			}
 		}
 	}
 	void Idle() {
@@ -612,7 +619,7 @@ public:
 			if (this->move_speed == 1 * 2) {
 				this->Field.object("Elon")->UpdateAnimation(2);
 			}
-			if (S) {
+			if (S && !W) {
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
@@ -621,7 +628,7 @@ public:
 					S_key();
 				}
 			}
-			if (W) {
+			if (W && !S) {
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
@@ -630,22 +637,28 @@ public:
 					W_key();
 				}
 			}
-			if (D) {
+			if (D && !A) {
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
 				}
 				if (D_moveable) {
-					D_key();
+					D_key(true);
 				}
 			}
-			if (A) {
+			if (A && !D) {
 				if (!updated) {
 					updated = true;
 					this->Field.object("Elon")->UpdateAnimation(1);
 				}
 				if (A_moveable) {
-					A_key();
+					A_key(true);
+				}
+			}
+			if (W && S || A && D) {
+				if (!updated) {
+					updated = true;
+					Idle();
 				}
 			}
 		}
@@ -700,7 +713,7 @@ void SortObj() {
 			Sleep(1);
 		}
 		for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
-			if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSize()) > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSize()))) {
+			if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight()* First_step.DrawField_Dynamic[i]->getSize())/2 > First_step.DrawField_Dynamic[i+1]->PosY() + (First_step.DrawField_Dynamic[i+1]->getImgHeight() * First_step.DrawField_Dynamic[i+1]->getSize()) / 2)) {
 				iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
 			}
 		}
@@ -722,11 +735,7 @@ void CheckInsight() {
 				First_step.DrawField_Dynamic.erase(First_step.DrawField_Dynamic.begin() + i);
 			}
 		}
-		for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
-			if (i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSize()) > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSize()))) {
-				iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
-			}
-		}
+		SortObj();
 	}
 }
 
@@ -745,15 +754,22 @@ bool hitBoxhit(float x1, float y1, float x2, float y2, float x3, float y3, float
 	float setX2[2] = { x3,x4 };
 	float setY1[2] = { y1,y2 };
 	float setY2[2] = { y3,y4 };
-	return (anyBetween(setX1, setX2) && anyBetween(setY1, setY2)) || (anyBetween(setX2, setX1) && anyBetween(setY2, setY1));
+	return (anyBetween(setX1, setX2) || anyBetween(setX2, setX1)) && (anyBetween(setY1, setY2) || anyBetween(setY2, setY1));
 }
+
+vector<float> getHitVector(float x1O, float y1O, float x2O, float y2O) {
+	return {x1O-x2O, y1O-y2O};
+}
+
 
 void isMovable() {
 	Event ev;
+	vector<float> HitVec;
 	float AnchorX, AnchorY, ElonX, ElonY, ElonHight, ElonWidth, ElonSize, ObjX, ObjY, ObjHight, ObjWidth, ObjSize;
-	int hitBoxXoffset = 20;
 	bool bump = false;
 	bool W_isbump = false, A_isbump = false, S_isbump = false, D_isbump = false;
+	float hitBoxHPercent = 30;
+	hitBoxHPercent = 1/(hitBoxHPercent / 100);
 	while (First_step.isRuning()) {
 		bump = false;
 		while (First_step.Field.entityNumber() == 0) {
@@ -763,47 +779,45 @@ void isMovable() {
 			AnchorX = First_step.Field.object("Anchor")->PosX(), AnchorY = First_step.Field.object("Anchor")->PosY();
 			ElonX = First_step.Field.object("Elon")->PosX(), ElonY = First_step.Field.object("Elon")->PosY(), ElonWidth = First_step.Field.object("Elon")->getImgWigth(), ElonHight = First_step.Field.object("Elon")->getImgHeight(), ElonSize = First_step.Field.object("Elon")->getSize();
 			ObjX = First_step.Field.objectAt(i)->PosX(), ObjY = First_step.Field.objectAt(i)->PosY(), ObjWidth = First_step.Field.objectAt(i)->getImgWigth(), ObjHight = First_step.Field.objectAt(i)->getImgHeight(), ObjSize = First_step.Field.objectAt(i)->getSize();
-			printf("%.1f %.1f %.1f %.1f \t", ElonX - ElonWidth * ElonSize*0.5, ElonY + ElonHight * ElonSize * 0.8, ElonX + ElonWidth * ElonSize * 0.5, ElonY + ElonHight * ElonSize);
-			printf("%.1f %.1f %.1f %.1f \t", ObjX - ObjWidth * ObjSize*0.5, ObjY + ObjHight * ObjSize * 0.8, ObjX + ObjWidth * ObjSize * 0.5, ObjY + ObjHight * ObjSize);
-			cout << First_step.Field.objectAt(i)->nowIs() << '\t';
-			printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
-			if (!First_step.DrawField_Dynamic[i]->passable && First_step.Field.objectAt(i)->nowIs() != "Elon" && hitBoxhit(ElonX - ElonWidth*ElonSize*0.5 + hitBoxXoffset, ElonY + ElonHight*ElonSize*0.8, ElonX + ElonWidth*ElonSize*0.5 - hitBoxXoffset, ElonY + ElonHight*ElonSize,    ObjX - ObjWidth*ObjSize*0.5, ObjY + ObjHight*ObjSize*0.8, ObjX + ObjWidth*ObjSize*0.5, ObjY + ObjHight*ObjSize)) {
-				if (First_step.W) {
+			//printf("%.1f %.1f %.1f %.1f \t", ElonX - (ElonWidth*ElonSize/ 2), ElonY, ElonX + (ElonWidth*ElonSize/ 2), ElonY + (ElonHight*ElonSize/ hitBoxHPercent));
+			//printf("%.1f %.1f %.1f %.1f \t", ObjX - (ObjWidth * ObjSize / 2), ObjY-50, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent));
+			//cout << First_step.Field.objectAt(i)->nowIs() << '\t';
+			//printf("%d\t", hitBoxhit(ElonX - (ElonWidth * ElonSize / 2), ElonY, ElonX + (ElonWidth * ElonSize / 2), ElonY + (ElonHight * ElonSize / hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent)));
+			//printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
+			if (hitBoxhit(ElonX - (ElonWidth*ElonSize/2) + (ObjWidth*ObjSize)*0.4, ElonY, ElonX + (ElonWidth*ElonSize/2) - (ObjWidth* ObjSize)*0.4, ElonY + (ElonHight*ElonSize/ hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent))) {
+				HitVec = getHitVector(ObjX, ObjY+(ObjHight*ObjSize)/2, ElonX, ElonY+(ElonHight*ElonSize)/2);
+				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
+				if (HitVec[1] < 0) {
 					W_isbump = true;
+					First_step.move_speed /= 100;
+					First_step.S_key();
+					First_step.move_speed *= 100;
 				}
-				if (First_step.A) {
+				if (HitVec[0] < 0) {
 					A_isbump = true;
+					First_step.move_speed /= 100;
+					First_step.D_key(false);
+					First_step.move_speed *= 100;
 				}
-				if (First_step.S) {
+				if (HitVec[1] > 0) {
 					S_isbump = true;
+					First_step.move_speed /= 100;
+					First_step.W_key();
+					First_step.move_speed *= 100;
 				}
-				if (First_step.D) {
+				if (HitVec[0] > 0) {
 					D_isbump = true;
+					First_step.move_speed /= 100;
+					First_step.A_key(false);
+					First_step.move_speed *= 100;
 				}
 				printf("************************************ with ");
 				cout << First_step.Field.objectAt(i)->nowIs() << endl;
 				break;
 			}
 		}
-		if (First_step.S && W_isbump) {
-			First_step.W_moveable = true;
-			W_isbump = false;
-		}
-		if (First_step.D && A_isbump) {
-			First_step.A_moveable = true;
-			A_isbump = false;
-		}
-		if (First_step.W && S_isbump) {
-			First_step.S_moveable = true;
-			S_isbump = false;
-		}
-		if (First_step.A && D_isbump) {
-			First_step.D_moveable = true;
-			D_isbump = false;
-		}
 		if (W_isbump) {
 			First_step.W_moveable = false;
-
 		}
 		else {
 			First_step.W_moveable = true;
@@ -826,6 +840,10 @@ void isMovable() {
 		else {
 			First_step.D_moveable = true;
 		}
+		W_isbump = false;
+		A_isbump = false;
+		S_isbump = false;
+		D_isbump = false;
 		printf("\n\n");
 	}
 }
