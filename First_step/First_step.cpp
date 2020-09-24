@@ -141,8 +141,8 @@ private:
 	int imgWidth;
 
 	int time = 0, Index = 0;
-	vector<Texture*> textureArray[10];
-	vector<int> duration[10];
+	vector<vector<Texture*>> textureArray;
+	vector<vector<int>> duration;
 	int slot = 0;
 public:
 	bool loop = false;
@@ -155,6 +155,24 @@ public:
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
 	}
+	void useStat(Object In) {
+		this->textureArray = In.textureArray;
+		this->duration = In.duration;
+		this->fliping = In.fliping;
+		this->setImgDim(In.imgWidth, In.imgHeight);
+		this->loop = In.loop;
+		this->passable = In.passable;
+		this->setPosX(In.posX);
+		this->setPosY(In.posY);
+		this->setSpriteSize(In.getSize());
+		this->Stat = In.Stat;
+		this->Type = In.Type;
+		this->sprite = In.sprite;
+		this->slot = In.slot;
+	}
+	vector<float> getHitBoxData() {
+		return { this->PosX() - (this->getImgWigth() * this->Size / 2), this->PosY(), this->PosX() + (this->getImgWigth()*this->Size / 2), this->PosY() + (this->getImgHeight() * this->Size * 3/10) , this->PosX(), this->PosY()+(this->getImgHeight()*this->Size)/2};
+	}
 	void isPassable(bool In) {
 		this->passable = In;
 	}
@@ -162,10 +180,10 @@ public:
 		this->slot = Slot;
 	}
 	int getImgHeight() {
-		return imgHeight;
+		return this->imgHeight;
 	}
 	int getImgWigth() {
-		return imgWidth;
+		return this->imgWidth;
 	}
 	void setImgDim(int Width, int Height) {
 		this->imgHeight = Height;
@@ -188,6 +206,11 @@ public:
 		if (!(*ptr).loadFromFile(Path)) {
 			printf("Error");
 		}
+		int old_size = this->textureArray.size();
+		for (int i = 0; i <= slot - old_size; i++) {
+			this->textureArray.push_back({});
+			this->duration.push_back({});
+		}
 		this->textureArray[slot].push_back(ptr);
 		this->duration[slot].push_back(durt);
 		
@@ -209,10 +232,10 @@ public:
 		return Stat.get(KeyIn);
 	}
 	void setOffsetPosX(float offx) {
-		this->offsetPosX = offx * 100;
+		this->offsetPosX = offx;
 	}
 	void setOffsetPosY(float offy) {
-		this->offsetPosY = offy * 100;
+		this->offsetPosY = offy;
 	}
 	void setPosX(float x) {
 		this->posX = x;
@@ -320,9 +343,9 @@ public:
 		this->Templ.append(p);
 	}
 	void registerObject(string Name, string Template) {
-		Object* p = new Object(this->Tuple.length());
-		*p = *this->Template(Template);
-		p->Is(Name);
+		Object *p = new Object(this->Tuple.length());
+		(*p).useStat(*this->Template(Template));
+		(*p).Is(Name);
 		this->Tuple.append(p);
 	}
 	Object* object(string keyIn) {
@@ -399,7 +422,6 @@ private:
 		this->Field.Template("Item")->setSpriteSize(0.005);
 		this->Field.Template("Item")->setImgDim(1000,1000);
 		this->Field.Template("Item")->setType("Static");
-
 		this->Field.createTemplate("Rocky");
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", 0, 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
@@ -416,6 +438,7 @@ private:
 		this->Field.Template("BG_Element")->setPosY(0);
 
 		this->Field.registerObject("Anchor", "BG_Element");
+		this->Field.object("Anchor")->isPassable(true);
 
 		this->Field.createTemplate("Structure");
 		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
@@ -423,10 +446,21 @@ private:
 		this->Field.Template("Structure")->setType("Dynamic");
 		this->Field.Template("Structure")->isPassable(false);
 
+		this->Field.createTemplate("Pump");
+		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png",0 , 1000);
+		this->Field.Template("Pump")->setSpriteTexture(0, 0);
+		this->Field.Template("Pump")->setSpriteSize(0.1);
+		this->Field.Template("Pump")->setImgDim(1000, 1000);
+		this->Field.Template("Pump")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.Template("Pump")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.Template("Pump")->setType("Dynamic");
+		this->Field.Template("Pump")->isPassable(false);
+
 		this->Field.registerObject("BG", "BG_Element");
 		this->Field.object("BG")->addTexture("assets\\graph.jpg", 0, 1000);
 		this->Field.object("BG")->setSpriteTexture(0, 0);
 		this->Field.object("BG")->setSpriteSize(10);
+		this->Field.object("BG")->isPassable(true);
 
 		for (int j = 0; j < 0; j++) {
 			float size = rand() % 10;
@@ -435,30 +469,6 @@ private:
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 50);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 50);
 		}
-
-		this->Field.registerObject("Pump", "Structure");
-		this->Field.object("Pump")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
-		this->Field.object("Pump")->setSpriteTexture(0, 0);
-		this->Field.object("Pump")->setSpriteSize(0.1);
-		this->Field.object("Pump")->setImgDim(1000, 1000);
-		this->Field.object("Pump")->setOffsetPosX(10);
-		this->Field.object("Pump")->setOffsetPosY(10);
-
-		this->Field.registerObject("Pump0", "Structure");
-		this->Field.object("Pump0")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
-		this->Field.object("Pump0")->setSpriteTexture(0, 0);
-		this->Field.object("Pump0")->setSpriteSize(0.1);
-		this->Field.object("Pump0")->setImgDim(1000, 1000);
-		this->Field.object("Pump0")->setOffsetPosX(5);
-		this->Field.object("Pump0")->setOffsetPosY(10);
-
-		this->Field.registerObject("Pump1", "Structure");
-		this->Field.object("Pump1")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png", 0, 1000);
-		this->Field.object("Pump1")->setSpriteTexture(0, 0);
-		this->Field.object("Pump1")->setSpriteSize(0.1);
-		this->Field.object("Pump1")->setImgDim(1000, 1000);
-		this->Field.object("Pump1")->setOffsetPosX(20);
-		this->Field.object("Pump1")->setOffsetPosY(10);
 
 		this->Field.registerObject("Elon", "Blank");
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 0, 20);
@@ -503,6 +513,7 @@ public:
 	Map Field;
 	vector<Object*> DrawField_Dynamic;
 	vector<Object*> DrawField_Static;
+	vector<float> mousePos = {0,0};
 	bool pass = true;
 	bool movable = true;
 	float move_speed = 1;
@@ -609,6 +620,29 @@ public:
 				this->move_speed = 1;
 
 			}
+			if (ev.type == Event::MouseMoved) {
+				this->mousePos[0] = ev.mouseMove.x;
+				this->mousePos[1] = ev.mouseMove.y;
+			}
+			if (ev.type == Event::MouseButtonPressed) {
+				if (ev.mouseButton.button == Mouse::Left) {
+					//for (int i = 0; i < this->Field.entityNumber(); i++) {
+						//cout << this->Field.objectAt(i)->nowIs() << endl;
+					//}
+					printf("\n");
+					string ObjName = "Pumpy" + to_string(rand()%100000);
+					this->Field.registerObject(ObjName, "Pump");
+					this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
+					this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
+					vector<float> data = this->Field.object(ObjName)->getHitBoxData();
+					cout << this->Field.object(ObjName)->nowIs() << endl;
+					for (int i = 0; i < 6; i++) {
+						printf("%.1f ", data[i]);
+					}
+					printf("\n");
+					
+				}
+			}
 		}
 
 	}
@@ -708,14 +742,9 @@ public:
 gameEngine First_step;
 
 void SortObj() {
-	while (First_step.isRuning()) {
-		while (First_step.DrawField_Dynamic.size() == 0) {
-			Sleep(1);
-		}
-		for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
-			if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight()* First_step.DrawField_Dynamic[i]->getSize())/2 > First_step.DrawField_Dynamic[i+1]->PosY() + (First_step.DrawField_Dynamic[i+1]->getImgHeight() * First_step.DrawField_Dynamic[i+1]->getSize()) / 2)) {
-				iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
-			}
+	for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
+		if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight()* First_step.DrawField_Dynamic[i]->getSize())/2 > First_step.DrawField_Dynamic[i+1]->PosY() + (First_step.DrawField_Dynamic[i+1]->getImgHeight() * First_step.DrawField_Dynamic[i+1]->getSize()) / 2)) {
+			iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
 		}
 	}
 }
@@ -765,11 +794,12 @@ vector<float> getHitVector(float x1O, float y1O, float x2O, float y2O) {
 void isMovable() {
 	Event ev;
 	vector<float> HitVec;
-	float AnchorX, AnchorY, ElonX, ElonY, ElonHight, ElonWidth, ElonSize, ObjX, ObjY, ObjHight, ObjWidth, ObjSize;
+	float AnchorX, AnchorY;
+	vector<float>ElonHitBox;
+	vector<float>ObjHitBox;
 	bool bump = false;
 	bool W_isbump = false, A_isbump = false, S_isbump = false, D_isbump = false;
-	float hitBoxHPercent = 30;
-	hitBoxHPercent = 1/(hitBoxHPercent / 100);
+	float hitBoxXoffset = 30;
 	while (First_step.isRuning()) {
 		bump = false;
 		while (First_step.Field.entityNumber() == 0) {
@@ -777,15 +807,15 @@ void isMovable() {
 		}
 		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
 			AnchorX = First_step.Field.object("Anchor")->PosX(), AnchorY = First_step.Field.object("Anchor")->PosY();
-			ElonX = First_step.Field.object("Elon")->PosX(), ElonY = First_step.Field.object("Elon")->PosY(), ElonWidth = First_step.Field.object("Elon")->getImgWigth(), ElonHight = First_step.Field.object("Elon")->getImgHeight(), ElonSize = First_step.Field.object("Elon")->getSize();
-			ObjX = First_step.Field.objectAt(i)->PosX(), ObjY = First_step.Field.objectAt(i)->PosY(), ObjWidth = First_step.Field.objectAt(i)->getImgWigth(), ObjHight = First_step.Field.objectAt(i)->getImgHeight(), ObjSize = First_step.Field.objectAt(i)->getSize();
-			//printf("%.1f %.1f %.1f %.1f \t", ElonX - (ElonWidth*ElonSize/ 2), ElonY, ElonX + (ElonWidth*ElonSize/ 2), ElonY + (ElonHight*ElonSize/ hitBoxHPercent));
-			//printf("%.1f %.1f %.1f %.1f \t", ObjX - (ObjWidth * ObjSize / 2), ObjY-50, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent));
+			ElonHitBox = First_step.Field.object("Elon")->getHitBoxData();
+			ObjHitBox = First_step.DrawField_Dynamic[i]->getHitBoxData();
+			//printf("%.1f %.1f %.1f %.1f \t", ElonHitBox[0], ElonHitBox[1], ElonHitBox[2], ElonHitBox[3]);
+			//printf("%.1f %.1f %.1f %.1f \t", ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3]);
 			//cout << First_step.Field.objectAt(i)->nowIs() << '\t';
 			//printf("%d\t", hitBoxhit(ElonX - (ElonWidth * ElonSize / 2), ElonY, ElonX + (ElonWidth * ElonSize / 2), ElonY + (ElonHight * ElonSize / hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent)));
 			//printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
-			if (hitBoxhit(ElonX - (ElonWidth*ElonSize/2) + (ObjWidth*ObjSize)*0.4, ElonY, ElonX + (ElonWidth*ElonSize/2) - (ObjWidth* ObjSize)*0.4, ElonY + (ElonHight*ElonSize/ hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent))) {
-				HitVec = getHitVector(ObjX, ObjY+(ObjHight*ObjSize)/2, ElonX, ElonY+(ElonHight*ElonSize)/2);
+			if (hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2]- hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
+				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
 				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
 				if (HitVec[1] < 0) {
 					W_isbump = true;
@@ -844,17 +874,35 @@ void isMovable() {
 		A_isbump = false;
 		S_isbump = false;
 		D_isbump = false;
-		printf("\n\n");
+		//printf("****************************\n");
 	}
 }
 
+void ShowDrawingStat() {
+	while (First_step.isRuning()) {
+		while (First_step.Field.entityNumber() == 0) {
+			Sleep(1);
+		}
+		for (int num = 0; num < First_step.DrawField_Dynamic.size(); num++) {
+			vector<float> data = First_step.DrawField_Dynamic[num]->getHitBoxData();
+			cout << First_step.DrawField_Dynamic[num]->nowIs() << '\t';
+			for (int i = 0; i < 6; i++) {
+				printf("%.1f ", data[i]);
+			}
+			printf("\n");
+		}
+		printf("\n");
+	}
+}
 int main() { // Game loop
-	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable);
+	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat);
 	CheckInsight_Thread1.launch();
 	CheckBump.launch();
+	monitor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
+		//printf("%.1f %.1f\n", First_step.Field.object("Elon")->PosX() - First_step.Field.object("Anchor")->PosX(), First_step.Field.object("Elon")->PosY() - First_step.Field.object("Anchor")->PosY());
 	}
 	return 0;
 }
