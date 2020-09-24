@@ -422,6 +422,7 @@ private:
 		this->Field.Template("Item")->setSpriteSize(0.005);
 		this->Field.Template("Item")->setImgDim(1000,1000);
 		this->Field.Template("Item")->setType("Static");
+
 		this->Field.createTemplate("Rocky");
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", 0, 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
@@ -429,7 +430,7 @@ private:
 		this->Field.Template("Rocky")->setSpriteTexture(0, 0);
 		this->Field.Template("Rocky")->setSpriteSize(0.05);
 		this->Field.Template("Rocky")->setImgDim(900,900);
-		this->Field.Template("Rocky")->isPassable(false);
+		this->Field.Template("Rocky")->isPassable(true);
 		this->Field.Template("Rocky")->setType("Dynamic");
 
 		this->Field.createTemplate("BG_Element");
@@ -447,10 +448,10 @@ private:
 		this->Field.Template("Structure")->isPassable(false);
 
 		this->Field.createTemplate("Pump");
-		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\WaterPump_stage1_13.png",0 , 1000);
+		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png",0 , 1000);
 		this->Field.Template("Pump")->setSpriteTexture(0, 0);
 		this->Field.Template("Pump")->setSpriteSize(0.1);
-		this->Field.Template("Pump")->setImgDim(1000, 1000);
+		this->Field.Template("Pump")->setImgDim(1200, 1600);
 		this->Field.Template("Pump")->setPosX(this->Field.object("Anchor")->PosX());
 		this->Field.Template("Pump")->setPosY(this->Field.object("Anchor")->PosY());
 		this->Field.Template("Pump")->setType("Dynamic");
@@ -462,13 +463,31 @@ private:
 		this->Field.object("BG")->setSpriteSize(10);
 		this->Field.object("BG")->isPassable(true);
 
-		for (int j = 0; j < 0; j++) {
+		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Rocky");
 			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture(0, rand()%3);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 50);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 50);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
+			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
+			this->Field.object(to_string(i) + to_string(j))->isPassable(true);
 		}
+
+
+		this->Field.registerObject("Hut", "Structure");
+		this->Field.object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", 0, 1000);
+		this->Field.object("Hut")->setSpriteTexture(0, 0);
+		this->Field.object("Hut")->setSpriteSize(0.1);
+		this->Field.object("Hut")->setOffsetPosX(500);
+		this->Field.object("Hut")->setOffsetPosY(500);
+		this->Field.object("Hut")->setImgDim(4800, 3200);
+
+		this->Field.registerObject("power", "Structure");
+		this->Field.object("power")->addTexture("assets\\Prop\\Building\\Solarcell.png", 0, 1000);
+		this->Field.object("power")->setSpriteTexture(0, 0);
+		this->Field.object("power")->setSpriteSize(0.1);
+		this->Field.object("power")->setOffsetPosX(1000);
+		this->Field.object("power")->setOffsetPosY(500);
+		this->Field.object("power")->setImgDim(1200, 1600);
 
 		this->Field.registerObject("Elon", "Blank");
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 0, 20);
@@ -517,7 +536,7 @@ public:
 	bool pass = true;
 	bool movable = true;
 	float move_speed = 1;
-	bool W = false, A = false, S = false, D = false;
+	bool W = false, A = false, S = false, D = false, shift = false;
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	gameEngine() {
 		this->initVar();
@@ -613,10 +632,12 @@ public:
 				D = false;
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
-				this->move_speed = 1 * 2;
+				shift = true;
+				this->move_speed = 1*2;
 
 			}
 			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
+				shift = false;
 				this->move_speed = 1;
 
 			}
@@ -649,8 +670,8 @@ public:
 	void update() {
 		int updated = false;
 		this->pollEvents();
-		if (W || A || S || D) {
-			if (this->move_speed == 1 * 2) {
+		if (W || A || S || D || shift) {
+			if (shift) {
 				this->Field.object("Elon")->UpdateAnimation(2);
 			}
 			if (S && !W) {
@@ -701,11 +722,16 @@ public:
 			this->Field.object("Elon")->resetTimeSeq();
 		}
 		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
-		for (int i = 0; i < Field.entityNumber(); i++) {
+		try {
+			for (int i = 0; i < Field.entityNumber(); i++) {
 				if (this->Field.objectAt(i)->type() == "Dynamic" && i < Field.entityNumber()) {
 					this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
 					this->Field.objectAt(i)->setPosY(this->Field.object("Anchor")->PosY());
 				}
+			}
+		}
+		catch (const std::out_of_range& e) {
+			printf("%d\n", e);
 		}
 		/*
 		This part is for update game event.
@@ -724,11 +750,16 @@ public:
 			//cout << this->Field.objectAt(i)->nowIs() << '\n';
 		//}
 		//cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
-		for (int i = 0; i < DrawField_Dynamic.size() && DrawField_Dynamic[i]; i++) {
-			this->window->draw(this->DrawField_Dynamic[i]->getSprite());
+		try {
+			for (int i = 0; i < DrawField_Dynamic.size() && DrawField_Dynamic[i]; i++) {
+				this->window->draw(this->DrawField_Dynamic[i]->getSprite());
+			}
+			for (int i = 0; i < DrawField_Static.size() && DrawField_Static[i]; i++) {
+				this->window->draw(this->DrawField_Static[i]->getSprite());
+			}
 		}
-		for (int i = 0; i < DrawField_Static.size() && DrawField_Static[i]; i++) {
-			this->window->draw(this->DrawField_Static[i]->getSprite());
+		catch (const std::out_of_range& e) {
+			printf("%d\n", e);
 		}
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
 
@@ -750,10 +781,7 @@ void SortObj() {
 }
 
 void CheckInsight() {
-	while (First_step.isRuning()) {
-		while (First_step.Field.entityNumber() == 0) {
-			Sleep(1);
-		}
+	try {
 		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
 			if ((First_step.Field.objectAt(i)->type() != "Static" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1500) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
 				First_step.DrawField_Dynamic.push_back(First_step.Field.objectAt(i));
@@ -765,6 +793,9 @@ void CheckInsight() {
 			}
 		}
 		SortObj();
+	}
+	catch (const std::out_of_range& e) {
+		printf("%d\n", e);
 	}
 }
 
@@ -805,41 +836,48 @@ void isMovable() {
 		while (First_step.Field.entityNumber() == 0) {
 			Sleep(1);
 		}
+		CheckInsight();
 		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
-			AnchorX = First_step.Field.object("Anchor")->PosX(), AnchorY = First_step.Field.object("Anchor")->PosY();
-			ElonHitBox = First_step.Field.object("Elon")->getHitBoxData();
-			ObjHitBox = First_step.DrawField_Dynamic[i]->getHitBoxData();
+			try {
+				First_step.DrawField_Dynamic.at(i);
+				First_step.Field.getTuple().at(First_step.Field.getIndex("Elon"));
+				ElonHitBox = First_step.Field.object("Elon")->getHitBoxData();
+				ObjHitBox = First_step.DrawField_Dynamic[i]->getHitBoxData();
+			}
+			catch (const std::out_of_range& e) {
+				cout << "Out of Range error.";
+			}
 			//printf("%.1f %.1f %.1f %.1f \t", ElonHitBox[0], ElonHitBox[1], ElonHitBox[2], ElonHitBox[3]);
 			//printf("%.1f %.1f %.1f %.1f \t", ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3]);
 			//cout << First_step.Field.objectAt(i)->nowIs() << '\t';
 			//printf("%d\t", hitBoxhit(ElonX - (ElonWidth * ElonSize / 2), ElonY, ElonX + (ElonWidth * ElonSize / 2), ElonY + (ElonHight * ElonSize / hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent)));
 			//printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
-			if (hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2]- hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
+			if (!First_step.DrawField_Dynamic[i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
 				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
 				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
 				if (HitVec[1] < 0) {
 					W_isbump = true;
-					First_step.move_speed /= 100;
+					First_step.move_speed /= 5;
 					First_step.S_key();
-					First_step.move_speed *= 100;
+					First_step.move_speed *= 5;
 				}
 				if (HitVec[0] < 0) {
 					A_isbump = true;
-					First_step.move_speed /= 100;
+					First_step.move_speed /= 5;
 					First_step.D_key(false);
-					First_step.move_speed *= 100;
+					First_step.move_speed *= 5;
 				}
 				if (HitVec[1] > 0) {
 					S_isbump = true;
-					First_step.move_speed /= 100;
+					First_step.move_speed /= 5;
 					First_step.W_key();
-					First_step.move_speed *= 100;
+					First_step.move_speed *= 5;
 				}
 				if (HitVec[0] > 0) {
 					D_isbump = true;
-					First_step.move_speed /= 100;
+					First_step.move_speed /= 5;
 					First_step.A_key(false);
-					First_step.move_speed *= 100;
+					First_step.move_speed *= 5;
 				}
 				printf("************************************ with ");
 				cout << First_step.Field.objectAt(i)->nowIs() << endl;
@@ -883,20 +921,25 @@ void ShowDrawingStat() {
 		while (First_step.Field.entityNumber() == 0) {
 			Sleep(1);
 		}
-		for (int num = 0; num < First_step.DrawField_Dynamic.size(); num++) {
-			vector<float> data = First_step.DrawField_Dynamic[num]->getHitBoxData();
-			cout << First_step.DrawField_Dynamic[num]->nowIs() << '\t';
-			for (int i = 0; i < 6; i++) {
-				printf("%.1f ", data[i]);
+		try {
+			for (int num = 0; num < First_step.DrawField_Dynamic.size(); num++) {
+				vector<float> data = First_step.DrawField_Dynamic[num]->getHitBoxData();
+				cout << First_step.DrawField_Dynamic[num]->nowIs() << '\t';
+				for (int i = 0; i < 6; i++) {
+					printf("%.1f ", data[i]);
+				}
+				printf("\n");
 			}
 			printf("\n");
 		}
-		printf("\n");
+		catch (const std::out_of_range& e) {
+			printf("%d\n", e);
+		}
 	}
 }
+
 int main() { // Game loop
 	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat);
-	CheckInsight_Thread1.launch();
 	CheckBump.launch();
 	monitor.launch();
 	while (First_step.isRuning()) {
