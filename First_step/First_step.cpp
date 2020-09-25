@@ -136,7 +136,7 @@ private:
 	float posX = 0;
 	float posY = 0;
 	Sprite sprite;
-	float Size;
+	float Size[2];
 	int imgHeight;
 	int imgWidth;
 
@@ -150,8 +150,7 @@ public:
 	bool fliping = false;
 	float offsetPosX = 0;
 	float offsetPosY = 0;
-	float xy1[2] = { this->PosX() + this->offsetPosX, (this->PosY()+this->offsetPosY)+(this->imgHeight)*this->getSize()*3/4 };
-	float xy2[2] = { this->PosX() + this->offsetPosX + this->imgWidth, this->PosY()+this->offsetPosY+this->imgHeight*this->getSize() };
+	string tag = "None";
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
 	}
@@ -164,14 +163,14 @@ public:
 		this->passable = In.passable;
 		this->setPosX(In.posX);
 		this->setPosY(In.posY);
-		this->setSpriteSize(In.getSize());
+		this->setSpriteSize(In.getSizeX(), In.getSizeY());
 		this->Stat = In.Stat;
 		this->Type = In.Type;
 		this->sprite = In.sprite;
 		this->slot = In.slot;
 	}
 	vector<float> getHitBoxData() {
-		return { this->PosX() - (this->getImgWigth() * this->Size / 2), this->PosY(), this->PosX() + (this->getImgWigth()*this->Size / 2), this->PosY() + (this->getImgHeight() * this->Size * 3/10) , this->PosX(), this->PosY()+(this->getImgHeight()*this->Size)/2};
+		return { this->PosX() - (this->getImgWigth() * this->Size[0] / 2), this->PosY(), this->PosX() + (this->getImgWigth()*this->Size[0] / 2), this->PosY() + (this->getImgHeight() * this->Size[1] * 3/10) , this->PosX(), this->PosY()+(this->getImgHeight()*this->Size[1])/2};
 	}
 	void isPassable(bool In) {
 		this->passable = In;
@@ -218,12 +217,16 @@ public:
 	void setSpriteTexture(unsigned long long Index, int slot) {
 		this->sprite.setTexture(*this->textureArray[slot][Index]);
 	}
-	void setSpriteSize(float scale) {
-		this->sprite.setScale(scale, scale);
-		this->Size = scale;
+	void setSpriteSize(float scalex, float scaley) {
+		this->sprite.setScale(scalex, scaley);
+		this->Size[0] = scalex;
+		this->Size[1] = scaley;
 	}
-	float getSize() {
-		return this->Size;
+	float getSizeX() {
+		return this->Size[0];
+	}
+	float getSizeY() {
+		return this->Size[1];
 	}
 	void addStat(string KeyIn, float val) {
 		Stat.append(KeyIn, val);
@@ -290,7 +293,10 @@ public:
 	}
 	void flipTexture(int rev) {
 		this->fliping = ! this->fliping;
-		this->sprite.setScale(rev*this->Size, this->Size);
+		this->sprite.setScale(rev*this->Size[0], this->Size[1]);
+	}
+	void setStat(string key, float value) {
+		this->Stat.set(key, value);
 	}
 };
 
@@ -419,7 +425,7 @@ private:
 		this->Field.createTemplate("Item");
 		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
 		this->Field.Template("Item")->setSpriteTexture(0, 0);
-		this->Field.Template("Item")->setSpriteSize(0.005);
+		this->Field.Template("Item")->setSpriteSize(0.005, 0.005);
 		this->Field.Template("Item")->setImgDim(1000,1000);
 		this->Field.Template("Item")->setType("Static");
 
@@ -428,7 +434,7 @@ private:
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", 2, 1000);
 		this->Field.Template("Rocky")->setSpriteTexture(0, 0);
-		this->Field.Template("Rocky")->setSpriteSize(0.05);
+		this->Field.Template("Rocky")->setSpriteSize(0.05, 0.05);
 		this->Field.Template("Rocky")->setImgDim(900,900);
 		this->Field.Template("Rocky")->isPassable(true);
 		this->Field.Template("Rocky")->setType("Dynamic");
@@ -447,10 +453,27 @@ private:
 		this->Field.Template("Structure")->setType("Dynamic");
 		this->Field.Template("Structure")->isPassable(false);
 
+		this->Field.createTemplate("itemFrame");
+		this->Field.Template("itemFrame")->addTexture("assets\\Prop\\HUD\\ItemFrame.png", 0, 1000);
+		this->Field.Template("itemFrame")->setSpriteTexture(0, 0);
+		this->Field.Template("itemFrame")->setSpriteSize(0.06, 0.06);
+		this->Field.Template("itemFrame")->setType("Static");
+		this->Field.Template("itemFrame")->isPassable(false);
+
+		this->Field.createTemplate("StatBar");
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\StatFrame.png", 0, 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Health.png", 1, 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Hunger.png", 2, 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Thirst.png", 3, 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Air.png", 4, 1000);
+		this->Field.Template("StatBar")->setSpriteTexture(0, 0);
+		this->Field.Template("StatBar")->setSpriteSize(0.06, 0.06);
+		this->Field.Template("StatBar")->setType("Static");
+
 		this->Field.createTemplate("Pump");
 		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png",0 , 1000);
 		this->Field.Template("Pump")->setSpriteTexture(0, 0);
-		this->Field.Template("Pump")->setSpriteSize(0.1);
+		this->Field.Template("Pump")->setSpriteSize(0.1, 0.1);
 		this->Field.Template("Pump")->setImgDim(1200, 1600);
 		this->Field.Template("Pump")->setPosX(this->Field.object("Anchor")->PosX());
 		this->Field.Template("Pump")->setPosY(this->Field.object("Anchor")->PosY());
@@ -460,7 +483,7 @@ private:
 		this->Field.registerObject("BG", "BG_Element");
 		this->Field.object("BG")->addTexture("assets\\graph.jpg", 0, 1000);
 		this->Field.object("BG")->setSpriteTexture(0, 0);
-		this->Field.object("BG")->setSpriteSize(10);
+		this->Field.object("BG")->setSpriteSize(10,10);
 		this->Field.object("BG")->isPassable(true);
 
 		for (int j = 0; j < 50; j++) {
@@ -476,7 +499,7 @@ private:
 		this->Field.registerObject("Hut", "Structure");
 		this->Field.object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", 0, 1000);
 		this->Field.object("Hut")->setSpriteTexture(0, 0);
-		this->Field.object("Hut")->setSpriteSize(0.1);
+		this->Field.object("Hut")->setSpriteSize(0.1, 0.1);
 		this->Field.object("Hut")->setOffsetPosX(500);
 		this->Field.object("Hut")->setOffsetPosY(500);
 		this->Field.object("Hut")->setImgDim(4800, 3200);
@@ -484,7 +507,7 @@ private:
 		this->Field.registerObject("power", "Structure");
 		this->Field.object("power")->addTexture("assets\\Prop\\Building\\Solarcell.png", 0, 1000);
 		this->Field.object("power")->setSpriteTexture(0, 0);
-		this->Field.object("power")->setSpriteSize(0.1);
+		this->Field.object("power")->setSpriteSize(0.1, 0.1);
 		this->Field.object("power")->setOffsetPosX(1000);
 		this->Field.object("power")->setOffsetPosY(500);
 		this->Field.object("power")->setImgDim(1200, 1600);
@@ -500,22 +523,47 @@ private:
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 0, 20);
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", 1, 20);
 		this->Field.object("Elon")->loop = true;
-		this->Field.object("Elon")->setSpriteSize(0.1);
+		this->Field.object("Elon")->setSpriteSize(0.1, 0.1);
 		this->Field.object("Elon")->setImgDim(1000,1600);
-		this->Field.object("Elon")->addStat("Health", 100);
-		this->Field.object("Elon")->addStat("Hunger", 100);
-		this->Field.object("Elon")->addStat("Air", 100);
+		this->Field.object("Elon")->addStat("Health", 50);
+		this->Field.object("Elon")->addStat("Thirst", 10);
+		this->Field.object("Elon")->addStat("Hunger", 60);
+		this->Field.object("Elon")->addStat("Air", 20);
 		this->Field.object("Elon")->setPosX(700 - 1000 * 0.1 * 1 / 2);
 		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
 
-		for (int i = 0; i < 11; i++) {
-			for (int j = 0; j < 17; j++) {
-				this->Field.registerObject(to_string(i)+to_string(j), "Item");
-				this->Field.object(to_string(i) + to_string(j))->setPosX(j*100);
-				this->Field.object(to_string(i) + to_string(j))->setPosY(i*100);
-			}
+		
+
+		//for (int i = 0; i < 11; i++) {
+			//for (int j = 0; j < 17; j++) {
+				//this->Field.registerObject(to_string(i)+to_string(j), "Item");
+				//this->Field.object(to_string(i) + to_string(j))->setPosX(j*100);
+				//this->Field.object(to_string(i) + to_string(j))->setPosY(i*100);
+			//}
+		//}
+		for (int i = 0; i < 9; i++) {
+			this->Field.registerObject("ItemFrame" + to_string(i), "itemFrame");
+			this->Field.object("ItemFrame" + to_string(i))->setPosX(503+1100*0.06*i);
+			this->Field.object("ItemFrame" + to_string(i))->setPosY(800);
+
 		}
+		for (int i = 0; i < 4; i++) {
+			this->Field.registerObject("StatBar_Fill" + to_string(i), "StatBar");
+			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06,-0.06);
+			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture(0, i + 1);
+			this->Field.object("StatBar_Fill" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
+			this->Field.object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200*0.06);
+		}
+		for (int i = 0; i < 4; i++) {
+			this->Field.registerObject("StatBar" + to_string(i), "StatBar");
+			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500*0.1*i);
+			this->Field.object("StatBar" + to_string(i))->setPosY(600);
+		}
+
+
+		
+
 
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
 			if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
@@ -663,13 +711,31 @@ public:
 					printf("\n");
 					
 				}
+				if (ev.mouseButton.button == Mouse::Right && this->Field.object("Elon")->getStat("Health") < 100) {
+					this->Field.object("Elon")->setStat("Health", this->Field.object("Elon")->getStat("Health") + 10);
+				}
 			}
 		}
 
 	}
+	void updateHUD() {
+		if (this->Field.object("Elon")->getStat("Health") > 0) {
+			this->Field.object("StatBar_Fill0")->setSpriteSize(0.06, -0.06 * this->Field.object("Elon")->getStat("Health") / 100);
+		}
+		if (this->Field.object("Elon")->getStat("Hunger") > 0) {
+			this->Field.object("StatBar_Fill1")->setSpriteSize(0.06, -0.06 * this->Field.object("Elon")->getStat("Hunger") / 100);
+		}
+		if (this->Field.object("Elon")->getStat("Thirst") > 0) {
+			this->Field.object("StatBar_Fill2")->setSpriteSize(0.06, -0.06 * this->Field.object("Elon")->getStat("Thirst") / 100);
+		}
+		if (this->Field.object("Elon")->getStat("Air") > 0) {
+			this->Field.object("StatBar_Fill3")->setSpriteSize(0.06, -0.06 * this->Field.object("Elon")->getStat("Air") / 100);
+		}
+	}
 	void update() {
 		int updated = false;
 		this->pollEvents();
+		this->updateHUD();
 		if (W || A || S || D || shift) {
 			if (shift) {
 				this->Field.object("Elon")->UpdateAnimation(2);
@@ -774,7 +840,7 @@ gameEngine First_step;
 
 void SortObj() {
 	for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
-		if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight()* First_step.DrawField_Dynamic[i]->getSize())/2 > First_step.DrawField_Dynamic[i+1]->PosY() + (First_step.DrawField_Dynamic[i+1]->getImgHeight() * First_step.DrawField_Dynamic[i+1]->getSize()) / 2)) {
+		if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight()* First_step.DrawField_Dynamic[i]->getSizeY())/2 > First_step.DrawField_Dynamic[i+1]->PosY() + (First_step.DrawField_Dynamic[i+1]->getImgHeight() * First_step.DrawField_Dynamic[i+1]->getSizeY()) / 2)) {
 			iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
 		}
 	}
@@ -861,19 +927,20 @@ void isMovable() {
 					First_step.S_key();
 					First_step.move_speed *= 5;
 				}
+				else if (HitVec[1] > 0) {
+					S_isbump = true;
+					First_step.move_speed /= 5;
+					First_step.W_key();
+					First_step.move_speed *= 5;
+				}
 				if (HitVec[0] < 0) {
 					A_isbump = true;
 					First_step.move_speed /= 5;
 					First_step.D_key(false);
 					First_step.move_speed *= 5;
 				}
-				if (HitVec[1] > 0) {
-					S_isbump = true;
-					First_step.move_speed /= 5;
-					First_step.W_key();
-					First_step.move_speed *= 5;
-				}
-				if (HitVec[0] > 0) {
+				
+				else if (HitVec[0] > 0) {
 					D_isbump = true;
 					First_step.move_speed /= 5;
 					First_step.A_key(false);
@@ -925,6 +992,14 @@ void ShowDrawingStat() {
 			for (int num = 0; num < First_step.DrawField_Dynamic.size(); num++) {
 				vector<float> data = First_step.DrawField_Dynamic[num]->getHitBoxData();
 				cout << First_step.DrawField_Dynamic[num]->nowIs() << '\t';
+				for (int i = 0; i < 6; i++) {
+					printf("%.1f ", data[i]);
+				}
+				printf("\n");
+			}
+			for (int num = 0; num < First_step.DrawField_Static.size(); num++) {
+				vector<float> data = First_step.DrawField_Static[num]->getHitBoxData();
+				cout << First_step.DrawField_Static[num]->nowIs() << '\t';
 				for (int i = 0; i < 6; i++) {
 					printf("%.1f ", data[i]);
 				}
