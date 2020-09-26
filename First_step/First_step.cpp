@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
+#include <SFML/OpenGL.hpp>
 #include<thread>
 #include <math.h>
 #include <iostream>
@@ -11,125 +12,48 @@
 #include <typeinfo>
 #include<windows.h>
 #include<random>
+#include <unordered_map> 
 
 using namespace sf;
 using namespace std;
 
-class strTuple { // string tuple for store array of string.
-public:
-	vector<string> Tuple;
-	string var(unsigned __int64 i) {
-		return this->Tuple[i];
-	}
-	void set(unsigned __int64 Index, string In) {
-		this->Tuple.at(Index) = In;
-	}
-	void append(string In) {
-		this->Tuple.push_back(In);
-	}
-	void remove(string In) {
-		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
-	}
-	void popOut(unsigned __int64 index) {
-		this->Tuple.erase(Tuple.begin() + index);
-	}
-	unsigned __int64 length() {
-		return this->Tuple.size();
-	}
-	unsigned __int64 index(string In) {
-		auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
-		if (pos != this->Tuple.end()) {
-			unsigned __int64 index = distance(this->Tuple.begin(), pos);
-			return index;
-		}
-		else {
-			return -1;
-		}
-	}
-};
-
-class fltTuple { // string tuple for store array of string.
-public:
-	vector<float> Tuple;
-	float var(unsigned __int64 i) {
-		return this->Tuple[i];
-	}
-	void set(unsigned __int64 Index, float In) {
-		this->Tuple.at(Index) = In;
-	}
-	void append(float In) {
-		this->Tuple.push_back(In);
-	}
-	void remove(float In) {
-		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
-	}
-	void popOut(unsigned __int64 index) {
-		this->Tuple.erase(Tuple.begin() + index);
-	}
-	unsigned __int64 length() {
-		return this->Tuple.size();
-	}
-	unsigned __int64 index(float In) {
-		auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
-		if (pos != this->Tuple.end()) {
-			unsigned __int64 index = distance(this->Tuple.begin(), pos);
-			return index;
-		}
-		else {
-			return -1;
-		}
-	}
-};
-
 class strDic { // string tuple for store array of string.
 public:
-	strTuple Key;
-	strTuple Tuple;
+	unordered_map<string, string> map;
 	string get(string keyIn) {
-		return this->Tuple.var(Key.index(keyIn));
+		return this->map[keyIn];
 	}
 	void set(string keyIn, string In) {
-		this->Tuple.set(Key.index(keyIn), In);
+		this->map[keyIn] = In;
 	}
 	void append(string keyIn, string In) {
-		this->Key.append(keyIn);
-		this->Tuple.append(In);
+		this->map[keyIn] = In;
 	}
 	void remove(string keyIn) {
-		this->Tuple.popOut(Key.index(keyIn));
-		this->Key.popOut(Key.index(keyIn));
+		this->map.erase(keyIn);
 	}
 	unsigned __int64 length() {
-		return this->Tuple.length();
+		return this->map.size();
 	}
 };
 
 class fltDic { // string tuple for store array of string.
 public:
-	strTuple Key;
-	fltTuple Tuple;
+	unordered_map<string, float> map;
 	float get(string keyIn) {
-		return this->Tuple.var(Key.index(keyIn));
-	}
-	string getKey(int i) {
-		return this->Key.var(i);
+		return this->map[keyIn];
 	}
 	void set(string keyIn, float In) {
-		this->Tuple.set(Key.index(keyIn), In);
+		this->map[keyIn] = In;
 	}
 	void append(string keyIn, float In) {
-		this->Key.append(keyIn);
-		this->Tuple.append(In);
+		this->map[keyIn] = In;
 	}
 	void remove(string keyIn) {
-		this->Tuple.popOut(Key.index(keyIn));
-		this->Key.popOut(Key.index(keyIn));
+		this->map.erase(keyIn);
 	}
 	unsigned __int64 length() {
-		return this->Tuple.length();
-	}
-	float var(int i) {
-		return this->Tuple.var(i);
+		return this->map.size();
 	}
 };
 
@@ -212,6 +136,7 @@ public:
 		if (!(*ptr).loadFromFile(Path)) {
 			printf("Error");
 		}
+		ptr->setSmooth(true);
 		int old_size = this->textureArray.size();
 		for (int i = 0; i <= slot - old_size; i++) {
 			this->textureArray.push_back({});
@@ -419,14 +344,19 @@ private:
 	int i = 0;
 	Map itemList;
 	vector<Object*> Backpack;
+	ContextSettings settings;
 	void initVar() {
 		this->window = nullptr;
 	}
 	void initWindow() {
 		this->mode.height = h;
 		this->mode.width = w;
-		this->window = new RenderWindow(this->mode, "First Step", Style::Titlebar | Style::Close);
-		this->window->setFramerateLimit(75);
+		this->settings.antialiasingLevel = 100;
+		this->window = new RenderWindow(this->mode, "First Step", Style::Titlebar | Style::Close, this->settings);
+		(*this->window).setVerticalSyncEnabled(true);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glMatrixMode(GL_PROJECTION);
+		
 	}
 	void initItem() {
 		for (int i = 0; i < 9; i++) {
@@ -485,6 +415,7 @@ private:
 		this->Field.object("Anchor")->setPosX(-3000);
 		this->Field.object("Anchor")->setPosY(-3000);
 		this->Field.object("Anchor")->isPassable(true);
+		this->Anchor = this->Field.object("Anchor");
 
 		this->Field.createTemplate("Structure");
 		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
@@ -584,6 +515,7 @@ private:
 		this->Field.object("Elon")->setPosX(700 - 1000 * 0.1 * 1 / 2);
 		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
+		this->Elon = this->Field.object("Elon");
 
 		
 
@@ -657,8 +589,6 @@ public:
 		this->initVar();
 		this->initWindow();
 		this->initObject();
-		this->Anchor = this->Field.object("Anchor");
-		this->Elon = this->Field.object("Elon");
 	}
 	virtual ~gameEngine() {
 		delete this->window;
@@ -762,7 +692,7 @@ public:
 				this->mousePos[1] = ev.mouseMove.y;
 			}
 			if (ev.type == Event::MouseButtonPressed) {
-				if (ev.mouseButton.button == Mouse::Left && false) {
+				if (ev.mouseButton.button == Mouse::Middle) {
 					//for (int i = 0; i < this->Field.entityNumber(); i++) {
 						//cout << this->Field.objectAt(i)->nowIs() << endl;
 					//}
@@ -836,21 +766,20 @@ public:
 	}
 	void update() {
 		int updated = false;
-		Object* Elon = this->Field.object("Elon");
 		this->pollEvents();
 		this->updateHUD();
 		if (W || A || S || D || shift) {
-			Elon->setStat("Hunger", Elon->getStat("Hunger") - 0.0002);
-			Elon->setStat("Thirst", Elon->getStat("Thirst") - 0.0003);
+			this->Elon->setStat("Hunger", this->Elon->getStat("Hunger") - 0.0002);
+			this->Elon->setStat("Thirst", this->Elon->getStat("Thirst") - 0.0003);
 			if (shift) {
-				Elon->UpdateAnimation(2);
-				Elon->setStat("Hunger", Elon->getStat("Hunger") - 0.002);
-				Elon->setStat("Thirst", Elon->getStat("Thirst") - 0.003);
+				this->Elon->UpdateAnimation(2);
+				this->Elon->setStat("Hunger", this->Elon->getStat("Hunger") - 0.002);
+				this->Elon->setStat("Thirst", this->Elon->getStat("Thirst") - 0.003);
 			}
 			if (S && !W) {
 				if (!updated) {
 					updated = true;
-					Elon->UpdateAnimation(1);
+					this->Elon->UpdateAnimation(1);
 				}
 				if (S_moveable) {
 					S_key();
@@ -859,7 +788,7 @@ public:
 			if (W && !S) {
 				if (!updated) {
 					updated = true;
-					Elon->UpdateAnimation(1);
+					this->Elon->UpdateAnimation(1);
 				}
 				if (W_moveable) {
 					W_key();
@@ -868,7 +797,7 @@ public:
 			if (D && !A) {
 				if (!updated) {
 					updated = true;
-					Elon->UpdateAnimation(1);
+					this->Elon->UpdateAnimation(1);
 				}
 				if (D_moveable) {
 					D_key(true);
@@ -877,7 +806,7 @@ public:
 			if (A && !D) {
 				if (!updated) {
 					updated = true;
-					Elon->UpdateAnimation(1);
+					this->Elon->UpdateAnimation(1);
 				}
 				if (A_moveable) {
 					A_key(true);
@@ -892,14 +821,14 @@ public:
 		}
 		else {
 			Idle();
-			Elon->resetTimeSeq();
+			this->Elon->resetTimeSeq();
 		}
 		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
 		try {
 			for (int i = 0; i < Field.entityNumber(); i++) {
 				if (this->Field.objectAt(i)->type() == "Dynamic" && i < Field.entityNumber()) {
-					this->Field.objectAt(i)->setPosX(this->Field.object("Anchor")->PosX());
-					this->Field.objectAt(i)->setPosY(this->Field.object("Anchor")->PosY());
+					this->Field.objectAt(i)->setPosX(this->Anchor->PosX());
+					this->Field.objectAt(i)->setPosY(this->Anchor->PosY());
 				}
 			}
 		}
@@ -942,7 +871,7 @@ public:
 			printf("%d\n", e);
 		}
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
-
+	
 		this->window->display();
 	}
 	void sort() {
