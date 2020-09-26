@@ -229,10 +229,10 @@ public:
 		}
 	}
 	void resetTimeSeq() {
-		this->time == 0;
+		this->time = 0;
 	}
 	void flipTexture(int rev) {
-		this->fliping = ! this->fliping;
+		this->fliping =! this->fliping;
 		this->sprite.setScale(rev*this->Size[0], this->Size[1]);
 	}
 	void setStat(string key, float value) {
@@ -332,7 +332,6 @@ private:
 	Map Mars;
 	int i = 0;
 	Map itemList;
-	vector<Object*> Backpack;
 	ContextSettings settings;
 	void initVar() {
 		this->window = nullptr;
@@ -363,15 +362,24 @@ private:
 		this->itemList.registerObject("Herb", "Item");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", 0, 1000);
 		this->itemList.object("Herb")->setSpriteTexture(0, 0);
+		this->itemList.object("Herb")->addStat("Quantity", 10);
 		this->itemList.object("Herb")->tag = "Medicine";
 
 		this->itemList.registerObject("Apple", "Item");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
 		this->itemList.object("Apple")->setSpriteTexture(0, 0);
+		this->itemList.object("Apple")->addStat("Quantity", 10);
 		this->itemList.object("Apple")->tag = "Food";
 
-		Backpack[0] = this->itemList.object("Herb");
-		Backpack[1] = this->itemList.object("Apple");
+		this->itemList.registerObject("HydroFlask", "Item");
+		this->itemList.object("HydroFlask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", 0, 1000);
+		this->itemList.object("HydroFlask")->setSpriteTexture(0, 0);
+		this->itemList.object("HydroFlask")->addStat("Quantity", 100);
+		this->itemList.object("HydroFlask")->tag = "Drink";
+
+		this->Backpack[0] = this->itemList.object("Herb");
+		this->Backpack[1] = this->itemList.object("Apple");
+		this->Backpack[2] = this->itemList.object("HydroFlask");
 	}
 	void initObject() {
 
@@ -493,14 +501,21 @@ private:
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 0, 8);
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 0, 8);
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", 1, 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying1.png", 2, 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying2.png", 2, 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying3.png", 2, 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying4.png", 2, 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", 2, 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", 2, 20000000);
 		this->Field.object("Elon")->loop = true;
 		this->Field.object("Elon")->setSpriteSize(0.1, 0.1);
 		this->Field.object("Elon")->setImgDim(1000,1600);
 		this->Field.object("Elon")->addStat("Health", 100);
-		this->Field.object("Elon")->addStat("Thirst", 100);
-		this->Field.object("Elon")->addStat("Hunger", 100);
-		this->Field.object("Elon")->addStat("Air", 100);
-		this->Field.object("Elon")->setPosX(700 - 1000 * 0.1 * 1 / 2);
+		this->Field.object("Elon")->addStat("Thirst", 2);
+		this->Field.object("Elon")->addStat("Hunger", 2);
+		this->Field.object("Elon")->addStat("Air", 2);
+		this->Field.object("Elon")->addStat("Alive", 1);
+		this->Field.object("Elon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
 		this->Field.object("Elon")->setPosY(400);
 		this->Field.object("Elon")->setType("Static");
 		this->Elon = this->Field.object("Elon");
@@ -556,6 +571,7 @@ private:
 public:
 	RenderWindow* window;
 	Map Field;
+	vector<Object*> Backpack;
 	vector<Object*> DrawField_Dynamic;
 	vector<Object*> DrawField_Static;
 	vector<Object*> DrawField_BG;
@@ -563,6 +579,7 @@ public:
 	vector<float> mousePos = {0,0};
 	Object* Anchor;
 	Object* Elon;
+	bool time = true;
 	bool pass = true;
 	bool movable = true;
 	float move_speed = 3;
@@ -688,16 +705,31 @@ public:
 				}
 				if (ev.mouseButton.button == Mouse::Right) {
 					cout << this->Backpack[this->selectingSlot]->tag << endl;
-					if (this->Backpack[this->selectingSlot]->tag == "Medicine" && Elon->getStat("Health") < 100) {
-						Elon->setStat("Health", Elon->getStat("Health") + 10);
-						if (Elon->getStat("Health") > 100) {
-							Elon->setStat("Health", 100);
+					if (this->Elon->getStat("Alive") == 1) {
+						if (this->Backpack[this->selectingSlot]->tag == "Medicine" && this->Backpack[this->selectingSlot]->getStat("Quantity") > 0 && Elon->getStat("Health") < 100) {
+							Elon->setStat("Health", Elon->getStat("Health") + 10);
+							if (Elon->getStat("Health") > 100) {
+								Elon->setStat("Health", 100);
+							}
 						}
-					}
-					if (this->Backpack[this->selectingSlot]->tag == "Food" && Elon->getStat("Hunger") < 100) {
-						Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
-						if (Elon->getStat("Hunger") > 100) {
-							Elon->setStat("Hunger", 100);
+						else if (this->Backpack[this->selectingSlot]->tag == "Food" && this->Backpack[this->selectingSlot]->getStat("Quantity") > 0 && Elon->getStat("Hunger") < 100) {
+							Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
+							if (Elon->getStat("Hunger") > 100) {
+								Elon->setStat("Hunger", 100);
+							}
+						}
+						else if (this->Backpack[this->selectingSlot]->tag == "Drink" && this->Backpack[this->selectingSlot]->getStat("Quantity") > 0 && Elon->getStat("Thirst") < 100) {
+							Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
+							if (Elon->getStat("Thirst") > 100) {
+								Elon->setStat("Thirst", 100);
+							}
+						}
+						if (this->Backpack[this->selectingSlot]->getStat("Quantity") > 0) {
+							this->Backpack[this->selectingSlot]->setStat("Quantity", this->Backpack[this->selectingSlot]->getStat("Quantity") - 1);
+						}
+						if (this->Backpack[this->selectingSlot]->getStat("Quantity") == 0) {
+							this->Backpack[this->selectingSlot]->Is("None");
+							this->Backpack[this->selectingSlot]->setSpriteSize(0, 0);
 						}
 					}
 				}
@@ -715,9 +747,15 @@ public:
 						this->selectingSlot = 0;
 					}
 				}
+				cout << this->Backpack[this->selectingSlot]->tag << endl;
 			}
 		}
 
+	}
+	void DecStat(string Stat, float amount) {
+		if (Elon->getStat(Stat) > 1) {
+			Elon->setStat(Stat, Elon->getStat(Stat) - amount);
+		}
 	}
 	void updateHUD() {
 		if (Elon->getStat("Health") > 0) {
@@ -745,13 +783,14 @@ public:
 		int updated = false;
 		this->pollEvents();
 		this->updateHUD();
-		if (W || A || S || D || shift) {
-			this->Elon->setStat("Hunger", this->Elon->getStat("Hunger") - 0.0002);
-			this->Elon->setStat("Thirst", this->Elon->getStat("Thirst") - 0.0003);
+		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1) {
+			DecStat("Hunger", 0.0002);
+			DecStat("Thirst", 0.0003);
+			DecStat("Air", 0.005);
 			if (shift) {
 				this->Elon->UpdateAnimation(2);
-				this->Elon->setStat("Hunger", this->Elon->getStat("Hunger") - 0.002);
-				this->Elon->setStat("Thirst", this->Elon->getStat("Thirst") - 0.003);
+				DecStat("Hunger", 0.002);
+				DecStat("Thirst", 0.003);
 			}
 			if (S && !W) {
 				if (!updated) {
@@ -796,7 +835,7 @@ public:
 				}
 			}
 		}
-		else {
+		else if(Elon->getStat("Alive") == 1) {
 			Idle();
 			this->Elon->resetTimeSeq();
 		}
@@ -812,10 +851,29 @@ public:
 		catch (const std::out_of_range& e) {
 			printf("%d\n", e);
 		}
-		Elon->setStat("Health", Elon->getStat("Health") - 0.001);
-		Elon->setStat("Hunger", Elon->getStat("Hunger") - 0.0005);
-		Elon->setStat("Thirst", Elon->getStat("Thirst") - 0.0007);
-		Elon->setStat("Air", Elon->getStat("Air") - 0.005);
+		DecStat("Health", 0.00025);
+		DecStat("Hunger", 0.0005);
+		DecStat("Thirst", 0.0007);
+		DecStat("Air", 0.005);
+		
+		if (Elon->getStat("Hunger") <= 1) {
+			DecStat("Health", 0.005);
+		}
+		if (Elon->getStat("Thirst") <= 1) {
+			DecStat("Health", 0.007);
+		}
+		if (Elon->getStat("Air") <= 1) {
+			DecStat("Health", 0.05);
+		}
+		if (Elon->getStat("Health") <= 1) {
+			if (time) {
+				this->Elon->resetTimeSeq();
+				time = false;
+			}
+			Elon->setStat("Alive", 0);
+			Elon->setAnimationSeq(2);
+			Elon->UpdateAnimation(1);
+		}
 		/*
 		This part is for update game event.
 		*/
@@ -1059,11 +1117,23 @@ void ShowDrawingStat1() {
 		printf("BG : %d, Dynamic : %d, Static %d, Overall %d\n", First_step.DrawField_BG.size(), First_step.DrawField_Dynamic.size(), First_step.DrawField_Static.size(), First_step.Field.entityNumber());
 	}
 }
+
+void ShowDrawingStat2() {
+	while (First_step.isRuning()) {
+		while (First_step.Field.entityNumber() == 0) {
+			Sleep(1);
+		}
+		for (int i = 0; i < 9; i++) {
+			printf("%d ", First_step.Backpack[i]->getStat("Quantity"));
+		}
+		printf("\n");
+	}
+}
 int main() { // Game loop
-	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat1);
+	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat2);
 	CheckBump.launch();
 	ChechFloor.launch();
-	monitor.launch();
+	//monitor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
