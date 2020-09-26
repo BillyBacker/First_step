@@ -17,6 +17,14 @@
 using namespace sf;
 using namespace std;
 
+void Break() {
+	while(true) {
+		Sleep(1000);
+		printf("Happyliy\n");
+		continue;
+	}
+}
+
 class strDic { // string tuple for store array of string.
 public:
 	unordered_map<string, string> map;
@@ -59,7 +67,7 @@ public:
 
 class Object {
 private:
-	string Type;
+	string Type = "Dynamic";
 	unsigned __int64 ID;
 	string Name;
 	fltDic Stat;
@@ -123,7 +131,7 @@ public:
 		this->sprite.setOrigin({ halfW , halfH });
 	}
 	string type() {
-		return Type;
+		return this->Type;
 	}
 	void setType(string In) {
 		this->Type = In;
@@ -270,64 +278,45 @@ public:
 
 class Map {
 public:
-	objPtrTuple Tuple;
-	objPtrTuple Templ;
-	unsigned __int64 getIndex(string name) {
-		return this->Tuple.index(this->object(name));
-	}
+	unordered_map<string, Object*> Tuple;
+	unordered_map<string, Object*> Templ;
+	unordered_map<unsigned __int64, string> Tuplekey, Templkey;
 	void createTemplate(string name) {
-		Object* p = new Object(this->Templ.length());
+		Object* p = new Object(this->Templ.size());
 		p->Is(name);
-		this->Templ.append(p);
+		this->Templ[name] = p;
+		Templkey[this->Templ.size()] = name;
 	}
 	void registerObject(string Name, string Template) {
-		Object *p = new Object(this->Tuple.length());
+		Object *p = new Object(this->Tuple.size());
 		(*p).useStat(*this->Template(Template));
 		(*p).Is(Name);
-		this->Tuple.append(p);
+		this->Tuple[Name] = p;
+		this->Tuplekey[this->Tuple.size()-1] = Name;
 	}
 	Object* object(string keyIn) {
-		for (int i = 0; i < this->Tuple.length(); i++) {
-			if (Tuple.var(i)->nowIs() == keyIn) {
-				return Tuple.var(i);
-			}
-		}
+		return Tuple[keyIn];
 	}
 	Object* Template(string keyIn) {
-		for (int i = 0; i < this->Templ.length(); i++) {
-			if (Templ.var(i)->nowIs() == keyIn) {
-				return Templ.var(i);
-			}
-		}
+		return Templ[keyIn];
 	}
 	Object* objectAt(unsigned __int64 Index) {
-		return this->Tuple.var(Index);
-	}
-	void append(Object* In) {
-		this->Tuple.append(In);
+		return this->Tuple[Tuplekey[Index]];
 	}
 	void remove(string keyIn) {
-		vector<Object*> ptr = this->Tuple.Tuple;
-		for (int i = 0; i < this->Tuple.length(); i++) {
-			if ((ptr[i])->nowIs() == keyIn) {
-				this->Tuple.popOut(i);
-			}
-		}
+		this->Tuple.erase(keyIn);
 	}
 	void removeObjAt(unsigned __int64 Index) {
-		this->Tuple.popOut(Index);
-	}
-	void insertQuene(unsigned __int64 Index, Object* In) {
-		this->Tuple.insert(Index, In);
+		this->Tuple.erase(Tuplekey[Index]);
 	}
 	unsigned __int64 entityNumber() {
-		return this->Tuple.length();
+		return this->Tuple.size();
 	}
 	string objectTypeAt(unsigned __int64 Index) {
-		return this->Tuple.var(Index)->nowIs();
+		return this->objectAt(Index)->nowIs();
 	}
-	vector<Object*> getTuple() {
-		return this->Tuple.Tuple;
+	unordered_map<string, Object*> getTuple() {
+		return this->Tuple;
 	}
 
 };
@@ -367,7 +356,6 @@ private:
 			ptr->Is("None");
 			Backpack.push_back(ptr);
 		}
-
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
 		this->itemList.Template("Item")->setImgDim(1000, 1000);
@@ -388,14 +376,14 @@ private:
 	void initObject() {
 
 		this->Field.createTemplate("Blank");
-
+		
 		this->Field.createTemplate("Item");
 		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
 		this->Field.Template("Item")->setSpriteTexture(0, 0);
 		this->Field.Template("Item")->setSpriteSize(0.005, 0.005);
 		this->Field.Template("Item")->setImgDim(1000,1000);
 		this->Field.Template("Item")->setType("Static");
-
+		
 		this->Field.createTemplate("Rocky");
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", 0, 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
@@ -461,8 +449,8 @@ private:
 		this->Field.Template("Floor")->isPassable(true);
 		this->Field.Template("Floor")->tag = "BG";
 
-		for (int i = 0; i < 15; i++) {
-			for (int j = 0; j < 15; j++) {
+		for (int i = 0; i < 30; i++) {
+			for (int j = 0; j < 30; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
 				this->Field.registerObject(ObjName, "Floor");
 				this->Field.object(ObjName)->setOffsetPosX(i * 5000 * 0.1/1.1);
@@ -517,8 +505,6 @@ private:
 		this->Field.object("Elon")->setType("Static");
 		this->Elon = this->Field.object("Elon");
 
-		
-
 		//for (int i = 0; i < 11; i++) {
 			//for (int j = 0; j < 17; j++) {
 				//this->Field.registerObject(to_string(i)+to_string(j), "Item");
@@ -554,8 +540,8 @@ private:
 			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500*0.1*i);
 			this->Field.object("StatBar" + to_string(i))->setPosY(600);
 		}
-
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
+			this->Field.objectAt(i)->type();
 			if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
 				this->DrawField_Static.push_back(this->Field.objectAt(i));
 			}
@@ -563,7 +549,6 @@ private:
 				this->BG_repo.push_back(this->Field.objectAt(i));
 			}
 		}
-
 	}
 	double ObjectDis(Object* A, Object* B) {
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
@@ -600,14 +585,6 @@ public:
 		else {
 			return false;
 		}
-	}
-	void Swap(unsigned __int64 ID1, unsigned __int64 ID2) {
-		Object* ptr1 = this->Field.objectAt(ID1);
-		Object* ptr2 = this->Field.objectAt(ID2);
-		this->Field.removeObjAt(ID1);
-		this->Field.insertQuene(ID1, ptr2);
-		this->Field.removeObjAt(ID2);
-		this->Field.insertQuene(ID2, ptr1);
 	}
 	const bool isRuning() {
 		return this->window->isOpen();
@@ -892,12 +869,12 @@ void SortObj() {
 void CheckInsight() {
 	try {
 		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
-			if ((First_step.Field.objectAt(i)->type() != "Static"&& First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1700) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
+			if ((First_step.Field.objectAt(i)->type() != "Static"&& First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
 				First_step.DrawField_Dynamic.push_back(First_step.Field.objectAt(i));
 			}
 		}
 		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
-			if (!(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1700) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")) {
+			if (!(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1100) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")) {
 				First_step.DrawField_Dynamic.erase(First_step.DrawField_Dynamic.begin() + i);
 			}
 		}
@@ -969,8 +946,6 @@ void isMovable() {
 		CheckInsight();
 		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
 			try {
-				First_step.DrawField_Dynamic.at(i);
-				First_step.Field.getTuple().at(First_step.Field.getIndex("Elon"));
 				ElonHitBox = First_step.Field.object("Elon")->getHitBoxData();
 				ObjHitBox = First_step.DrawField_Dynamic[i]->getHitBoxData();
 			}
@@ -1081,7 +1056,7 @@ void ShowDrawingStat1() {
 		while (First_step.Field.entityNumber() == 0) {
 			Sleep(1);
 		}
-		printf("%d %d %d\n", First_step.DrawField_BG.size(), First_step.DrawField_Dynamic.size(), First_step.DrawField_Static.size());
+		printf("BG : %d, Dynamic : %d, Static %d, Overall %d\n", First_step.DrawField_BG.size(), First_step.DrawField_Dynamic.size(), First_step.DrawField_Static.size(), First_step.Field.entityNumber());
 	}
 }
 int main() { // Game loop
