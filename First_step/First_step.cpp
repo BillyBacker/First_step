@@ -79,9 +79,9 @@ private:
 	int imgWidth;
 
 	int time = 0, Index = 0;
-	vector<vector<Texture*>> textureArray;
-	vector<vector<int>> duration;
-	int slot = 0;
+	unordered_map<string, vector<Texture*>> textureArray;
+	unordered_map<string, vector<int>> duration;
+	string slot;
 public:
 	bool loop = false;
 	bool passable = true;
@@ -114,7 +114,7 @@ public:
 	void isPassable(bool In) {
 		this->passable = In;
 	}
-	void setAnimationSeq(int Slot) {
+	void setAnimationSeq(string Slot) {
 		this->slot = Slot;
 	}
 	int getImgHeight() {
@@ -139,23 +139,19 @@ public:
 	unsigned __int64 getID() {
 		return this->ID;
 	}
-	void addTexture(string Path,int slot , int durt) {
+	void addTexture(string Path,string seqName , int durt) {
 		Texture* ptr = new Texture;
 		if (!(*ptr).loadFromFile(Path)) {
 			printf("Error");
 		}
 		ptr->setSmooth(true);
 		int old_size = this->textureArray.size();
-		for (int i = 0; i <= slot - old_size; i++) {
-			this->textureArray.push_back({});
-			this->duration.push_back({});
-		}
-		this->textureArray[slot].push_back(ptr);
-		this->duration[slot].push_back(durt);
+		this->textureArray[seqName].push_back(ptr);
+		this->duration[seqName].push_back(durt);
 		
 	}
-	void setSpriteTexture(unsigned long long Index, int slot) {
-		this->sprite.setTexture(*this->textureArray[slot][Index]);
+	void setSpriteTexture(string seqName, unsigned long long Index) {
+		this->sprite.setTexture(*this->textureArray[seqName][Index]);
 	}
 	void setSpriteSize(float scalex, float scaley) {
 		this->sprite.setScale(scalex, scaley);
@@ -358,45 +354,45 @@ private:
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
 		this->itemList.Template("Item")->setImgDim(1000, 1000);
-
+		
 		this->itemList.registerObject("Herb", "Item");
-		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", 0, 1000);
-		this->itemList.object("Herb")->setSpriteTexture(0, 0);
+		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
+		this->itemList.object("Herb")->setSpriteTexture("default", 0);
 		this->itemList.object("Herb")->addStat("Quantity", 10);
 		this->itemList.object("Herb")->tag = "Medicine";
-
+		
 		this->itemList.registerObject("Apple", "Item");
-		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
-		this->itemList.object("Apple")->setSpriteTexture(0, 0);
+		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
+		this->itemList.object("Apple")->setSpriteTexture("default", 0);
 		this->itemList.object("Apple")->addStat("Quantity", 10);
 		this->itemList.object("Apple")->tag = "Food";
 
 		this->itemList.registerObject("HydroFlask", "Item");
-		this->itemList.object("HydroFlask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", 0, 1000);
-		this->itemList.object("HydroFlask")->setSpriteTexture(0, 0);
+		this->itemList.object("HydroFlask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
+		this->itemList.object("HydroFlask")->setSpriteTexture("default", 0);
 		this->itemList.object("HydroFlask")->addStat("Quantity", 100);
 		this->itemList.object("HydroFlask")->tag = "Drink";
-
+		
 		this->Backpack[0] = this->itemList.object("Herb");
 		this->Backpack[1] = this->itemList.object("Apple");
 		this->Backpack[2] = this->itemList.object("HydroFlask");
 	}
 	void initObject() {
-
+		
 		this->Field.createTemplate("Blank");
 		
 		this->Field.createTemplate("Item");
-		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", 0, 1000);
-		this->Field.Template("Item")->setSpriteTexture(0, 0);
+		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
+		this->Field.Template("Item")->setSpriteTexture("default", 0);
 		this->Field.Template("Item")->setSpriteSize(0.005, 0.005);
 		this->Field.Template("Item")->setImgDim(1000,1000);
 		this->Field.Template("Item")->setType("Static");
 		
 		this->Field.createTemplate("Rocky");
-		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", 0, 1000);
-		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", 1, 1000);
-		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", 2, 1000);
-		this->Field.Template("Rocky")->setSpriteTexture(0, 0);
+		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", "default0", 1000);
+		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", "default1", 1000);
+		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", "default2", 1000);
+		this->Field.Template("Rocky")->setSpriteTexture("default1", 0);
 		this->Field.Template("Rocky")->setSpriteSize(0.1, 0.1);
 		this->Field.Template("Rocky")->setImgDim(900,900);
 		this->Field.Template("Rocky")->isPassable(false);
@@ -413,6 +409,9 @@ private:
 		this->Field.object("Anchor")->isPassable(true);
 		this->Anchor = this->Field.object("Anchor");
 
+		this->Field.createTemplate("dropItem");
+		this->Field.Template("dropItem")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
+
 		this->Field.createTemplate("Structure");
 		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
 		this->Field.Template("Structure")->setPosY(this->Field.object("Anchor")->PosY());
@@ -420,25 +419,25 @@ private:
 		this->Field.Template("Structure")->isPassable(false);
 
 		this->Field.createTemplate("itemFrame");
-		this->Field.Template("itemFrame")->addTexture("assets\\Prop\\HUD\\ItemFrameWhite.png", 0, 1000);
-		this->Field.Template("itemFrame")->setSpriteTexture(0, 0);
+		this->Field.Template("itemFrame")->addTexture("assets\\Prop\\HUD\\ItemFrameWhite.png", "default", 1000);
+		this->Field.Template("itemFrame")->setSpriteTexture("default", 0);
 		this->Field.Template("itemFrame")->setSpriteSize(0.06, 0.06);
 		this->Field.Template("itemFrame")->setType("Static");
 		this->Field.Template("itemFrame")->isPassable(false);
 
 		this->Field.createTemplate("StatBar");
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\StatFrame.png", 0, 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Health.png", 1, 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Hunger.png", 2, 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Thirst.png", 3, 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Air.png", 4, 1000);
-		this->Field.Template("StatBar")->setSpriteTexture(0, 0);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\StatFrame.png", "frame", 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Health.png", "Stat1", 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Hunger.png", "Stat2", 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Thirst.png", "Stat3", 1000);
+		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Air.png", "Stat4", 1000);
+		this->Field.Template("StatBar")->setSpriteTexture("frame", 0);
 		this->Field.Template("StatBar")->setSpriteSize(0.06, 0.06);
 		this->Field.Template("StatBar")->setType("Static");
 
 		this->Field.createTemplate("Pump");
-		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png",0 , 1000);
-		this->Field.Template("Pump")->setSpriteTexture(0, 0);
+		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png","pump" , 1000);
+		this->Field.Template("Pump")->setSpriteTexture("pump", 0);
 		this->Field.Template("Pump")->setSpriteSize(0.1, 0.1);
 		this->Field.Template("Pump")->setImgDim(1200, 1600);
 		this->Field.Template("Pump")->setPosX(this->Field.object("Anchor")->PosX());
@@ -447,8 +446,8 @@ private:
 		this->Field.Template("Pump")->isPassable(false);
 
 		this->Field.createTemplate("Floor");
-		this->Field.Template("Floor")->addTexture("assets\\Prop\\Floor\\Floor11.png", 0, 1000);
-		this->Field.Template("Floor")->setSpriteTexture(0, 0);
+		this->Field.Template("Floor")->addTexture("assets\\Prop\\Floor\\Floor11.png", "default", 1000);
+		this->Field.Template("Floor")->setSpriteTexture("default", 0);
 		this->Field.Template("Floor")->setSpriteSize(0.1, 0.1);
 		this->Field.Template("Floor")->setImgDim(5000, 5000);
 		this->Field.Template("Floor")->setPosX(this->Field.object("Anchor")->PosX());
@@ -456,7 +455,7 @@ private:
 		this->Field.Template("Floor")->setType("Dynamic");
 		this->Field.Template("Floor")->isPassable(true);
 		this->Field.Template("Floor")->tag = "BG";
-
+	
 		for (int i = 0; i < 30; i++) {
 			for (int j = 0; j < 30; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
@@ -469,44 +468,43 @@ private:
 		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Rocky");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture(0, rand()%3);
+			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("default"+to_string(rand()%3), 0);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
 		}
 
-
 		this->Field.registerObject("Hut", "Structure");
-		this->Field.object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", 0, 1000);
-		this->Field.object("Hut")->setSpriteTexture(0, 0);
+		this->Field.object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", "default", 1000);
+		this->Field.object("Hut")->setSpriteTexture("default", 0);
 		this->Field.object("Hut")->setSpriteSize(0.1, 0.1);
 		this->Field.object("Hut")->setOffsetPosX(2500);
 		this->Field.object("Hut")->setOffsetPosY(2500);
 		this->Field.object("Hut")->setImgDim(4800, 3200);
 
 		this->Field.registerObject("power", "Structure");
-		this->Field.object("power")->addTexture("assets\\Prop\\Building\\Solarcell.png", 0, 1000);
-		this->Field.object("power")->setSpriteTexture(0, 0);
+		this->Field.object("power")->addTexture("assets\\Prop\\Building\\Solarcell.png", "default", 1000);
+		this->Field.object("power")->setSpriteTexture("default", 0);
 		this->Field.object("power")->setSpriteSize(0.1, 0.1);
 		this->Field.object("power")->setOffsetPosX(1000);
 		this->Field.object("power")->setOffsetPosY(500);
 		this->Field.object("power")->setImgDim(1200, 1600);
 
 		this->Field.registerObject("Elon", "Blank");
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", 0, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", 1, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying1.png", 2, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying2.png", 2, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying3.png", 2, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying4.png", 2, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", 2, 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", 2, 20000000);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", "idle", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying1.png", "dying", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying2.png", "dying", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying3.png", "dying", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying4.png", "dying", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 8);
+		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
 		this->Field.object("Elon")->loop = true;
 		this->Field.object("Elon")->setSpriteSize(0.1, 0.1);
 		this->Field.object("Elon")->setImgDim(1000,1600);
@@ -535,8 +533,8 @@ private:
 		}
 
 		this->Field.registerObject("ItemPrt", "Blank");
-		this->Field.object("ItemPrt")->addTexture("assets\\Prop\\HUD\\ItemPointer.png", 0, 1000);
-		this->Field.object("ItemPrt")->setSpriteTexture(0, 0);
+		this->Field.object("ItemPrt")->addTexture("assets\\Prop\\HUD\\ItemPointer.png", "default", 1000);
+		this->Field.object("ItemPrt")->setSpriteTexture("default", 0);
 		this->Field.object("ItemPrt")->setSpriteSize(0.06, 0.06);
 		this->Field.object("ItemPrt")->setImgDim(1100, 1500);
 		this->Field.object("ItemPrt")->setPosX(503+1100*0.06/2);
@@ -546,7 +544,7 @@ private:
 		for (int i = 0; i < 4; i++) {
 			this->Field.registerObject("StatBar_Fill" + to_string(i), "StatBar");
 			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06,-0.06);
-			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture(0, i + 1);
+			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture("Stat" + to_string(i+1), 0);
 			this->Field.object("StatBar_Fill" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
 			this->Field.object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200*0.06);
 		}
@@ -633,7 +631,7 @@ public:
 		}
 	}
 	void Idle() {
-		Elon->setSpriteTexture(0, 1);
+		Elon->setSpriteTexture("idle", 0);
 	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
@@ -784,6 +782,7 @@ public:
 		this->pollEvents();
 		this->updateHUD();
 		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1) {
+			Elon->setAnimationSeq("walk");
 			DecStat("Hunger", 0.0002);
 			DecStat("Thirst", 0.0003);
 			DecStat("Air", 0.005);
@@ -871,7 +870,7 @@ public:
 				time = false;
 			}
 			Elon->setStat("Alive", 0);
-			Elon->setAnimationSeq(2);
+			Elon->setAnimationSeq("dying");
 			Elon->UpdateAnimation(1);
 		}
 		/*
