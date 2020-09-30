@@ -16,10 +16,10 @@
 
 using namespace sf;
 using namespace std;
-vector<float> getHitVector(float, float, float, float);
+const vector<float> getHitVector(float, float, float, float);
 
 void Break() {
-	while(true) {
+	while (true) {
 		Sleep(1000);
 		printf("Happyliy\n");
 		continue;
@@ -111,7 +111,7 @@ public:
 		this->tag = In.tag;
 	}
 	vector<float> getHitBoxData() {
-		return { this->PosX() - (this->getImgWigth() * this->Size[0] / 2), this->PosY(), this->PosX() + (this->getImgWigth()*this->Size[0] / 2), this->PosY() + (this->getImgHeight() * this->Size[1] * 3/10) , this->PosX(), this->PosY()+(this->getImgHeight()*this->Size[1])/2};
+		return { this->PosX() - (this->getImgWigth() * this->Size[0] / 2), this->PosY(), this->PosX() + (this->getImgWigth() * this->Size[0] / 2), this->PosY() + (this->getImgHeight() * this->Size[1] * 3 / 10) , this->PosX(), this->PosY() + (this->getImgHeight() * this->Size[1]) / 2 };
 	}
 	void isPassable(bool In) {
 		this->passable = In;
@@ -141,7 +141,7 @@ public:
 	unsigned __int64 getID() {
 		return this->ID;
 	}
-	void addTexture(string Path,string seqName , int durt) {
+	void addTexture(string Path, string seqName, int durt) {
 		Texture* ptr = new Texture;
 		if (!(*ptr).loadFromFile(Path)) {
 			printf("Error");
@@ -150,7 +150,7 @@ public:
 		int old_size = this->textureArray.size();
 		this->textureArray[seqName].push_back(ptr);
 		this->duration[seqName].push_back(durt);
-		
+
 	}
 	void setSpriteTexture(string seqName, unsigned long long Index) {
 		this->sprite.setTexture(*this->textureArray[seqName][Index]);
@@ -216,7 +216,7 @@ public:
 		return this->sprite;
 	}
 	void UpdateAnimation(int speed) {
-		this->time+=speed;
+		this->time += speed;
 		if (this->loop && this->Index >= this->textureArray[this->slot].size()) {
 			this->Index = 0;
 		}
@@ -230,8 +230,8 @@ public:
 		this->time = 0;
 	}
 	void flipTexture(int rev) {
-		this->fliping =! this->fliping;
-		this->sprite.setScale(rev*this->Size[0], this->Size[1]);
+		this->fliping = !this->fliping;
+		this->sprite.setScale(rev * this->Size[0], this->Size[1]);
 	}
 	void setStat(string key, float value) {
 		this->Stat.set(key, value);
@@ -286,11 +286,11 @@ public:
 		Templkey[this->Templ.size()] = name;
 	}
 	void registerObject(string Name, string Template) {
-		Object *p = new Object(this->Tuple.size());
+		Object* p = new Object(this->Tuple.size());
 		(*p).useStat(*this->Template(Template));
 		(*p).Is(Name);
 		this->Tuple[Name] = p;
-		this->Tuplekey[this->Tuple.size()-1] = Name;
+		this->Tuplekey[this->Tuple.size() - 1] = Name;
 	}
 	Object* object(string keyIn) {
 		return Tuple[keyIn];
@@ -305,7 +305,8 @@ public:
 		this->Tuple.erase(keyIn);
 	}
 	void removeObjAt(unsigned __int64 Index) {
-		this->Tuple.erase(Tuplekey[Index]);
+		cout << this->Tuplekey[Index] << endl;
+		this->Tuple.erase(this->Tuplekey[Index]);
 	}
 	unsigned __int64 entityNumber() {
 		return this->Tuple.size();
@@ -342,11 +343,11 @@ private:
 		(*this->window).setVerticalSyncEnabled(true);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glMatrixMode(GL_PROJECTION);
-		
+
 	}
 	void initItem() {
 		for (int i = 0; i < 9; i++) {
-			Object* ptr = new Object(rand()%10000);
+			Object* ptr = new Object(rand() % 10000);
 			ptr->setImgDim(1000, 1000);
 			ptr->setPosX(503 + 1100 * 0.06 * i);
 			ptr->setPosX(800);
@@ -356,13 +357,13 @@ private:
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
 		this->itemList.Template("Item")->setImgDim(1000, 1000);
-		
+
 		this->itemList.registerObject("Herb", "Item");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
 		this->itemList.object("Herb")->setSpriteTexture("default", 0);
 		this->itemList.object("Herb")->addStat("Quantity", 10);
 		this->itemList.object("Herb")->tag = "Medicine";
-		
+
 		this->itemList.registerObject("Apple", "Item");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
@@ -374,29 +375,29 @@ private:
 		this->itemList.object("HydroFlask")->setSpriteTexture("default", 0);
 		this->itemList.object("HydroFlask")->addStat("Quantity", 100);
 		this->itemList.object("HydroFlask")->tag = "Drink";
-		
+
 		this->Backpack[0] = this->itemList.object("Herb");
 		this->Backpack[1] = this->itemList.object("Apple");
 		this->Backpack[2] = this->itemList.object("HydroFlask");
 	}
 	void initObject() {
-		
+
 		this->Field.createTemplate("Blank");
-		
+
 		this->Field.createTemplate("Item");
 		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->Field.Template("Item")->setSpriteTexture("default", 0);
 		this->Field.Template("Item")->setSpriteSize(0.005, 0.005);
-		this->Field.Template("Item")->setImgDim(1000,1000);
+		this->Field.Template("Item")->setImgDim(1000, 1000);
 		this->Field.Template("Item")->setType("Static");
-		
+
 		this->Field.createTemplate("Rocky");
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", "default0", 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", "default1", 1000);
 		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", "default2", 1000);
 		this->Field.Template("Rocky")->setSpriteTexture("default1", 0);
 		this->Field.Template("Rocky")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("Rocky")->setImgDim(900,900);
+		this->Field.Template("Rocky")->setImgDim(900, 900);
 		this->Field.Template("Rocky")->isPassable(false);
 		this->Field.Template("Rocky")->setType("Dynamic");
 
@@ -419,18 +420,18 @@ private:
 		this->Field.Template("dropItem")->setImgDim(1000, 1000);
 		this->Field.Template("dropItem")->setType("Dynamic");
 
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 50; i++) {
 			this->Field.registerObject("AppleFloor" + to_string(i), "dropItem");
 			this->Field.object("AppleFloor" + to_string(i))->setSpriteTexture("Apple", 0);
-			this->Field.object("AppleFloor" + to_string(i))->setOffsetPosX(rand()%1000);
-			this->Field.object("AppleFloor" + to_string(i))->setOffsetPosY(rand() % 1000);
+			this->Field.object("AppleFloor" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field.object("AppleFloor" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
 			this->Field.object("AppleFloor" + to_string(i))->tag = "fallItem";
 		}
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 50; i++) {
 			this->Field.registerObject("HerbFloor" + to_string(i), "dropItem");
 			this->Field.object("HerbFloor" + to_string(i))->setSpriteTexture("Herb", 0);
-			this->Field.object("HerbFloor" + to_string(i))->setOffsetPosX(rand() % 2000);
-			this->Field.object("HerbFloor" + to_string(i))->setOffsetPosY(rand() % 2000);
+			this->Field.object("HerbFloor" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field.object("HerbFloor" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
 			this->Field.object("HerbFloor" + to_string(i))->tag = "fallItem";
 		}
 
@@ -458,7 +459,7 @@ private:
 		this->Field.Template("StatBar")->setType("Static");
 
 		this->Field.createTemplate("Pump");
-		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png","pump" , 1000);
+		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png", "pump", 1000);
 		this->Field.Template("Pump")->setSpriteTexture("pump", 0);
 		this->Field.Template("Pump")->setSpriteSize(0.1, 0.1);
 		this->Field.Template("Pump")->setImgDim(1200, 1600);
@@ -477,20 +478,20 @@ private:
 		this->Field.Template("Floor")->setType("Dynamic");
 		this->Field.Template("Floor")->isPassable(true);
 		this->Field.Template("Floor")->tag = "BG";
-	
+
 		for (int i = 0; i < 30; i++) {
 			for (int j = 0; j < 30; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
 				this->Field.registerObject(ObjName, "Floor");
-				this->Field.object(ObjName)->setOffsetPosX(i * 5000 * 0.1/1.1);
-				this->Field.object(ObjName)->setOffsetPosY(j * 5000 * 0.1/1.1);
+				this->Field.object(ObjName)->setOffsetPosX(i * 5000 * 0.1 / 1.1);
+				this->Field.object(ObjName)->setOffsetPosY(j * 5000 * 0.1 / 1.1);
 			}
 		}
 
 		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
 			this->Field.registerObject(to_string(i) + to_string(j), "Rocky");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("default"+to_string(rand()%3), 0);
+			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("default" + to_string(rand() % 3), 0);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
 		}
@@ -529,7 +530,7 @@ private:
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
 		this->Field.object("Elon")->loop = true;
 		this->Field.object("Elon")->setSpriteSize(0.1, 0.1);
-		this->Field.object("Elon")->setImgDim(1000,1600);
+		this->Field.object("Elon")->setImgDim(1000, 1600);
 		this->Field.object("Elon")->addStat("Health", 100);
 		this->Field.object("Elon")->addStat("Thirst", 100);
 		this->Field.object("Elon")->addStat("Hunger", 100);
@@ -549,7 +550,7 @@ private:
 		//}
 		for (int i = 0; i < 9; i++) {
 			this->Field.registerObject("ItemFrame" + to_string(i), "itemFrame");
-			this->Field.object("ItemFrame" + to_string(i))->setPosX(503+1100*0.06*i);
+			this->Field.object("ItemFrame" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
 			this->Field.object("ItemFrame" + to_string(i))->setPosY(800);
 
 		}
@@ -559,20 +560,20 @@ private:
 		this->Field.object("ItemPrt")->setSpriteTexture("default", 0);
 		this->Field.object("ItemPrt")->setSpriteSize(0.06, 0.06);
 		this->Field.object("ItemPrt")->setImgDim(1100, 1500);
-		this->Field.object("ItemPrt")->setPosX(503+1100*0.06/2);
+		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2);
 		this->Field.object("ItemPrt")->setPosY(833);
 		this->Field.object("ItemPrt")->setType("Static");
 
 		for (int i = 0; i < 4; i++) {
 			this->Field.registerObject("StatBar_Fill" + to_string(i), "StatBar");
-			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06,-0.06);
-			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture("Stat" + to_string(i+1), 0);
+			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06, -0.06);
+			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture("Stat" + to_string(i + 1), 0);
 			this->Field.object("StatBar_Fill" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
-			this->Field.object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200*0.06);
+			this->Field.object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200 * 0.06);
 		}
 		for (int i = 0; i < 4; i++) {
 			this->Field.registerObject("StatBar" + to_string(i), "StatBar");
-			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500*0.1*i);
+			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
 			this->Field.object("StatBar" + to_string(i))->setPosY(600);
 		}
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
@@ -596,7 +597,7 @@ public:
 	vector<Object*> DrawField_Static;
 	vector<Object*> DrawField_BG;
 	vector<Object*> BG_repo;
-	vector<float> mousePos = {0,0};
+	vector<float> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
 	bool time = true;
@@ -617,7 +618,7 @@ public:
 		delete this->window;
 	}
 	const bool ObjIsOnSight(Object* charactor, Object* B, double range) {
-		if (pow(charactor->PosX() - B->PosX(),2) + pow(charactor->PosY() - B->PosY(),2) < pow(range, 2)) {
+		if (pow(charactor->PosX() - B->PosX(), 2) + pow(charactor->PosY() - B->PosY(), 2) < pow(range, 2)) {
 			return true;
 		}
 		else {
@@ -694,7 +695,7 @@ public:
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
 				shift = true;
-				this->move_speed = 3*2;
+				this->move_speed = 3 * 2;
 
 			}
 			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
@@ -712,7 +713,7 @@ public:
 						//cout << this->Field.objectAt(i)->nowIs() << endl;
 					//}
 					printf("\n");
-					string ObjName = "Pumpy" + to_string(rand()%100000);
+					string ObjName = "Pumpy" + to_string(rand() % 100000);
 					this->Field.registerObject(ObjName, "Pump");
 					this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
 					this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
@@ -722,7 +723,7 @@ public:
 						printf("%.1f ", data[i]);
 					}
 					printf("\n");
-					
+
 				}
 				if (ev.mouseButton.button == Mouse::Right) {
 					cout << this->Backpack[this->selectingSlot]->tag << endl;
@@ -791,10 +792,10 @@ public:
 		if (Elon->getStat("Air")) {
 			this->Field.object("StatBar_Fill3")->setSpriteSize(0.06, -0.06 * Elon->getStat("Air") / 100);
 		}
-		this->Field.object("ItemPrt")->setPosX(503 + 1100*0.06/2 + (this->selectingSlot * 1100 * 0.06));
+		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
 		for (int i = 0; i < 8; i++) {
 			if (this->Backpack[i]->nowIs() != "None" && find(this->DrawField_Static.begin(), this->DrawField_Static.end(), this->Backpack[i]) == this->DrawField_Static.end()) {
-				this->Backpack[i]->setPosX(503 +1100*0.06/2+ (1100 * 0.06 * i));
+				this->Backpack[i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
 				this->Backpack[i]->setPosY(833);
 				this->DrawField_Static.push_back(this->Backpack[i]);
 			}
@@ -857,14 +858,14 @@ public:
 				}
 			}
 		}
-		else if(Elon->getStat("Alive") == 1) {
+		else if (Elon->getStat("Alive") == 1) {
 			Idle();
 			this->Elon->resetTimeSeq();
 		}
 		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
 		try {
 			for (int i = 0; i < Field.entityNumber(); i++) {
-				if (this->Field.objectAt(i)->type() == "Dynamic" && i < Field.entityNumber()) {
+				if (this->Field.objectAt(i)->type() == "Dynamic" && i < this->Field.entityNumber() && this->Field.objectAt(i)->usable) {
 					this->Field.objectAt(i)->setPosX(this->Anchor->PosX());
 					this->Field.objectAt(i)->setPosY(this->Anchor->PosY());
 				}
@@ -877,7 +878,7 @@ public:
 		DecStat("Hunger", 0.0005);
 		DecStat("Thirst", 0.0007);
 		DecStat("Air", 0.005);
-		
+
 		if (Elon->getStat("Hunger") <= 1) {
 			DecStat("Health", 0.005);
 		}
@@ -897,24 +898,22 @@ public:
 			Elon->UpdateAnimation(1);
 		}
 		int maxParam = 0;
-		for (int i = 0; i < this->DrawField_Dynamic.size() - maxParam; i++) {
-			if (this->DrawField_Dynamic[i]->usable && this->DrawField_Dynamic[i]->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), this->DrawField_Dynamic[i]) <= 200) {
-				vector<float> moveVec = getHitVector(this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), this->DrawField_Dynamic[i]->PosX(), this->DrawField_Dynamic[i]->PosY());
-				this->DrawField_Dynamic[i]->setOffsetPosX(this->DrawField_Dynamic[i]->offsetPosX + moveVec[0]*0.05);
-				this->DrawField_Dynamic[i]->setOffsetPosY(this->DrawField_Dynamic[i]->offsetPosY + moveVec[1]*0.05);
-				if (ObjectDis(this->Field.object("Elon"), this->DrawField_Dynamic[i]) <= 50) {
-					this->pause = true;
-					this->DrawField_Dynamic[i]->setSpriteSize(0, 0);
-					this->DrawField_Dynamic[i]->usable = false;
-					this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
-					//this->Field.object(this->DrawField_Dynamic[i]->nowIs())->usable = false;
-					maxParam++;
-					printf("a\n");
-					this->pause = false;
-				}
-				//this->DrawField_Dynamic[i]->setSpriteSize(0, 0);
+		for (int i = 0; i < this->DrawField_Dynamic.size(); i++) {
+			Object* A = this->DrawField_Dynamic[i];
+			if (!this->pause && A->usable && A->tag == "fallItem" && i < this->DrawField_Dynamic.size() && ObjectDis(this->Field.object("Elon"), A) <= 50) {
+				this->pause = true;
+				this->DrawField_Dynamic[i]->usable = false;
+				this->Field.objectAt(i)->usable = false;
+				printf("a\n");
+				this->pause = false;
+			}
+			if (!this->pause && A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 200) {
+				const vector<float> moveVec = getHitVector(this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), A->PosX(), A->PosY());
+				A->setOffsetPosX(A->offsetPosX + 7*moveVec[0]/abs(moveVec[0]));
+				A->setOffsetPosY(A->offsetPosY + 7*moveVec[1] / abs(moveVec[1]));
+				//A->setSpriteSize(0, 0);
 				//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
-				//this->Field.remove(this->DrawField_Dynamic[i]->nowIs());
+				//this->Field.remove(A->nowIs());
 			}
 		}
 		/*
@@ -938,7 +937,7 @@ public:
 			for (int i = 0; i < this->DrawField_BG.size(); i++) {
 				this->window->draw(this->DrawField_BG[i]->getSprite());
 			}
-			for (int i = 0; i < this->DrawField_Dynamic.size() && DrawField_Dynamic[i] && DrawField_Dynamic[i]->tag != "BG" ; i++) {
+			for (int i = 0; i < this->DrawField_Dynamic.size() && DrawField_Dynamic[i]->tag != "BG"; i++) {
 				this->window->draw(this->DrawField_Dynamic[i]->getSprite());
 			}
 			for (int i = 0; i < this->DrawField_Static.size() && DrawField_Static[i]; i++) {
@@ -949,7 +948,7 @@ public:
 			printf("%d\n", e);
 		}
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
-	
+
 		this->window->display();
 	}
 	void sort() {
@@ -961,8 +960,10 @@ gameEngine First_step;
 
 void SortObj() {
 	for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
-		if ( i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight()* First_step.DrawField_Dynamic[i]->getSizeY())/2 > First_step.DrawField_Dynamic[i+1]->PosY() + (First_step.DrawField_Dynamic[i+1]->getImgHeight() * First_step.DrawField_Dynamic[i+1]->getSizeY()) / 2)) {
+		if (i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSizeY()) / 2 > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSizeY()) / 2)) {
+			First_step.pause = true;
 			iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
+			First_step.pause = false;
 		}
 	}
 }
@@ -970,12 +971,12 @@ void SortObj() {
 void CheckInsight() {
 	try {
 		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
-			if (First_step.Field.objectAt(i)->usable && i < First_step.Field.entityNumber() - 1 && (First_step.Field.objectAt(i)->type() != "Static"&& First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
+			if (First_step.Field.objectAt(i)->usable && !First_step.pause && i < First_step.Field.entityNumber() - 1 && (First_step.Field.objectAt(i)->type() != "Static" && First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
 				First_step.DrawField_Dynamic.push_back(First_step.Field.objectAt(i));
 			}
 		}
 		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
-			if (!First_step.pause && i < First_step.Field.entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1100) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")) {
+			if (First_step.DrawField_Dynamic[i]->nowIs() != "Elon" && (!First_step.DrawField_Dynamic[i]->usable || (First_step.pause && i < First_step.Field.entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1100) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")))) {
 				First_step.DrawField_Dynamic.erase(First_step.DrawField_Dynamic.begin() + i);
 			}
 		}
@@ -1024,12 +1025,12 @@ bool hitBoxhit(float x1, float y1, float x2, float y2, float x3, float y3, float
 	return (anyBetween(setX1, setX2) || anyBetween(setX2, setX1)) && (anyBetween(setY1, setY2) || anyBetween(setY2, setY1));
 }
 
-vector<float> getHitVector(float x1O, float y1O, float x2O, float y2O) {
-	return {x1O-x2O, y1O-y2O};
+const vector<float> getHitVector(float x1O, float y1O, float x2O, float y2O) {
+	return { x1O - x2O, y1O - y2O };
 }
 
-float Distance(Object* A, Object *B) {
-	return sqrt(pow(A->PosX() - B->PosX(), 2)+pow(A->PosY() - B->PosY(), 2));
+float Distance(Object* A, Object* B) {
+	return sqrt(pow(A->PosX() - B->PosX(), 2) + pow(A->PosY() - B->PosY(), 2));
 }
 
 void isMovable() {
@@ -1061,7 +1062,7 @@ void isMovable() {
 			//cout << First_step.Field.objectAt(i)->nowIs() << '\t';
 			//printf("%d\t", hitBoxhit(ElonX - (ElonWidth * ElonSize / 2), ElonY, ElonX + (ElonWidth * ElonSize / 2), ElonY + (ElonHight * ElonSize / hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent)));
 			//printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
-			if (First_step.DrawField_Dynamic[i]->usable && !First_step.DrawField_Dynamic[i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
+			if (!First_step.pause && First_step.DrawField_Dynamic[i]->usable && !First_step.DrawField_Dynamic[i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
 				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
 				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
 				if (HitVec[1] < 0) {
@@ -1082,7 +1083,7 @@ void isMovable() {
 					First_step.D_key(false);
 					First_step.move_speed *= 5;
 				}
-				
+
 				else if (HitVec[0] > 0) {
 					D_isbump = true;
 					First_step.move_speed /= 5;
@@ -1191,7 +1192,7 @@ int main() { // Game loop
 	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat1);
 	CheckBump.launch();
 	ChechFloor.launch();
-	monitor.launch();
+	//monitor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
