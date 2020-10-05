@@ -328,7 +328,6 @@ private:
 	bool running = true;
 	Event ev;
 	VideoMode mode;
-	Map Mars;
 	int i = 0;
 	Map itemList;
 	ContextSettings settings;
@@ -534,7 +533,7 @@ private:
 		this->Field.object("Elon")->addStat("Health", 100);
 		this->Field.object("Elon")->addStat("Thirst", 100);
 		this->Field.object("Elon")->addStat("Hunger", 100);
-		this->Field.object("Elon")->addStat("Air", 1000);
+		this->Field.object("Elon")->addStat("Air", 100);
 		this->Field.object("Elon")->addStat("Alive", 1);
 		this->Field.object("Elon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
 		this->Field.object("Elon")->setPosY(400);
@@ -576,13 +575,32 @@ private:
 			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
 			this->Field.object("StatBar" + to_string(i))->setPosY(600);
 		}
+	}
+	void intitUI() {
+		this->Field.createTemplate("PauseUI_BG");
+		this->Field.Template("PauseUI_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field.Template("PauseUI_BG")->setSpriteSize(0.5, 0.5);
+		this->Field.Template("PauseUI_BG")->setImgDim(3200, 1800);
+		this->Field.Template("PauseUI_BG")->setPosX(800);
+		this->Field.Template("PauseUI_BG")->setPosY(450);
+		this->Field.Template("PauseUI_BG")->setType("Static");
+		this->Field.Template("PauseUI_BG")->tag = "PauseUI";
+
+		this->Field.registerObject("PauseBG", "PauseUI_BG");
+		this->Field.object("PauseBG")->setSpriteTexture("default", 0);
+
+	}
+	void manageLayer() {
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
 			this->Field.objectAt(i)->type();
-			if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
-				this->DrawField_Static.push_back(this->Field.objectAt(i));
-			}
 			if (this->Field.objectAt(i)->tag == "BG") {
 				this->BG_repo.push_back(this->Field.objectAt(i));
+			}
+			else if (this->Field.objectAt(i)->tag == "PauseUI") {
+				this->DrawField_pauseUI.push_back(this->Field.objectAt(i));
+			}
+			else if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
+				this->DrawField_Static.push_back(this->Field.objectAt(i));
 			}
 		}
 	}
@@ -596,6 +614,7 @@ public:
 	vector<Object*> DrawField_Dynamic;
 	vector<Object*> DrawField_Static;
 	vector<Object*> DrawField_BG;
+	vector<Object*> DrawField_pauseUI;
 	vector<Object*> BG_repo;
 	vector<float> mousePos = { 0,0 };
 	Object* Anchor;
@@ -607,12 +626,16 @@ public:
 	bool W = false, A = false, S = false, D = false, shift = false;
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	bool pause = false;
+	bool escPressed = false, escToggle = false;
+	bool paused = false;
 	int selectingSlot = 0;
 	gameEngine() {
 		this->initItem();
 		this->initVar();
 		this->initWindow();
 		this->initObject();
+		this->intitUI();
+		this->manageLayer();
 	}
 	virtual ~gameEngine() {
 		delete this->window;
@@ -662,6 +685,12 @@ public:
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
 				this->window->close();
 				running = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::X) {
+				this->escPressed = true;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::X) {
+				this->escPressed = false;
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Q && pass) {
 				pass = false;
@@ -805,7 +834,19 @@ public:
 		int updated = false;
 		this->pollEvents();
 		this->updateHUD();
-		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1) {
+		if (this->escPressed && !this->escToggle) {
+			if (this->paused) {
+				this->paused = false;
+			}
+			else {
+				this->paused = true;
+			}
+			this->escToggle = true;
+		}
+		else if(!this->escPressed) {
+			this->escToggle = false;
+		}
+		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && ! this->paused) {
 			Elon->setAnimationSeq("walk");
 			DecStat("Hunger", 0.0002);
 			DecStat("Thirst", 0.0003);
@@ -942,6 +983,11 @@ public:
 			}
 			for (int i = 0; i < this->DrawField_Static.size() && DrawField_Static[i]; i++) {
 				this->window->draw(this->DrawField_Static[i]->getSprite());
+			}
+			if (this->paused) {
+				for (int i = 0; i < DrawField_pauseUI.size(); i++) {
+					this->window->draw(this->DrawField_pauseUI[i]->getSprite());
+				}
 			}
 		}
 		catch (int e) {
@@ -1178,21 +1224,17 @@ void ShowDrawingStat2() {
 }
 void ShowDrawingStat3() {
 	while (First_step.isRuning()) {
-		while (First_step.Field.entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field.entityNumber() == 0 || First_step.paused) {
 			Sleep(1);
 		}
-		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
-			if (!First_step.Field.objectAt(i)->usable) {
-				cout << First_step.Field.objectAt(i)->nowIs() << endl;
-			}
-		}
+		printf("%d\n", First_step.escPressed);
 	}
 }
 int main() { // Game loop
-	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat1);
+	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat3);
 	CheckBump.launch();
 	ChechFloor.launch();
-	//monitor.launch();
+	monitor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
