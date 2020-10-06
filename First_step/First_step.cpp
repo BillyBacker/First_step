@@ -1,18 +1,19 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/OpenGL.hpp>
+#include<SFML/Graphics.hpp>
+#include<SFML/System.hpp>
+#include<SFML/Window.hpp>
+#include<SFML/OpenGL.hpp>
 #include<thread>
-#include <math.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <typeinfo>
-#include<windows.h>
+#include<math.h>
+#include<iostream>
+#include<string>
+#include<vector>
+#include<algorithm>
+#include<typeinfo>
 #include<random>
-#include <unordered_map> 
+#include<windows.h>
+#include<unordered_map> 
+#include <time.h>
 
 using namespace sf;
 using namespace std;
@@ -24,6 +25,14 @@ void Break() {
 		printf("Happyliy\n");
 		continue;
 	}
+}
+
+
+unsigned int randSeed() {
+	int* i = new int;
+	int* val = i;
+	delete i;
+	return (unsigned int)val;
 }
 
 class strDic { // string tuple for store array of string.
@@ -619,7 +628,7 @@ public:
 	vector<float> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
-	bool time = true;
+	bool _time = true;
 	bool pass = true;
 	bool movable = true;
 	float move_speed = 3;
@@ -630,6 +639,8 @@ public:
 	bool paused = false;
 	int selectingSlot = 0;
 	gameEngine() {
+		unsigned int time_ui = unsigned int(time(NULL));
+		srand(time_ui);
 		this->initItem();
 		this->initVar();
 		this->initWindow();
@@ -930,9 +941,9 @@ public:
 			DecStat("Health", 0.05);
 		}
 		if (Elon->getStat("Health") <= 1) {
-			if (time) {
+			if (_time) {
 				this->Elon->resetTimeSeq();
-				time = false;
+				_time = false;
 			}
 			Elon->setStat("Alive", 0);
 			Elon->setAnimationSeq("dying");
@@ -1003,30 +1014,39 @@ public:
 };
 
 gameEngine First_step;
+bool change = false;
 
-void SortObj() {
+bool SortObj() {
+	bool swaped = false;
 	for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
 		if (i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSizeY()) / 2 > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSizeY()) / 2)) {
 			First_step.pause = true;
 			iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
 			First_step.pause = false;
+			swaped = true;
 		}
 	}
+	return swaped;
 }
 
 void CheckInsight() {
+	bool swaping = true;
 	try {
 		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
 			if (First_step.Field.objectAt(i)->usable && !First_step.pause && i < First_step.Field.entityNumber() - 1 && (First_step.Field.objectAt(i)->type() != "Static" && First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
 				First_step.DrawField_Dynamic.push_back(First_step.Field.objectAt(i));
 			}
+			change = true;
 		}
 		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
 			if (First_step.DrawField_Dynamic[i]->nowIs() != "Elon" && (!First_step.DrawField_Dynamic[i]->usable || (First_step.pause && i < First_step.Field.entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1100) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")))) {
 				First_step.DrawField_Dynamic.erase(First_step.DrawField_Dynamic.begin() + i);
 			}
+			change = true;
 		}
-		SortObj();
+		while (swaping){
+			swaping = SortObj();
+		} 
 	}
 	catch (int e) {
 		printf("%d\n", e);
@@ -1049,7 +1069,6 @@ void checkFloorInsight() {
 				First_step.DrawField_BG.erase(First_step.DrawField_BG.begin() + i);
 			}
 		}
-		//printf("%d \\ %d\n", First_step.DrawField_BG.size(), First_step.BG_repo.size());
 	}
 }
 
@@ -1103,11 +1122,6 @@ void isMovable() {
 			catch (const std::out_of_range& e) {
 				cout << "Out of Range error.";
 			}
-			//printf("%.1f %.1f %.1f %.1f \t", ElonHitBox[0], ElonHitBox[1], ElonHitBox[2], ElonHitBox[3]);
-			//printf("%.1f %.1f %.1f %.1f \t", ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3]);
-			//cout << First_step.Field.objectAt(i)->nowIs() << '\t';
-			//printf("%d\t", hitBoxhit(ElonX - (ElonWidth * ElonSize / 2), ElonY, ElonX + (ElonWidth * ElonSize / 2), ElonY + (ElonHight * ElonSize / hitBoxHPercent), ObjX - (ObjWidth * ObjSize / 2), ObjY, ObjX + (ObjWidth * ObjSize / 2), ObjY + (ObjHight * ObjSize / hitBoxHPercent)));
-			//printf("%d %d %d %d\n", W_isbump, A_isbump, S_isbump, D_isbump);
 			if (!First_step.pause && First_step.DrawField_Dynamic[i]->usable && !First_step.DrawField_Dynamic[i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
 				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
 				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
@@ -1234,11 +1248,11 @@ int main() { // Game loop
 	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat3);
 	CheckBump.launch();
 	ChechFloor.launch();
-	monitor.launch();
+	//monitor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
-		//printf("%.1f %.1f\n", First_step.Field.object("Elon")->PosX() - First_step.Field.object("Anchor")->PosX(), First_step.Field.object("Elon")->PosY() - First_step.Field.object("Anchor")->PosY());
+		Sleep(1);
 	}
 	return 0;
 }
