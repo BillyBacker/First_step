@@ -70,6 +70,9 @@ public:
 	void remove(string keyIn) {
 		this->map.erase(keyIn);
 	}
+	void incread(string keyIn, int In) {
+		this->map[keyIn]+=In;
+	}
 	unsigned __int64 length() {
 		return this->map.size();
 	}
@@ -177,6 +180,9 @@ public:
 	}
 	void addStat(string KeyIn, float val) {
 		Stat.append(KeyIn, val);
+	}
+	void incread(string KeyIn, int amount) {
+		this->Stat.incread(KeyIn, amount);
 	}
 	float getStat(string KeyIn) {
 		return Stat.get(KeyIn);
@@ -361,6 +367,7 @@ private:
 			ptr->setPosX(800);
 			ptr->Is("None");
 			Backpack.push_back(ptr);
+			BackpackQuantity.push_back(0);
 		}
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
@@ -369,24 +376,22 @@ private:
 		this->itemList.registerObject("Herb", "Item");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
 		this->itemList.object("Herb")->setSpriteTexture("default", 0);
-		this->itemList.object("Herb")->addStat("Quantity", 10);
 		this->itemList.object("Herb")->tag = "Medicine";
 
 		this->itemList.registerObject("Apple", "Item");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
-		this->itemList.object("Apple")->addStat("Quantity", 10);
 		this->itemList.object("Apple")->tag = "Food";
 
 		this->itemList.registerObject("HydroFlask", "Item");
 		this->itemList.object("HydroFlask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
 		this->itemList.object("HydroFlask")->setSpriteTexture("default", 0);
-		this->itemList.object("HydroFlask")->addStat("Quantity", 100);
 		this->itemList.object("HydroFlask")->tag = "Drink";
-
-		this->Backpack[0] = this->itemList.object("Herb");
-		this->Backpack[1] = this->itemList.object("Apple");
-		this->Backpack[2] = this->itemList.object("HydroFlask");
+		/*
+		this->Backpack[0] = itemList.object("Herb");
+		this->Backpack[1] = itemList.object("Apple");
+		this->Backpack[2] = itemList.object("HydroFlask");
+		*/
 	}
 	void initObject() {
 
@@ -428,19 +433,19 @@ private:
 		this->Field.Template("dropItem")->setImgDim(1000, 1000);
 		this->Field.Template("dropItem")->setType("Dynamic");
 
-		for (int i = 0; i < 50; i++) {
-			this->Field.registerObject("AppleFloor" + to_string(i), "dropItem");
-			this->Field.object("AppleFloor" + to_string(i))->setSpriteTexture("Apple", 0);
-			this->Field.object("AppleFloor" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
-			this->Field.object("AppleFloor" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
-			this->Field.object("AppleFloor" + to_string(i))->tag = "fallItem";
+		for (int i = 0; i < 20; i++) {
+			this->Field.registerObject("Apple" + to_string(i), "dropItem");
+			this->Field.object("Apple" + to_string(i))->setSpriteTexture("Apple", 0);
+			this->Field.object("Apple" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field.object("Apple" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
+			this->Field.object("Apple" + to_string(i))->tag = "fallItem";
 		}
-		for (int i = 0; i < 50; i++) {
-			this->Field.registerObject("HerbFloor" + to_string(i), "dropItem");
-			this->Field.object("HerbFloor" + to_string(i))->setSpriteTexture("Herb", 0);
-			this->Field.object("HerbFloor" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
-			this->Field.object("HerbFloor" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
-			this->Field.object("HerbFloor" + to_string(i))->tag = "fallItem";
+		for (int i = 0; i < 20; i++) {
+			this->Field.registerObject("Herb" + to_string(i), "dropItem");
+			this->Field.object("Herb" + to_string(i))->setSpriteTexture("Herb", 0);
+			this->Field.object("Herb" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field.object("Herb" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
+			this->Field.object("Herb" + to_string(i))->tag = "fallItem";
 		}
 
 		this->Field.createTemplate("Structure");
@@ -616,10 +621,20 @@ private:
 	double ObjectDis(Object* A, Object* B) {
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
 	}
+	string charOnly(string In) {
+		int numPos = 0, buffer = 9999;
+		for (int i = 0; i < 10; i++) {
+			if (In.find(to_string(i)) < buffer) {
+				buffer = In.find(to_string(i));
+			}
+		}
+		return In.substr(0, buffer);
+	}
 public:
 	RenderWindow* window;
 	Map Field;
 	vector<Object*> Backpack;
+	vector<int> BackpackQuantity;
 	vector<Object*> DrawField_Dynamic;
 	vector<Object*> DrawField_Static;
 	vector<Object*> DrawField_BG;
@@ -768,29 +783,30 @@ public:
 				if (ev.mouseButton.button == Mouse::Right) {
 					cout << this->Backpack[this->selectingSlot]->tag << endl;
 					if (this->Elon->getStat("Alive") == 1) {
-						if (this->Backpack[this->selectingSlot]->tag == "Medicine" && this->Backpack[this->selectingSlot]->getStat("Quantity") > 0 && Elon->getStat("Health") < 100) {
+						if (this->Backpack[this->selectingSlot]->tag == "Medicine" && this->BackpackQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
 							Elon->setStat("Health", Elon->getStat("Health") + 10);
 							if (Elon->getStat("Health") > 100) {
 								Elon->setStat("Health", 100);
 							}
 						}
-						else if (this->Backpack[this->selectingSlot]->tag == "Food" && this->Backpack[this->selectingSlot]->getStat("Quantity") > 0 && Elon->getStat("Hunger") < 100) {
+						else if (this->Backpack[this->selectingSlot]->tag == "Food" && this->BackpackQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
 							Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
 							if (Elon->getStat("Hunger") > 100) {
 								Elon->setStat("Hunger", 100);
 							}
 						}
-						else if (this->Backpack[this->selectingSlot]->tag == "Drink" && this->Backpack[this->selectingSlot]->getStat("Quantity") > 0 && Elon->getStat("Thirst") < 100) {
+						else if (this->Backpack[this->selectingSlot]->tag == "Drink" && this->BackpackQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
 							Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
 							if (Elon->getStat("Thirst") > 100) {
 								Elon->setStat("Thirst", 100);
 							}
 						}
-						if (this->Backpack[this->selectingSlot]->getStat("Quantity") > 0) {
-							this->Backpack[this->selectingSlot]->setStat("Quantity", this->Backpack[this->selectingSlot]->getStat("Quantity") - 1);
+						if (this->BackpackQuantity[this->selectingSlot] > 0) {
+							this->BackpackQuantity[this->selectingSlot]--;
 						}
-						if (this->Backpack[this->selectingSlot]->getStat("Quantity") == 0) {
+						if (this->BackpackQuantity[this->selectingSlot] <= 0) {
 							this->Backpack[this->selectingSlot]->Is("None");
+							this->Backpack[this->selectingSlot]->tag = "None";
 							this->Backpack[this->selectingSlot]->setSpriteSize(0, 0);
 						}
 					}
@@ -809,7 +825,7 @@ public:
 						this->selectingSlot = 0;
 					}
 				}
-				cout << this->Backpack[this->selectingSlot]->tag << endl;
+				cout << this->Backpack[this->selectingSlot]->tag << "     " << this->BackpackQuantity[this->selectingSlot] << endl;
 			}
 		}
 
@@ -956,8 +972,31 @@ public:
 				this->pause = true;
 				this->DrawField_Dynamic[i]->usable = false;
 				this->Field.objectAt(i)->usable = false;
-				printf("a\n");
 				this->pause = false;
+				bool found = false;
+				for (int i = 0; i < 9; i++) {
+					if (this->Backpack[i]->nowIs() == charOnly(A->nowIs())) {
+						cout << charOnly(A->nowIs()) << endl;
+						this->BackpackQuantity[i]++;
+						printf("added\n");
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					for (int i = 0; i < 9; i++) {
+						if (this->Backpack[i]->nowIs() == "None") {
+							this->Backpack[i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
+							//cout << this->Backpack[i]->tag  << " = " << this->itemList.object(charOnly(A->nowIs()))->tag << endl;
+							this->Backpack[i]->Is(charOnly(A->nowIs()));
+							this->Backpack[i] = this->itemList.object(charOnly(A->nowIs()));
+							this->BackpackQuantity[i] = 1;
+							this->Backpack[i]->setSpriteSize(0.06, 0.06);
+							this->Backpack[i]->setPosX(503 + 1100 * 0.06 * i);
+							break;
+						}
+					}
+				}
 			}
 			if (!this->pause && A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 200) {
 				const vector<float> moveVec = getHitVector(this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), A->PosX(), A->PosY());
