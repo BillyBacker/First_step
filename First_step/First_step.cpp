@@ -335,6 +335,49 @@ public:
 
 };
 
+class strMap {
+public:
+	unordered_map<string, Font> font;
+	unordered_map<string, Text*> Tuple;
+	unordered_map<string, string> Tag;
+	unordered_map<unsigned __int64, string> Tuplekey;
+	void registerObject(string Name, string tag) {
+		Text* p = new Text;
+		this->Tuple[Name] = p;
+		this->Tag[Name] = tag;
+		this->Tuplekey[this->Tuple.size()-1] = Name;
+	}
+	void addFont(string name, string path) {
+		font[name].loadFromFile(path);
+	}
+	Font Font(string name) {
+		return this->font[name];
+	}
+	Text* object(string keyIn) {
+		return this->Tuple[keyIn];
+	}
+	Text* objectAt(unsigned __int64 Index) {
+		return this->Tuple[this->Tuplekey[Index]];
+	}
+	void remove(string keyIn) {
+		this->Tuple.erase(keyIn);
+	}
+	string tag(string keyIn) {
+		return this->Tag[keyIn];
+	}
+	void removeObjAt(unsigned __int64 Index) {
+		cout << this->Tuplekey[Index] << endl;
+		this->Tuple.erase(this->Tuplekey[Index]);
+	}
+	unsigned __int64 entityNumber() {
+		return this->Tuple.size();
+	}
+	unordered_map<string, Text*> getTuple() {
+		return this->Tuple;
+	}
+
+};
+
 class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
 private:
 	//Add a variable down here.
@@ -383,15 +426,55 @@ private:
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
 		this->itemList.object("Apple")->tag = "Food";
 
-		this->itemList.registerObject("HydroFlask", "Item");
-		this->itemList.object("HydroFlask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
-		this->itemList.object("HydroFlask")->setSpriteTexture("default", 0);
-		this->itemList.object("HydroFlask")->tag = "Drink";
-		/*
-		this->Backpack[0] = itemList.object("Herb");
-		this->Backpack[1] = itemList.object("Apple");
-		this->Backpack[2] = itemList.object("HydroFlask");
-		*/
+		this->itemList.registerObject("Hydro Flask", "Item");
+		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
+		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
+		this->itemList.object("Hydro Flask")->tag = "Drink";
+
+		this->Backpack[2] = itemList.object("Hydro Flask");
+		this->BackpackQuantity[2] = 100;
+	}
+	void intitDialog() {
+		this->Dialog["PausedMenu"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
+		this->Dialog["PausedMenu"].addFont("Mitr-Bold", "assets\\font\\Mitr-Bold.ttf");
+
+		this->Dialog["PausedMenu"].registerObject("BackToGame", "PausedMenu");
+		this->Dialog["PausedMenu"].object("BackToGame")->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+		this->Dialog["PausedMenu"].object("BackToGame")->setCharacterSize(50);
+		this->Dialog["PausedMenu"].object("BackToGame")->setString("Back to game");
+		this->Dialog["PausedMenu"].object("BackToGame")->setPosition({ 250,200 });
+
+		this->Dialog["PausedMenu"].registerObject("ExitGame", "PausedMenu");
+		this->Dialog["PausedMenu"].object("ExitGame")->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+		this->Dialog["PausedMenu"].object("ExitGame")->setCharacterSize(50);
+		this->Dialog["PausedMenu"].object("ExitGame")->setString("Exit this game");
+		this->Dialog["PausedMenu"].object("ExitGame")->setPosition({ 250,600 });
+
+		this->Dialog["InGameStatus"].registerObject("ItemInHand", "InGameStatus");
+		this->Dialog["InGameStatus"].object("ItemInHand")->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+		this->Dialog["InGameStatus"].object("ItemInHand")->setCharacterSize(30);
+		this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ 750,750 });
+
+		for (int i = 0; i < 9; i++) {
+			this->Dialog["itemCount"].registerObject("itemCountBG"+to_string(i), "itemCountBG");
+			this->Dialog["itemCount"].registerObject("itemCount" + to_string(i), "itemCount");
+
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setFont(this->Dialog["PausedMenu"].font["Mitr-Bold"]);
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setCharacterSize(25);
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(i));
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setStyle(Text::Bold);
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setFillColor(Color::White);
+
+			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setCharacterSize(25);
+			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(i));
+			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setFillColor(Color::Black);
+			const float x = 525 + 1100.0 * 0.06 * i, y = 840;
+			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({ x ,y});
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({ x ,y});
+		}
+		
+
 	}
 	void initObject() {
 
@@ -433,19 +516,19 @@ private:
 		this->Field.Template("dropItem")->setImgDim(1000, 1000);
 		this->Field.Template("dropItem")->setType("Dynamic");
 
-		for (int i = 0; i < 20; i++) {
-			this->Field.registerObject("Apple" + to_string(i), "dropItem");
-			this->Field.object("Apple" + to_string(i))->setSpriteTexture("Apple", 0);
-			this->Field.object("Apple" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
-			this->Field.object("Apple" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
-			this->Field.object("Apple" + to_string(i))->tag = "fallItem";
+		for (int i = 0; i < 50; i++) {
+			this->Field.registerObject("Apple_" + to_string(i), "dropItem");
+			this->Field.object("Apple_" + to_string(i))->setSpriteTexture("Apple", 0);
+			this->Field.object("Apple_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field.object("Apple_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
+			this->Field.object("Apple_" + to_string(i))->tag = "fallItem";
 		}
-		for (int i = 0; i < 20; i++) {
-			this->Field.registerObject("Herb" + to_string(i), "dropItem");
-			this->Field.object("Herb" + to_string(i))->setSpriteTexture("Herb", 0);
-			this->Field.object("Herb" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
-			this->Field.object("Herb" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
-			this->Field.object("Herb" + to_string(i))->tag = "fallItem";
+		for (int i = 0; i < 50; i++) {
+			this->Field.registerObject("Herb_" + to_string(i), "dropItem");
+			this->Field.object("Herb_" + to_string(i))->setSpriteTexture("Herb", 0);
+			this->Field.object("Herb_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field.object("Herb_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
+			this->Field.object("Herb_" + to_string(i))->tag = "fallItem";
 		}
 
 		this->Field.createTemplate("Structure");
@@ -622,13 +705,7 @@ private:
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
 	}
 	string charOnly(string In) {
-		int numPos = 0, buffer = 9999;
-		for (int i = 0; i < 10; i++) {
-			if (In.find(to_string(i)) < buffer) {
-				buffer = In.find(to_string(i));
-			}
-		}
-		return In.substr(0, buffer);
+		return In.substr(0, In.find("_"));
 	}
 public:
 	RenderWindow* window;
@@ -640,6 +717,7 @@ public:
 	vector<Object*> DrawField_BG;
 	vector<Object*> DrawField_pauseUI;
 	vector<Object*> BG_repo;
+	unordered_map<string, strMap> Dialog;
 	vector<float> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
@@ -659,6 +737,7 @@ public:
 		this->initItem();
 		this->initVar();
 		this->initWindow();
+		this->intitDialog();
 		this->initObject();
 		this->intitUI();
 		this->manageLayer();
@@ -835,6 +914,10 @@ public:
 			Elon->setStat(Stat, Elon->getStat(Stat) - amount);
 		}
 	}
+	int IntDigit(int In) {
+		int i = floor(log10(In))+1;
+		return i;
+	}
 	void updateHUD() {
 		if (Elon->getStat("Health") > 0) {
 			this->Field.object("StatBar_Fill0")->setSpriteSize(0.06, -0.06 * Elon->getStat("Health") / 100);
@@ -873,7 +956,7 @@ public:
 		else if(!this->escPressed) {
 			this->escToggle = false;
 		}
-		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && ! this->paused) {
+		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && !this->paused) {
 			Elon->setAnimationSeq("walk");
 			DecStat("Hunger", 0.0002);
 			DecStat("Thirst", 0.0003);
@@ -942,43 +1025,40 @@ public:
 		catch (const std::out_of_range& e) {
 			printf("%d\n", e);
 		}
-		DecStat("Health", 0.00025);
-		DecStat("Hunger", 0.0005);
-		DecStat("Thirst", 0.0007);
-		DecStat("Air", 0.005);
+		if (!this->paused) {
+			DecStat("Health", 0.00025);
+			DecStat("Hunger", 0.0005);
+			DecStat("Thirst", 0.0007);
+			DecStat("Air", 0.005);
 
-		if (Elon->getStat("Hunger") <= 1) {
-			DecStat("Health", 0.005);
-		}
-		if (Elon->getStat("Thirst") <= 1) {
-			DecStat("Health", 0.007);
-		}
-		if (Elon->getStat("Air") <= 1) {
-			DecStat("Health", 0.05);
-		}
-		if (Elon->getStat("Health") <= 1) {
-			if (_time) {
-				this->Elon->resetTimeSeq();
-				_time = false;
+			if (Elon->getStat("Hunger") <= 1) {
+				DecStat("Health", 0.005);
 			}
-			Elon->setStat("Alive", 0);
-			Elon->setAnimationSeq("dying");
-			Elon->UpdateAnimation(1);
+			if (Elon->getStat("Thirst") <= 1) {
+				DecStat("Health", 0.007);
+			}
+			if (Elon->getStat("Air") <= 1) {
+				DecStat("Health", 0.05);
+			}
+			if (Elon->getStat("Health") <= 1) {
+				if (_time) {
+					this->Elon->resetTimeSeq();
+					_time = false;
+				}
+				Elon->setStat("Alive", 0);
+				Elon->setAnimationSeq("dying");
+				Elon->UpdateAnimation(1);
+			}
 		}
 		int maxParam = 0;
 		for (int i = 0; i < this->DrawField_Dynamic.size(); i++) {
 			Object* A = this->DrawField_Dynamic[i];
-			if (!this->pause && A->usable && A->tag == "fallItem" && i < this->DrawField_Dynamic.size() && ObjectDis(this->Field.object("Elon"), A) <= 50) {
-				this->pause = true;
+			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 50) {
 				this->DrawField_Dynamic[i]->usable = false;
-				this->Field.objectAt(i)->usable = false;
-				this->pause = false;
 				bool found = false;
 				for (int i = 0; i < 9; i++) {
 					if (this->Backpack[i]->nowIs() == charOnly(A->nowIs())) {
-						cout << charOnly(A->nowIs()) << endl;
 						this->BackpackQuantity[i]++;
-						printf("added\n");
 						found = true;
 						break;
 					}
@@ -998,14 +1078,32 @@ public:
 					}
 				}
 			}
-			if (!this->pause && A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 200) {
+			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 200) {
 				const vector<float> moveVec = getHitVector(this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), A->PosX(), A->PosY());
-				A->setOffsetPosX(A->offsetPosX + 7*moveVec[0]/abs(moveVec[0]));
-				A->setOffsetPosY(A->offsetPosY + 7*moveVec[1] / abs(moveVec[1]));
+				A->setOffsetPosX(A->offsetPosX + 7*moveVec[0]/abs(moveVec[0]+1));
+				A->setOffsetPosY(A->offsetPosY + 7*moveVec[1] / abs(moveVec[1]+1));
 				//A->setSpriteSize(0, 0);
 				//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
 				//this->Field.remove(A->nowIs());
 			}
+		}
+		for (int i = 0; i < 9; i++) {
+			if (this->Backpack[i]->nowIs() != "None") {
+				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width/2, y = 830, x1 = x-0.7*IntDigit(this->BackpackQuantity[i]);
+				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({x,y});
+				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->BackpackQuantity[i]));
+				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({x1,y});
+				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(this->BackpackQuantity[i]));
+			}
+			else {
+				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(" ");
+				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(" ");
+			}
+		}
+		if (this->Backpack[this->selectingSlot]->nowIs() != "None") {
+			const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
+			this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
+			this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->Backpack[this->selectingSlot]->nowIs());
 		}
 		/*
 		This part is for update game event.
@@ -1038,6 +1136,17 @@ public:
 				for (int i = 0; i < DrawField_pauseUI.size(); i++) {
 					this->window->draw(this->DrawField_pauseUI[i]->getSprite());
 				}
+				for (int i = 0; i < Dialog["PausedMenu"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["PausedMenu"].objectAt(i));
+				}
+			}
+			else {
+				for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["itemCount"].objectAt(i));
+				}
+				if (this->Backpack[this->selectingSlot]->nowIs() != "None") {
+					this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
+				}
 			}
 		}
 		catch (int e) {
@@ -1059,9 +1168,9 @@ bool SortObj() {
 	bool swaped = false;
 	for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
 		if (i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSizeY()) / 2 > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSizeY()) / 2)) {
-			First_step.pause = true;
+			//First_step.pause = true;
 			iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
-			First_step.pause = false;
+			//First_step.pause = false;
 			swaped = true;
 		}
 	}
