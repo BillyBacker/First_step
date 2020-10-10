@@ -419,20 +419,55 @@ private:
 		this->itemList.registerObject("Herb", "Item");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
 		this->itemList.object("Herb")->setSpriteTexture("default", 0);
+		this->itemList.object("Herb")->addStat("showCount", 1);
 		this->itemList.object("Herb")->tag = "Medicine";
 
 		this->itemList.registerObject("Apple", "Item");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
+		this->itemList.object("Apple")->addStat("showCount", 1);
 		this->itemList.object("Apple")->tag = "Food";
 
 		this->itemList.registerObject("Hydro Flask", "Item");
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
 		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
+		this->itemList.object("Hydro Flask")->addStat("showCount", 0);
 		this->itemList.object("Hydro Flask")->tag = "Drink";
+
+		this->itemList.registerObject("Composite Metal", "Item");
+		this->itemList.object("Composite Metal")->addTexture("assets\\Prop\\Item\\metalPlate.png", "default", 1000);
+		this->itemList.object("Composite Metal")->setSpriteTexture("default", 0);
+		this->itemList.object("Composite Metal")->addStat("showCount", 1);
+		this->itemList.object("Composite Metal")->tag = "Material";
+
+		this->itemList.registerObject("Drill", "Item");
+		this->itemList.object("Drill")->addTexture("assets\\Prop\\Item\\drill.png", "default", 1000);
+		this->itemList.object("Drill")->setSpriteTexture("default", 0);
+		this->itemList.object("Drill")->addStat("showCount", 0);
+		this->itemList.object("Drill")->tag = "Tool";
+
+		this->itemList.registerObject("Shovel", "Item");
+		this->itemList.object("Shovel")->addTexture("assets\\Prop\\Item\\Shovel.png", "default", 1000);
+		this->itemList.object("Shovel")->setSpriteTexture("default", 0);
+		this->itemList.object("Shovel")->addStat("showCount", 0);
+		this->itemList.object("Shovel")->tag = "Tool";
+
+		this->itemList.registerObject("Hammer", "Item");
+		this->itemList.object("Hammer")->addTexture("assets\\Prop\\Item\\Hammer.png", "default", 1000);
+		this->itemList.object("Hammer")->setSpriteTexture("default", 0);
+		this->itemList.object("Hammer")->addStat("showCount", 0);
+		this->itemList.object("Hammer")->tag = "Tool";
 
 		this->Backpack[2] = itemList.object("Hydro Flask");
 		this->BackpackQuantity[2] = 100;
+		this->Backpack[6] = itemList.object("Drill");
+		this->BackpackQuantity[6] = 100;
+		this->Backpack[7] = itemList.object("Shovel");
+		this->BackpackQuantity[7] = 100;
+		this->Backpack[8] = itemList.object("Hammer");
+		this->BackpackQuantity[8] = 100;
+		this->Backpack[5] = itemList.object("Composite Metal");
+		this->BackpackQuantity[5] = 100;
 	}
 	void intitDialog() {
 		this->Dialog["PausedMenu"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -880,6 +915,16 @@ public:
 								Elon->setStat("Thirst", 100);
 							}
 						}
+						else if (this->Backpack[this->selectingSlot]->tag == "Tool" && this->BackpackQuantity[this->selectingSlot] > 0) {
+							if (this->Backpack[this->selectingSlot]->nowIs() == "Hammer") {
+								string ObjName = "Pump_" + to_string(rand() % 100000);
+								this->Field.registerObject(ObjName, "Pump");
+								this->Field.object(ObjName)->setOffsetPosX(this->Elon->PosX() - this->Field.object("Anchor")->PosX());
+								this->Field.object(ObjName)->setOffsetPosY(this->Elon->PosY() - this->Field.object("Anchor")->PosY());
+								printf("+\n");
+								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
+							}
+						}
 						if (this->BackpackQuantity[this->selectingSlot] > 0) {
 							this->BackpackQuantity[this->selectingSlot]--;
 						}
@@ -932,7 +977,7 @@ public:
 			this->Field.object("StatBar_Fill3")->setSpriteSize(0.06, -0.06 * Elon->getStat("Air") / 100);
 		}
 		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 9; i++) {
 			if (this->Backpack[i]->nowIs() != "None" && find(this->DrawField_Static.begin(), this->DrawField_Static.end(), this->Backpack[i]) == this->DrawField_Static.end()) {
 				this->Backpack[i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
 				this->Backpack[i]->setPosY(833);
@@ -1088,7 +1133,7 @@ public:
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			if (this->Backpack[i]->nowIs() != "None") {
+			if (this->Backpack[i]->nowIs() != "None" && this->Backpack[i]->getStat("showCount") == 1) {
 				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width/2, y = 830, x1 = x-0.7*IntDigit(this->BackpackQuantity[i]);
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({x,y});
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->BackpackQuantity[i]));
