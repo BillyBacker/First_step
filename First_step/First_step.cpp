@@ -599,6 +599,16 @@ private:
 		this->Field.Template("Pump")->setType("Dynamic");
 		this->Field.Template("Pump")->isPassable(false);
 
+		this->Field.createTemplate("SolarCell");
+		this->Field.Template("SolarCell")->addTexture("assets\\Prop\\Building\\SolarCell.png", "SolarCell", 1000);
+		this->Field.Template("SolarCell")->setSpriteTexture("SolarCell", 0);
+		this->Field.Template("SolarCell")->setSpriteSize(0.1, 0.1);
+		this->Field.Template("SolarCell")->setImgDim(1200, 1600);
+		this->Field.Template("SolarCell")->setPosX(this->Field.object("Anchor")->PosX());
+		this->Field.Template("SolarCell")->setPosY(this->Field.object("Anchor")->PosY());
+		this->Field.Template("SolarCell")->setType("Dynamic");
+		this->Field.Template("SolarCell")->isPassable(false);
+
 		this->Field.createTemplate("Floor");
 		this->Field.Template("Floor")->addTexture("assets\\Prop\\Floor\\Floor11.png", "default", 1000);
 		this->Field.Template("Floor")->setSpriteTexture("default", 0);
@@ -721,6 +731,37 @@ private:
 		this->Field.registerObject("PauseBG", "PauseUI_BG");
 		this->Field.object("PauseBG")->setSpriteTexture("default", 0);
 
+		this->Field.createTemplate("BuildUI_BG");
+		this->Field.Template("BuildUI_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field.Template("BuildUI_BG")->setSpriteSize(0.5, 0.5);
+		this->Field.Template("BuildUI_BG")->setImgDim(3200, 1800);
+		this->Field.Template("BuildUI_BG")->setPosX(800);
+		this->Field.Template("BuildUI_BG")->setPosY(450);
+		this->Field.Template("BuildUI_BG")->setType("Static");
+		this->Field.Template("BuildUI_BG")->tag = "BuildUI";
+
+		this->Field.registerObject("BuildBG", "BuildUI_BG");
+		this->Field.object("BuildBG")->setSpriteTexture("default", 0);
+
+		this->Field.createTemplate("BuildingSample");
+		this->Field.Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
+		this->Field.Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
+		this->Field.Template("BuildingSample")->setSpriteSize(0.1, 0.1);
+		this->Field.Template("BuildingSample")->setImgDim(1200, 1600);
+		this->Field.Template("BuildingSample")->setType("Static");
+		this->Field.Template("BuildingSample")->tag = "BuildUI";
+
+		this->Field.registerObject("PumpSample", "BuildingSample");
+		this->Field.object("PumpSample")->setSpriteTexture("Pump", 0);
+		this->Field.object("PumpSample")->setPosX(400);
+		this->Field.object("PumpSample")->setPosY(200);
+
+		this->Field.registerObject("SolarCellSample", "BuildingSample");
+		this->Field.object("SolarCellSample")->setSpriteTexture("SolarCell", 0);
+		this->Field.object("SolarCellSample")->setPosX(400);
+		this->Field.object("SolarCellSample")->setPosY(400);
+
+
 	}
 	void manageLayer() {
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
@@ -730,6 +771,9 @@ private:
 			}
 			else if (this->Field.objectAt(i)->tag == "PauseUI") {
 				this->DrawField_pauseUI.push_back(this->Field.objectAt(i));
+			}
+			else if (this->Field.objectAt(i)->tag == "BuildUI") {
+				this->DrawField_buildingUI.push_back(this->Field.objectAt(i));
 			}
 			else if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
 				this->DrawField_Static.push_back(this->Field.objectAt(i));
@@ -751,9 +795,10 @@ public:
 	vector<Object*> DrawField_Static;
 	vector<Object*> DrawField_BG;
 	vector<Object*> DrawField_pauseUI;
+	vector<Object*> DrawField_buildingUI;
 	vector<Object*> BG_repo;
 	unordered_map<string, strMap> Dialog;
-	vector<float> mousePos = { 0,0 };
+	vector<int> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
 	bool _time = true;
@@ -764,7 +809,7 @@ public:
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	bool pause = false;
 	bool escPressed = false, escToggle = false;
-	bool paused = false;
+	bool paused = false, building = false;
 	int selectingSlot = 0;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
@@ -823,13 +868,9 @@ public:
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
-				this->window->close();
-				running = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::X) {
 				this->escPressed = true;
 			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::X) {
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::Escape) {
 				this->escPressed = false;
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Q && pass) {
@@ -917,12 +958,15 @@ public:
 						}
 						else if (this->Backpack[this->selectingSlot]->tag == "Tool" && this->BackpackQuantity[this->selectingSlot] > 0) {
 							if (this->Backpack[this->selectingSlot]->nowIs() == "Hammer") {
+								this->building = true;
+								/*
 								string ObjName = "Pump_" + to_string(rand() % 100000);
 								this->Field.registerObject(ObjName, "Pump");
 								this->Field.object(ObjName)->setOffsetPosX(this->Elon->PosX() - this->Field.object("Anchor")->PosX());
 								this->Field.object(ObjName)->setOffsetPosY(this->Elon->PosY() - this->Field.object("Anchor")->PosY());
 								printf("+\n");
 								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
+								*/
 							}
 						}
 						if (this->BackpackQuantity[this->selectingSlot] > 0) {
@@ -932,6 +976,44 @@ public:
 							this->Backpack[this->selectingSlot]->Is("None");
 							this->Backpack[this->selectingSlot]->tag = "None";
 							this->Backpack[this->selectingSlot]->setSpriteSize(0, 0);
+						}
+					}
+				}
+				if (ev.mouseButton.button == Mouse::Left) {
+					printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
+					if (this->Elon->getStat("Alive") == 1) {
+						if (this->paused) {
+							int BacktoGameHitBox[] = { 250, 200, 600, 250 };
+							int ExitHitBox[] = { 250, 600, 600, 650 };
+							if (clickHit(BacktoGameHitBox, this->mousePos[0], this->mousePos[1])) {
+								printf("Hit");
+								this->paused = false;
+							}
+							if(clickHit(ExitHitBox, this->mousePos[0], this->mousePos[1])) {
+								printf("Hit");
+								this->window->close();
+								this->running = false;
+							}
+						}
+						else if (this->building) {
+							int PumpHitBox[] = { 330, 100, 470, 280 };
+							int SlolarHitBox[] = { 330, 340, 460, 480 };
+							if (clickHit(PumpHitBox, this->mousePos[0], this->mousePos[1])) {
+								string ObjName = "Pump_" + to_string(rand() % 100000);
+								this->Field.registerObject(ObjName, "Pump");
+								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
+								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
+								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
+								this->building = false;
+							}
+							if (clickHit(SlolarHitBox, this->mousePos[0], this->mousePos[1])) {
+								string ObjName = "Solar_" + to_string(rand() % 100000);
+								this->Field.registerObject(ObjName, "SolarCell");
+								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
+								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
+								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
+								this->building = false;
+							}
 						}
 					}
 				}
@@ -958,6 +1040,9 @@ public:
 		if (Elon->getStat(Stat) > 1) {
 			Elon->setStat(Stat, Elon->getStat(Stat) - amount);
 		}
+	}
+	bool clickHit(int hitboxData[4], int Mx, int My) {
+		return Mx < hitboxData[2] && Mx > hitboxData[0] && My < hitboxData[3] && My >hitboxData[1];
 	}
 	int IntDigit(int In) {
 		int i = floor(log10(In))+1;
@@ -990,8 +1075,9 @@ public:
 		this->pollEvents();
 		this->updateHUD();
 		if (this->escPressed && !this->escToggle) {
-			if (this->paused) {
+			if (this->paused || this->building) {
 				this->paused = false;
+				this->building = false;
 			}
 			else {
 				this->paused = true;
@@ -1183,6 +1269,11 @@ public:
 				}
 				for (int i = 0; i < Dialog["PausedMenu"].entityNumber(); i++) {
 					this->window->draw(*this->Dialog["PausedMenu"].objectAt(i));
+				}
+			}
+			else if (this->building) {
+				for (int i = 0; i < DrawField_buildingUI.size(); i++) {
+					this->window->draw(this->DrawField_buildingUI[i]->getSprite());
 				}
 			}
 			else {
