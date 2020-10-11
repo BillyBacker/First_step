@@ -440,6 +440,12 @@ private:
 		this->itemList.object("Composite Metal")->addStat("showCount", 1);
 		this->itemList.object("Composite Metal")->tag = "Material";
 
+		this->itemList.registerObject("Arclyic", "Item");
+		this->itemList.object("Arclyic")->addTexture("assets\\Prop\\Item\\Arclyic.png", "default", 1000);
+		this->itemList.object("Arclyic")->setSpriteTexture("default", 0);
+		this->itemList.object("Arclyic")->addStat("showCount", 1);
+		this->itemList.object("Arclyic")->tag = "Material";
+
 		this->itemList.registerObject("Drill", "Item");
 		this->itemList.object("Drill")->addTexture("assets\\Prop\\Item\\drill.png", "default", 1000);
 		this->itemList.object("Drill")->setSpriteTexture("default", 0);
@@ -466,27 +472,29 @@ private:
 		this->BackpackQuantity[7] = 100;
 		this->Backpack[8] = itemList.object("Hammer");
 		this->BackpackQuantity[8] = 100;
+		this->Backpack[4] = itemList.object("Arclyic");
+		this->BackpackQuantity[4] = 100;
 		this->Backpack[5] = itemList.object("Composite Metal");
 		this->BackpackQuantity[5] = 100;
 	}
 	void intitDialog() {
-		this->Dialog["PausedMenu"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
-		this->Dialog["PausedMenu"].addFont("Mitr-Bold", "assets\\font\\Mitr-Bold.ttf");
+		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
+		this->Dialog["Font"].addFont("Mitr-Bold", "assets\\font\\Mitr-Bold.ttf");
 
 		this->Dialog["PausedMenu"].registerObject("BackToGame", "PausedMenu");
-		this->Dialog["PausedMenu"].object("BackToGame")->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+		this->Dialog["PausedMenu"].object("BackToGame")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["PausedMenu"].object("BackToGame")->setCharacterSize(50);
 		this->Dialog["PausedMenu"].object("BackToGame")->setString("Back to game");
 		this->Dialog["PausedMenu"].object("BackToGame")->setPosition({ 250,200 });
 
 		this->Dialog["PausedMenu"].registerObject("ExitGame", "PausedMenu");
-		this->Dialog["PausedMenu"].object("ExitGame")->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+		this->Dialog["PausedMenu"].object("ExitGame")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["PausedMenu"].object("ExitGame")->setCharacterSize(50);
 		this->Dialog["PausedMenu"].object("ExitGame")->setString("Exit this game");
 		this->Dialog["PausedMenu"].object("ExitGame")->setPosition({ 250,600 });
 
 		this->Dialog["InGameStatus"].registerObject("ItemInHand", "InGameStatus");
-		this->Dialog["InGameStatus"].object("ItemInHand")->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+		this->Dialog["InGameStatus"].object("ItemInHand")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["InGameStatus"].object("ItemInHand")->setCharacterSize(30);
 		this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ 750,750 });
 
@@ -494,13 +502,13 @@ private:
 			this->Dialog["itemCount"].registerObject("itemCountBG"+to_string(i), "itemCountBG");
 			this->Dialog["itemCount"].registerObject("itemCount" + to_string(i), "itemCount");
 
-			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setFont(this->Dialog["PausedMenu"].font["Mitr-Bold"]);
+			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setFont(this->Dialog["Font"].font["Mitr-Bold"]);
 			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setCharacterSize(25);
 			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(i));
 			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setStyle(Text::Bold);
 			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setFillColor(Color::White);
 
-			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setFont(this->Dialog["PausedMenu"].font["Mitr-Regular"]);
+			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setCharacterSize(25);
 			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(i));
 			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setFillColor(Color::Black);
@@ -508,6 +516,18 @@ private:
 			this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({ x ,y});
 			this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({ x ,y});
 		}
+
+		this->Dialog["itemUse"].registerObject("metalUse_pump", "BuildingMenu");
+		this->Dialog["itemUse"].object("metalUse_pump")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("metalUse_pump")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("metalUse_pump")->setString("10");
+		this->Dialog["itemUse"].object("metalUse_pump")->setPosition({ 550,210 });
+
+		this->Dialog["itemUse"].registerObject("metalUse_Arclyic", "BuildingMenu");
+		this->Dialog["itemUse"].object("metalUse_Arclyic")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("metalUse_Arclyic")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("metalUse_Arclyic")->setString("5");
+		this->Dialog["itemUse"].object("metalUse_Arclyic")->setPosition({ 650,210 });
 		
 
 	}
@@ -761,6 +781,23 @@ private:
 		this->Field.object("SolarCellSample")->setPosX(400);
 		this->Field.object("SolarCellSample")->setPosY(400);
 
+		this->Field.createTemplate("ItemUse");
+		this->Field.Template("ItemUse")->addTexture("assets\\Prop\\Item\\metalPlate.png", "CompositeMetal", 1000);
+		this->Field.Template("ItemUse")->addTexture("assets\\Prop\\Item\\Arclyic.png", "Arclyic", 1000);
+		this->Field.Template("ItemUse")->setSpriteSize(0.1, 0.1);
+		this->Field.Template("ItemUse")->setImgDim(1000, 1000);
+		this->Field.Template("ItemUse")->setType("Static");
+		this->Field.Template("ItemUse")->tag = "BuildUI";
+
+		this->Field.registerObject("Pump_metal", "ItemUse");
+		this->Field.object("Pump_metal")->setSpriteTexture("CompositeMetal", 0);
+		this->Field.object("Pump_metal")->setPosX(550);
+		this->Field.object("Pump_metal")->setPosY(220);
+
+		this->Field.registerObject("Pump_Arclyic", "ItemUse");
+		this->Field.object("Pump_Arclyic")->setSpriteTexture("Arclyic", 0);
+		this->Field.object("Pump_Arclyic")->setPosX(650);
+		this->Field.object("Pump_Arclyic")->setPosY(220);
 
 	}
 	void manageLayer() {
@@ -969,6 +1006,9 @@ public:
 								*/
 							}
 						}
+						else {
+							continue;
+						}
 						if (this->BackpackQuantity[this->selectingSlot] > 0) {
 							this->BackpackQuantity[this->selectingSlot]--;
 						}
@@ -998,7 +1038,7 @@ public:
 						else if (this->building) {
 							int PumpHitBox[] = { 330, 100, 470, 280 };
 							int SlolarHitBox[] = { 330, 340, 460, 480 };
-							if (clickHit(PumpHitBox, this->mousePos[0], this->mousePos[1])) {
+							if (clickHit(PumpHitBox, this->mousePos[0], this->mousePos[1]) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
 								string ObjName = "Pump_" + to_string(rand() % 100000);
 								this->Field.registerObject(ObjName, "Pump");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
@@ -1035,6 +1075,15 @@ public:
 			}
 		}
 
+	}
+	bool hasEnoughItem(string item, int quantity) {
+		for (int i = 0; i < 9; i++) {
+			if (this->Backpack[i]->nowIs() == item && this->BackpackQuantity[i] >= quantity) {
+				this->BackpackQuantity[i] -= quantity;
+				return true;
+			}
+		}
+		return false;
 	}
 	void DecStat(string Stat, float amount) {
 		if (Elon->getStat(Stat) > 1) {
@@ -1203,7 +1252,7 @@ public:
 							this->Backpack[i] = this->itemList.object(charOnly(A->nowIs()));
 							this->BackpackQuantity[i] = 1;
 							this->Backpack[i]->setSpriteSize(0.06, 0.06);
-							this->Backpack[i]->setPosX(503 + 1100 * 0.06 * i);
+							//this->Backpack[i]->setPosX(503 + 1100 * 0.06 * i);
 							break;
 						}
 					}
@@ -1219,7 +1268,12 @@ public:
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			if (this->Backpack[i]->nowIs() != "None" && this->Backpack[i]->getStat("showCount") == 1) {
+			if (this->BackpackQuantity[i] <= 0) {
+				this->Backpack[i]->Is("None");
+				this->Backpack[i]->tag = "None";
+				this->Backpack[i]->setSpriteSize(0, 0);
+			}
+			if (this->Backpack[i]->nowIs() != "None" && this->Backpack[i]->getStat("showCount") == 1 && this->BackpackQuantity[i] > 0) {
 				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width/2, y = 830, x1 = x-0.7*IntDigit(this->BackpackQuantity[i]);
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({x,y});
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->BackpackQuantity[i]));
@@ -1263,6 +1317,12 @@ public:
 			for (int i = 0; i < this->DrawField_Static.size() && DrawField_Static[i]; i++) {
 				this->window->draw(this->DrawField_Static[i]->getSprite());
 			}
+			for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
+				this->window->draw(*this->Dialog["itemCount"].objectAt(i));
+			}
+			if (this->Backpack[this->selectingSlot]->nowIs() != "None") {
+				this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
+			}
 			if (this->paused) {
 				for (int i = 0; i < DrawField_pauseUI.size(); i++) {
 					this->window->draw(this->DrawField_pauseUI[i]->getSprite());
@@ -1275,13 +1335,8 @@ public:
 				for (int i = 0; i < DrawField_buildingUI.size(); i++) {
 					this->window->draw(this->DrawField_buildingUI[i]->getSprite());
 				}
-			}
-			else {
-				for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
-					this->window->draw(*this->Dialog["itemCount"].objectAt(i));
-				}
-				if (this->Backpack[this->selectingSlot]->nowIs() != "None") {
-					this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
+				for (int i = 0; i < this->Dialog["itemUse"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["itemUse"].objectAt(i));
 				}
 			}
 		}
