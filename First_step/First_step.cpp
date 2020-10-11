@@ -407,75 +407,188 @@ private:
 			Object* ptr = new Object(rand() % 10000);
 			ptr->setImgDim(1000, 1000);
 			ptr->setPosX(503 + 1100 * 0.06 * i);
-			ptr->setPosX(800);
+			ptr->setPosY(800);
 			ptr->Is("None");
-			Backpack.push_back(ptr);
-			BackpackQuantity.push_back(0);
+			ItemUseSlot.push_back(ptr);
+			InventoryUseSlot.push_back(ptr);
+			ItemUseSlotQuantity.push_back(0);
+		}
+		for (int i = 0; i < 3; i++) {
+			Backpack.push_back({});
+			BackpackQuantity.push_back({});
+			for (int j = 0; j < 9; j++) {
+				Object* ptr = new Object(rand() % 10000);
+				ptr->setImgDim(1000, 1000);
+				ptr->setPosX(200+1000*0.06*i);
+				ptr->setPosY(503+1000*0.06*j);
+				ptr->Is("None");
+				Backpack[i].push_back(ptr);
+				BackpackQuantity[i].push_back(0);
+			}
 		}
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
 		this->itemList.Template("Item")->setImgDim(1000, 1000);
+		this->itemList.Template("Item")->addStat("showCount", 1);
 
+		this->itemList.createTemplate("Tool");
+		this->itemList.Template("Tool")->setSpriteSize(0.06, 0.06);
+		this->itemList.Template("Tool")->setImgDim(1000, 1000);
+		this->itemList.Template("Tool")->addStat("showCount", 0);
+
+		// Item registeration section
 		this->itemList.registerObject("Herb", "Item");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
 		this->itemList.object("Herb")->setSpriteTexture("default", 0);
-		this->itemList.object("Herb")->addStat("showCount", 1);
 		this->itemList.object("Herb")->tag = "Medicine";
 
 		this->itemList.registerObject("Apple", "Item");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
-		this->itemList.object("Apple")->addStat("showCount", 1);
 		this->itemList.object("Apple")->tag = "Food";
 
 		this->itemList.registerObject("Hydro Flask", "Item");
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
 		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
-		this->itemList.object("Hydro Flask")->addStat("showCount", 0);
 		this->itemList.object("Hydro Flask")->tag = "Drink";
 
 		this->itemList.registerObject("Composite Metal", "Item");
 		this->itemList.object("Composite Metal")->addTexture("assets\\Prop\\Item\\metalPlate.png", "default", 1000);
 		this->itemList.object("Composite Metal")->setSpriteTexture("default", 0);
-		this->itemList.object("Composite Metal")->addStat("showCount", 1);
 		this->itemList.object("Composite Metal")->tag = "Material";
 
 		this->itemList.registerObject("Arclyic", "Item");
 		this->itemList.object("Arclyic")->addTexture("assets\\Prop\\Item\\Arclyic.png", "default", 1000);
 		this->itemList.object("Arclyic")->setSpriteTexture("default", 0);
-		this->itemList.object("Arclyic")->addStat("showCount", 1);
 		this->itemList.object("Arclyic")->tag = "Material";
 
-		this->itemList.registerObject("Drill", "Item");
+		this->itemList.registerObject("Aluminium Plate", "Item");
+		this->itemList.object("Aluminium Plate")->addTexture("assets\\Prop\\Item\\AluminiumPlate.png", "default", 1000);
+		this->itemList.object("Aluminium Plate")->setSpriteTexture("default", 0);
+		this->itemList.object("Aluminium Plate")->tag = "Material";
+
+		this->itemList.registerObject("Bread", "Item");
+		this->itemList.object("Bread")->addTexture("assets\\Prop\\Item\\Bread.png", "default", 1000);
+		this->itemList.object("Bread")->setSpriteTexture("default", 0);
+		this->itemList.object("Bread")->tag = "Food";
+
+		this->itemList.registerObject("Carrot", "Item");
+		this->itemList.object("Carrot")->addTexture("assets\\Prop\\Item\\Carrot.png", "default", 1000);
+		this->itemList.object("Carrot")->setSpriteTexture("default", 0);
+		this->itemList.object("Carrot")->tag = "Food";
+
+		this->itemList.registerObject("Carrot Seed", "Item");
+		this->itemList.object("Carrot Seed")->addTexture("assets\\Prop\\Item\\CarrotSeed.png", "default", 1000);
+		this->itemList.object("Carrot Seed")->setSpriteTexture("default", 0);
+		this->itemList.object("Carrot Seed")->tag = "Material";
+
+		this->itemList.registerObject("Copper Nugget", "Item");
+		this->itemList.object("Copper Nugget")->addTexture("assets\\Prop\\Item\\CopperNugget.png", "default", 1000);
+		this->itemList.object("Copper Nugget")->setSpriteTexture("default", 0);
+		this->itemList.object("Copper Nugget")->tag = "Material";
+
+		this->itemList.registerObject("Copper Plate", "Item");
+		this->itemList.object("Copper Plate")->addTexture("assets\\Prop\\Item\\CopperPlate.png", "default", 1000);
+		this->itemList.object("Copper Plate")->setSpriteTexture("default", 0);
+		this->itemList.object("Copper Plate")->tag = "Material";
+
+		this->itemList.registerObject("Copper Wire", "Item");
+		this->itemList.object("Copper Wire")->addTexture("assets\\Prop\\Item\\CopperWire.png", "default", 1000);
+		this->itemList.object("Copper Wire")->setSpriteTexture("default", 0);
+		this->itemList.object("Copper Wire")->tag = "Material";
+
+		this->itemList.registerObject("Flour", "Item");
+		this->itemList.object("Flour")->addTexture("assets\\Prop\\Item\\Flour.png", "default", 1000);
+		this->itemList.object("Flour")->setSpriteTexture("default", 0);
+		this->itemList.object("Flour")->tag = "Material";
+
+		this->itemList.registerObject("Gold Nugget", "Item");
+		this->itemList.object("Gold Nugget")->addTexture("assets\\Prop\\Item\\GoldNugget.png", "default", 1000);
+		this->itemList.object("Gold Nugget")->setSpriteTexture("default", 0);
+		this->itemList.object("Gold Nugget")->tag = "Material";
+
+		this->itemList.registerObject("Gold Plate", "Item");
+		this->itemList.object("Gold Plate")->addTexture("assets\\Prop\\Item\\GoldPlate.png", "default", 1000);
+		this->itemList.object("Gold Plate")->setSpriteTexture("default", 0);
+		this->itemList.object("Gold Plate")->tag = "Material";
+
+		this->itemList.registerObject("Gold Wire", "Item");
+		this->itemList.object("Gold Wire")->addTexture("assets\\Prop\\Item\\GoldWire.png", "default", 1000);
+		this->itemList.object("Gold Wire")->setSpriteTexture("default", 0);
+		this->itemList.object("Gold Wire")->tag = "Material";
+
+		this->itemList.registerObject("Herb Seed", "Item");
+		this->itemList.object("Herb Seed")->addTexture("assets\\Prop\\Item\\HerbSeed.png", "default", 1000);
+		this->itemList.object("Herb Seed")->setSpriteTexture("default", 0);
+		this->itemList.object("Herb Seed")->tag = "Material";
+
+		this->itemList.registerObject("MRE", "Item");
+		this->itemList.object("MRE")->addTexture("assets\\Prop\\Item\\MRE.png", "default", 1000);
+		this->itemList.object("MRE")->setSpriteTexture("default", 0);
+		this->itemList.object("MRE")->tag = "Food";
+
+		this->itemList.registerObject("Plastic", "Item");
+		this->itemList.object("Plastic")->addTexture("assets\\Prop\\Item\\Plastic.png", "default", 1000);
+		this->itemList.object("Plastic")->setSpriteTexture("default", 0);
+		this->itemList.object("Plastic")->tag = "Material";
+
+		this->itemList.registerObject("Titanium Nugget", "Item");
+		this->itemList.object("Titanium Nugget")->addTexture("assets\\Prop\\Item\\TitaniumNugget.png", "default", 1000);
+		this->itemList.object("Titanium Nugget")->setSpriteTexture("default", 0);
+		this->itemList.object("Titanium Nugget")->tag = "Material";
+
+		this->itemList.registerObject("Titanium Plate", "Item");
+		this->itemList.object("Titanium Plate")->addTexture("assets\\Prop\\Item\\TitaniumPlate.png", "default", 1000);
+		this->itemList.object("Titanium Plate")->setSpriteTexture("default", 0);
+		this->itemList.object("Titanium Plate")->tag = "Material";
+
+		this->itemList.registerObject("Wheat Grain", "Item");
+		this->itemList.object("Wheat Grain")->addTexture("assets\\Prop\\Item\\WheatGrain.png", "default", 1000);
+		this->itemList.object("Wheat Grain")->setSpriteTexture("default", 0);
+		this->itemList.object("Wheat Grain")->tag = "Material";
+
+		this->itemList.registerObject("Wheat Seed", "Item");
+		this->itemList.object("Wheat Seed")->addTexture("assets\\Prop\\Item\\WheatSeed.png", "default", 1000);
+		this->itemList.object("Wheat Seed")->setSpriteTexture("default", 0);
+		this->itemList.object("Wheat Seed")->tag = "Material";
+
+		this->itemList.registerObject("Drill", "Tool");
 		this->itemList.object("Drill")->addTexture("assets\\Prop\\Item\\drill.png", "default", 1000);
 		this->itemList.object("Drill")->setSpriteTexture("default", 0);
-		this->itemList.object("Drill")->addStat("showCount", 0);
 		this->itemList.object("Drill")->tag = "Tool";
 
-		this->itemList.registerObject("Shovel", "Item");
+		this->itemList.registerObject("Shovel", "Tool");
 		this->itemList.object("Shovel")->addTexture("assets\\Prop\\Item\\Shovel.png", "default", 1000);
 		this->itemList.object("Shovel")->setSpriteTexture("default", 0);
-		this->itemList.object("Shovel")->addStat("showCount", 0);
 		this->itemList.object("Shovel")->tag = "Tool";
 
-		this->itemList.registerObject("Hammer", "Item");
+		this->itemList.registerObject("Hammer", "Tool");
 		this->itemList.object("Hammer")->addTexture("assets\\Prop\\Item\\Hammer.png", "default", 1000);
 		this->itemList.object("Hammer")->setSpriteTexture("default", 0);
-		this->itemList.object("Hammer")->addStat("showCount", 0);
 		this->itemList.object("Hammer")->tag = "Tool";
 
-		this->Backpack[2] = itemList.object("Hydro Flask");
-		this->BackpackQuantity[2] = 100;
-		this->Backpack[6] = itemList.object("Drill");
-		this->BackpackQuantity[6] = 100;
-		this->Backpack[7] = itemList.object("Shovel");
-		this->BackpackQuantity[7] = 100;
-		this->Backpack[8] = itemList.object("Hammer");
-		this->BackpackQuantity[8] = 100;
-		this->Backpack[4] = itemList.object("Arclyic");
-		this->BackpackQuantity[4] = 100;
-		this->Backpack[5] = itemList.object("Composite Metal");
-		this->BackpackQuantity[5] = 100;
+		// Default item
+		this->ItemUseSlot[2] = itemList.object("Hydro Flask");
+		this->ItemUseSlotQuantity[2] = 100;
+		this->ItemUseSlot[6] = itemList.object("MRE");
+		this->ItemUseSlotQuantity[6] = 10;
+		this->ItemUseSlot[7] = itemList.object("Gold Wire");
+		this->ItemUseSlotQuantity[7] = 100;
+		this->ItemUseSlot[8] = itemList.object("Hammer");
+		this->ItemUseSlotQuantity[8] = 100;
+		this->ItemUseSlot[4] = itemList.object("Arclyic");
+		this->ItemUseSlotQuantity[4] = 100;
+		this->ItemUseSlot[5] = itemList.object("Composite Metal");
+		this->ItemUseSlotQuantity[5] = 100;
+
+		this->Backpack[0][0] = itemList.object("Wheat Grain");
+		this->BackpackQuantity[0][0] = 100;
+
+		this->Backpack[2][7] = itemList.object("Gold Nugget");
+		this->BackpackQuantity[2][7] = 53;
+
+		this->Backpack[1][5] = itemList.object("Bread");
+		this->BackpackQuantity[1][5] = 53;
 	}
 	void intitDialog() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -528,6 +641,46 @@ private:
 		this->Dialog["itemUse"].object("metalUse_Arclyic")->setCharacterSize(50);
 		this->Dialog["itemUse"].object("metalUse_Arclyic")->setString("5");
 		this->Dialog["itemUse"].object("metalUse_Arclyic")->setPosition({ 650,210 });
+
+		for (int i = 0; i < 9; i++) {
+			this->Dialog["InventoryItem_hotbar"].registerObject("InventoryitemCountBG_hotbar" + to_string(i), "itemCountBG");
+			this->Dialog["InventoryItem_hotbar"].registerObject("InventoryitemCount_hotbar" + to_string(i), "itemCount");
+
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setFont(this->Dialog["Font"].font["Mitr-Bold"]);
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setCharacterSize(25);
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(to_string(i));
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setStyle(Text::Bold);
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setFillColor(Color::White);
+
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setCharacterSize(25);
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(to_string(i));
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setFillColor(Color::Black);
+			const float x = 525 + 1100.0 * 0.06 * i, y = 533;
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setPosition({ x ,y });
+			this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setPosition({ x ,y });
+		}
+
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				this->Dialog["InventoryItem"].registerObject("InventoryitemCountBG" + to_string(i) + to_string(j), "itemCountBG");
+				this->Dialog["InventoryItem"].registerObject("InventoryitemCount" + to_string(i) + to_string(j), "itemCount");
+
+				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setFont(this->Dialog["Font"].font["Mitr-Bold"]);
+				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setCharacterSize(25);
+				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(to_string(i));
+				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setStyle(Text::Bold);
+				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setFillColor(Color::White);
+
+				this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+				this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setCharacterSize(25);
+				this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(to_string(i));
+				this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setFillColor(Color::Black);
+				const float x = 200 + 1100 * 0.06 * i, y = 503 + 1100 * 0.06 * j;
+				this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x ,y });
+				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x ,y });
+			}
+		}
 		
 
 	}
@@ -763,6 +916,31 @@ private:
 		this->Field.registerObject("BuildBG", "BuildUI_BG");
 		this->Field.object("BuildBG")->setSpriteTexture("default", 0);
 
+		this->Field.createTemplate("Inventory_BG");
+		this->Field.Template("Inventory_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field.Template("Inventory_BG")->setSpriteSize(0.5, 0.5);
+		this->Field.Template("Inventory_BG")->setImgDim(3200, 1800);
+		this->Field.Template("Inventory_BG")->setPosX(800);
+		this->Field.Template("Inventory_BG")->setPosY(450);
+		this->Field.Template("Inventory_BG")->setType("Static");
+		this->Field.Template("Inventory_BG")->tag = "InventoryUI";
+
+		this->Field.registerObject("InventoryBG", "Inventory_BG");
+		this->Field.object("InventoryBG")->setSpriteTexture("default", 0);
+		for (int i = 0; i < 9; i++) {
+			this->Field.registerObject("UseSlot" + to_string(i), "itemFrame");
+			this->Field.object("UseSlot" + to_string(i))->tag = "InventoryUI";
+			this->Field.object("UseSlot" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
+			this->Field.object("UseSlot" + to_string(i))->setPosY(500);
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				this->Field.registerObject("InventorySlot" + to_string(i) + to_string(j), "itemFrame");
+				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->tag = "InventoryUI";
+				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->setPosX(503 + 1100 * 0.06 * j);
+				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->setPosY(200 + 1100*0.06*i);
+			}
+		}
 		this->Field.createTemplate("BuildingSample");
 		this->Field.Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
 		this->Field.Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
@@ -812,6 +990,9 @@ private:
 			else if (this->Field.objectAt(i)->tag == "BuildUI") {
 				this->DrawField_buildingUI.push_back(this->Field.objectAt(i));
 			}
+			else if (this->Field.objectAt(i)->tag == "InventoryUI") {
+				this->DrawField_inventoryUI.push_back(this->Field.objectAt(i));
+			}
 			else if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
 				this->DrawField_Static.push_back(this->Field.objectAt(i));
 			}
@@ -826,13 +1007,17 @@ private:
 public:
 	RenderWindow* window;
 	Map Field;
-	vector<Object*> Backpack;
-	vector<int> BackpackQuantity;
+	vector<Object*> ItemUseSlot;
+	vector<Object*> InventoryUseSlot;
+	vector<int> ItemUseSlotQuantity;
+	vector<vector<Object*>> Backpack;
+	vector<vector<int>> BackpackQuantity;
 	vector<Object*> DrawField_Dynamic;
 	vector<Object*> DrawField_Static;
 	vector<Object*> DrawField_BG;
 	vector<Object*> DrawField_pauseUI;
 	vector<Object*> DrawField_buildingUI;
+	vector<Object*> DrawField_inventoryUI;
 	vector<Object*> BG_repo;
 	unordered_map<string, strMap> Dialog;
 	vector<int> mousePos = { 0,0 };
@@ -842,11 +1027,11 @@ public:
 	bool pass = true;
 	bool movable = true;
 	float move_speed = 3;
-	bool W = false, A = false, S = false, D = false, shift = false;
+	bool W = false, A = false, S = false, D = false, E = false, shift = false;
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	bool pause = false;
-	bool escPressed = false, escToggle = false;
-	bool paused = false, building = false;
+	bool escPressed = false, escToggle = false, EToggle = false;
+	bool paused = false, building = false, inventory = false;
 	int selectingSlot = 0;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
@@ -909,6 +1094,12 @@ public:
 			}
 			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::Escape) {
 				this->escPressed = false;
+			}
+			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::E) {
+				this->E = true;
+			}
+			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::E) {
+				this->E = false;
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Q && pass) {
 				pass = false;
@@ -973,28 +1164,28 @@ public:
 
 				}
 				if (ev.mouseButton.button == Mouse::Right) {
-					cout << this->Backpack[this->selectingSlot]->tag << endl;
+					cout << this->ItemUseSlot[this->selectingSlot]->tag << endl;
 					if (this->Elon->getStat("Alive") == 1) {
-						if (this->Backpack[this->selectingSlot]->tag == "Medicine" && this->BackpackQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
+						if (this->ItemUseSlot[this->selectingSlot]->tag == "Medicine" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
 							Elon->setStat("Health", Elon->getStat("Health") + 10);
 							if (Elon->getStat("Health") > 100) {
 								Elon->setStat("Health", 100);
 							}
 						}
-						else if (this->Backpack[this->selectingSlot]->tag == "Food" && this->BackpackQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
+						else if (this->ItemUseSlot[this->selectingSlot]->tag == "Food" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
 							Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
 							if (Elon->getStat("Hunger") > 100) {
 								Elon->setStat("Hunger", 100);
 							}
 						}
-						else if (this->Backpack[this->selectingSlot]->tag == "Drink" && this->BackpackQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
+						else if (this->ItemUseSlot[this->selectingSlot]->tag == "Drink" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
 							Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
 							if (Elon->getStat("Thirst") > 100) {
 								Elon->setStat("Thirst", 100);
 							}
 						}
-						else if (this->Backpack[this->selectingSlot]->tag == "Tool" && this->BackpackQuantity[this->selectingSlot] > 0) {
-							if (this->Backpack[this->selectingSlot]->nowIs() == "Hammer") {
+						else if (this->ItemUseSlot[this->selectingSlot]->tag == "Tool" && this->ItemUseSlotQuantity[this->selectingSlot] > 0) {
+							if (this->ItemUseSlot[this->selectingSlot]->nowIs() == "Hammer") {
 								this->building = true;
 								/*
 								string ObjName = "Pump_" + to_string(rand() % 100000);
@@ -1009,13 +1200,13 @@ public:
 						else {
 							continue;
 						}
-						if (this->BackpackQuantity[this->selectingSlot] > 0) {
-							this->BackpackQuantity[this->selectingSlot]--;
+						if (this->ItemUseSlotQuantity[this->selectingSlot] > 0) {
+							this->ItemUseSlotQuantity[this->selectingSlot]--;
 						}
-						if (this->BackpackQuantity[this->selectingSlot] <= 0) {
-							this->Backpack[this->selectingSlot]->Is("None");
-							this->Backpack[this->selectingSlot]->tag = "None";
-							this->Backpack[this->selectingSlot]->setSpriteSize(0, 0);
+						if (this->ItemUseSlotQuantity[this->selectingSlot] <= 0) {
+							this->ItemUseSlot[this->selectingSlot]->Is("None");
+							this->ItemUseSlot[this->selectingSlot]->tag = "None";
+							this->ItemUseSlot[this->selectingSlot]->setSpriteSize(0, 0);
 						}
 					}
 				}
@@ -1071,15 +1262,15 @@ public:
 						this->selectingSlot = 0;
 					}
 				}
-				cout << this->Backpack[this->selectingSlot]->tag << "     " << this->BackpackQuantity[this->selectingSlot] << endl;
+				cout << this->ItemUseSlot[this->selectingSlot]->tag << "     " << this->ItemUseSlotQuantity[this->selectingSlot] << endl;
 			}
 		}
 
 	}
 	bool hasEnoughItem(string item, int quantity) {
 		for (int i = 0; i < 9; i++) {
-			if (this->Backpack[i]->nowIs() == item && this->BackpackQuantity[i] >= quantity) {
-				this->BackpackQuantity[i] -= quantity;
+			if (this->ItemUseSlot[i]->nowIs() == item && this->ItemUseSlotQuantity[i] >= quantity) {
+				this->ItemUseSlotQuantity[i] -= quantity;
 				return true;
 			}
 		}
@@ -1112,10 +1303,17 @@ public:
 		}
 		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
 		for (int i = 0; i < 9; i++) {
-			if (this->Backpack[i]->nowIs() != "None" && find(this->DrawField_Static.begin(), this->DrawField_Static.end(), this->Backpack[i]) == this->DrawField_Static.end()) {
-				this->Backpack[i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
-				this->Backpack[i]->setPosY(833);
-				this->DrawField_Static.push_back(this->Backpack[i]);
+			if (this->ItemUseSlot[i]->nowIs() != "None" && find(this->DrawField_Static.begin(), this->DrawField_Static.end(), this->ItemUseSlot[i]) == this->DrawField_Static.end()) {
+				this->ItemUseSlot[i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
+				this->ItemUseSlot[i]->setPosY(833);
+				this->DrawField_Static.push_back(this->ItemUseSlot[i]);
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				if(this->Backpack[i][j]->nowIs() != "None")
+				this->Backpack[i][j]->setPosY(233 + 1100 * 0.06 * i);
+				this->Backpack[i][j]->setPosX(536 + 1100 * 0.06 * j);
 			}
 		}
 	}
@@ -1124,9 +1322,10 @@ public:
 		this->pollEvents();
 		this->updateHUD();
 		if (this->escPressed && !this->escToggle) {
-			if (this->paused || this->building) {
+			if (this->paused || this->building || this->inventory) {
 				this->paused = false;
 				this->building = false;
+				this->inventory = false;
 			}
 			else {
 				this->paused = true;
@@ -1135,6 +1334,18 @@ public:
 		}
 		else if(!this->escPressed) {
 			this->escToggle = false;
+		}
+		if (this->E && !this->EToggle) {
+			if (this->inventory) {
+				this->inventory = false;
+			}
+			else {
+				this->inventory = true;
+			}
+			this->EToggle = true;
+		}
+		else if (!this->E) {
+			this->EToggle = false;
 		}
 		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && !this->paused) {
 			Elon->setAnimationSeq("walk");
@@ -1237,22 +1448,22 @@ public:
 				this->DrawField_Dynamic[i]->usable = false;
 				bool found = false;
 				for (int i = 0; i < 9; i++) {
-					if (this->Backpack[i]->nowIs() == charOnly(A->nowIs())) {
-						this->BackpackQuantity[i]++;
+					if (this->ItemUseSlot[i]->nowIs() == charOnly(A->nowIs())) {
+						this->ItemUseSlotQuantity[i]++;
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
 					for (int i = 0; i < 9; i++) {
-						if (this->Backpack[i]->nowIs() == "None") {
-							this->Backpack[i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
-							//cout << this->Backpack[i]->tag  << " = " << this->itemList.object(charOnly(A->nowIs()))->tag << endl;
-							this->Backpack[i]->Is(charOnly(A->nowIs()));
-							this->Backpack[i] = this->itemList.object(charOnly(A->nowIs()));
-							this->BackpackQuantity[i] = 1;
-							this->Backpack[i]->setSpriteSize(0.06, 0.06);
-							//this->Backpack[i]->setPosX(503 + 1100 * 0.06 * i);
+						if (this->ItemUseSlot[i]->nowIs() == "None") {
+							this->ItemUseSlot[i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
+							//cout << this->ItemUseSlot[i]->tag  << " = " << this->itemList.object(charOnly(A->nowIs()))->tag << endl;
+							this->ItemUseSlot[i]->Is(charOnly(A->nowIs()));
+							this->ItemUseSlot[i] = this->itemList.object(charOnly(A->nowIs()));
+							this->ItemUseSlotQuantity[i] = 1;
+							this->ItemUseSlot[i]->setSpriteSize(0.06, 0.06);
+							//this->ItemUseSlot[i]->setPosX(503 + 1100 * 0.06 * i);
 							break;
 						}
 					}
@@ -1268,27 +1479,63 @@ public:
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			if (this->BackpackQuantity[i] <= 0) {
-				this->Backpack[i]->Is("None");
-				this->Backpack[i]->tag = "None";
-				this->Backpack[i]->setSpriteSize(0, 0);
+			if (this->ItemUseSlotQuantity[i] <= 0) {
+				this->ItemUseSlot[i]->Is("None");
+				this->ItemUseSlot[i]->tag = "None";
+				this->ItemUseSlot[i]->setSpriteSize(0, 0);
+				
+				this->InventoryUseSlot[i]->Is("None");
+				this->InventoryUseSlot[i]->tag = "None";
+				this->InventoryUseSlot[i]->setSpriteSize(0, 0);
 			}
-			if (this->Backpack[i]->nowIs() != "None" && this->Backpack[i]->getStat("showCount") == 1 && this->BackpackQuantity[i] > 0) {
-				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width/2, y = 830, x1 = x-0.7*IntDigit(this->BackpackQuantity[i]);
+			if (this->ItemUseSlot[i]->nowIs() != "None" && this->ItemUseSlot[i]->getStat("showCount") == 1 && this->ItemUseSlotQuantity[i] > 0) {
+				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width/2, y = 830, x1 = x-0.7*IntDigit(this->ItemUseSlotQuantity[i]);
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({x,y});
-				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->BackpackQuantity[i]));
+				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->ItemUseSlotQuantity[i]));
 				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({x1,y});
-				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(this->BackpackQuantity[i]));
+				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(this->ItemUseSlotQuantity[i]));
+				
+				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setPosition({ x,533 });
+				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(to_string(this->ItemUseSlotQuantity[i]));
+				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setPosition({ x1,533 });
+				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(to_string(this->ItemUseSlotQuantity[i]));
 			}
 			else {
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(" ");
 				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(" ");
+
+				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
+				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
 			}
+			*this->InventoryUseSlot[i] = *this->ItemUseSlot[i];
+			this->InventoryUseSlot[i]->setPosY(533);
 		}
-		if (this->Backpack[this->selectingSlot]->nowIs() != "None") {
+		if (this->ItemUseSlot[this->selectingSlot]->nowIs() != "None") {
 			const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
 			this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
-			this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->Backpack[this->selectingSlot]->nowIs());
+			this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->ItemUseSlot[this->selectingSlot]->nowIs());
+		}
+
+		for (int i = 0; i < 3; i++) {
+			for(int j = 0; j < 9; j++){
+				if (this->BackpackQuantity[i][j] <= 0) {
+					this->Backpack[i][j]->Is("None");
+					this->Backpack[i][j]->tag = "None";
+					this->Backpack[i][j]->setSpriteSize(0, 0);
+				}
+
+				if (this->Backpack[i][j]->nowIs() != "None" && this->Backpack[i][j]->getStat("showCount") == 1 && this->BackpackQuantity[i][j] > 0) {
+					const float x = (535 + 1100.0 * 0.06 * j) - this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * i, x1 = x - 0.7 * IntDigit(this->BackpackQuantity[i][j]);
+					this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
+					this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
+					this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x1,y });
+					this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
+				}
+				else {
+					this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(" ");
+					this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(" ");
+				}
+			}
 		}
 		/*
 		This part is for update game event.
@@ -1302,11 +1549,6 @@ public:
 		2. render object
 		3. draw
 		*/
-		//for (int i = 0; i < Field.entityNumber(); i++) {
-			//cout << i << '\t';
-			//cout << this->Field.objectAt(i)->nowIs() << '\n';
-		//}
-		//cout << "---------------------------------\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n" << '\n';
 		try {
 			for (int i = 0; i < this->DrawField_BG.size(); i++) {
 				this->window->draw(this->DrawField_BG[i]->getSprite());
@@ -1320,7 +1562,7 @@ public:
 			for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
 				this->window->draw(*this->Dialog["itemCount"].objectAt(i));
 			}
-			if (this->Backpack[this->selectingSlot]->nowIs() != "None") {
+			if (this->ItemUseSlot[this->selectingSlot]->nowIs() != "None") {
 				this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
 			}
 			if (this->paused) {
@@ -1338,6 +1580,26 @@ public:
 				for (int i = 0; i < this->Dialog["itemUse"].entityNumber(); i++) {
 					this->window->draw(*this->Dialog["itemUse"].objectAt(i));
 				}
+			}
+			else if (this->inventory) {
+				for (int i = 0; i < DrawField_inventoryUI.size(); i++) {
+					this->window->draw(this->DrawField_inventoryUI[i]->getSprite());
+				}
+				for (int i = 0; i < this->InventoryUseSlot.size(); i++) {
+					this->window->draw(this->InventoryUseSlot[i]->getSprite());
+				}
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 9; j++) {
+						this->window->draw(this->Backpack[i][j]->getSprite());
+					}
+				}
+				for (int i = 0; i < this->Dialog["InventoryItem_hotbar"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["InventoryItem_hotbar"].objectAt(i));
+				}
+				for (int i = 0; i < this->Dialog["InventoryItem"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["InventoryItem"].objectAt(i));
+				}
+
 			}
 		}
 		catch (int e) {
@@ -1570,7 +1832,7 @@ void ShowDrawingStat2() {
 			Sleep(1);
 		}
 		for (int i = 0; i < 9; i++) {
-			printf("%d ", First_step.Backpack[i]->getStat("Quantity"));
+			printf("%d ", First_step.ItemUseSlot[i]->getStat("Quantity"));
 		}
 		printf("\n");
 	}
