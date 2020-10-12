@@ -424,8 +424,8 @@ private:
 			ptr->setPosX(503 + 1100 * 0.06 * i);
 			ptr->setPosY(800);
 			ptr->Is("None");
-			ItemUseSlot.push_back(ptr);
-			InventoryUseSlot.push_back(ptr);
+			this->DrawField["ItemUseSlot"].push_back(ptr);
+			this->DrawField["InventoryUseSlot"].push_back(ptr);
 			ItemUseSlotQuantity.push_back(0);
 		}
 		for (int i = 0; i < 3; i++) {
@@ -583,17 +583,17 @@ private:
 		this->itemList.object("Hammer")->tag = "Tool";
 
 		// Default item
-		this->ItemUseSlot[2] = itemList.object("Hydro Flask");
+		this->DrawField["ItemUseSlot"][2] = itemList.object("Hydro Flask");
 		this->ItemUseSlotQuantity[2] = 100;
-		this->ItemUseSlot[6] = itemList.object("MRE");
+		this->DrawField["ItemUseSlot"][6] = itemList.object("MRE");
 		this->ItemUseSlotQuantity[6] = 10;
-		this->ItemUseSlot[7] = itemList.object("Gold Wire");
+		this->DrawField["ItemUseSlot"][7] = itemList.object("Gold Wire");
 		this->ItemUseSlotQuantity[7] = 100;
-		this->ItemUseSlot[8] = itemList.object("Hammer");
+		this->DrawField["ItemUseSlot"][8] = itemList.object("Hammer");
 		this->ItemUseSlotQuantity[8] = 100;
-		this->ItemUseSlot[4] = itemList.object("Arclyic");
+		this->DrawField["ItemUseSlot"][4] = itemList.object("Arclyic");
 		this->ItemUseSlotQuantity[4] = 100;
-		this->ItemUseSlot[5] = itemList.object("Composite Metal");
+		this->DrawField["ItemUseSlot"][5] = itemList.object("Composite Metal");
 		this->ItemUseSlotQuantity[5] = 100;
 
 		this->Backpack[0][0] = itemList.object("Wheat Grain");
@@ -997,19 +997,19 @@ private:
 		for (int i = 0; i < this->Field.entityNumber(); i++) {
 			this->Field.objectAt(i)->type();
 			if (this->Field.objectAt(i)->tag == "BG") {
-				this->BG_repo.push_back(this->Field.objectAt(i));
+				this->DrawField["BG_repo"].push_back(this->Field.objectAt(i));
 			}
 			else if (this->Field.objectAt(i)->tag == "PauseUI") {
-				this->DrawField_pauseUI.push_back(this->Field.objectAt(i));
+				this->DrawField["DrawField_pauseUI"].push_back(this->Field.objectAt(i));
 			}
 			else if (this->Field.objectAt(i)->tag == "BuildUI") {
-				this->DrawField_buildingUI.push_back(this->Field.objectAt(i));
+				this->DrawField["DrawField_buildingUI"].push_back(this->Field.objectAt(i));
 			}
 			else if (this->Field.objectAt(i)->tag == "InventoryUI") {
-				this->DrawField_inventoryUI.push_back(this->Field.objectAt(i));
+				this->DrawField["DrawField_inventoryUI"].push_back(this->Field.objectAt(i));
 			}
 			else if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
-				this->DrawField_Static.push_back(this->Field.objectAt(i));
+				this->DrawField["DrawField_Static"].push_back(this->Field.objectAt(i));
 			}
 		}
 	}
@@ -1022,18 +1022,10 @@ private:
 public:
 	RenderWindow* window;
 	Map Field;
-	vector<Object*> ItemUseSlot;
-	vector<Object*> InventoryUseSlot;
+	unordered_map<string, vector<Object*>> DrawField;
 	vector<int> ItemUseSlotQuantity;
 	vector<vector<Object*>> Backpack;
 	vector<vector<int>> BackpackQuantity;
-	vector<Object*> DrawField_Dynamic;
-	vector<Object*> DrawField_Static;
-	vector<Object*> DrawField_BG;
-	vector<Object*> DrawField_pauseUI;
-	vector<Object*> DrawField_buildingUI;
-	vector<Object*> DrawField_inventoryUI;
-	vector<Object*> BG_repo;
 	unordered_map<string, strMap> Dialog;
 	vector<int> mousePos = { 0,0 };
 	Object* Anchor;
@@ -1180,28 +1172,28 @@ public:
 
 				}
 				if (ev.mouseButton.button == Mouse::Right) {
-					cout << this->ItemUseSlot[this->selectingSlot]->tag << endl;
+					cout << this->DrawField["ItemUseSlot"][this->selectingSlot]->tag << endl;
 					if (this->Elon->getStat("Alive") == 1) {
-						if (this->ItemUseSlot[this->selectingSlot]->tag == "Medicine" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
+						if (this->DrawField["ItemUseSlot"][this->selectingSlot]->tag == "Medicine" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
 							Elon->setStat("Health", Elon->getStat("Health") + 10);
 							if (Elon->getStat("Health") > 100) {
 								Elon->setStat("Health", 100);
 							}
 						}
-						else if (this->ItemUseSlot[this->selectingSlot]->tag == "Food" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
+						else if (this->DrawField["ItemUseSlot"][this->selectingSlot]->tag == "Food" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
 							Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
 							if (Elon->getStat("Hunger") > 100) {
 								Elon->setStat("Hunger", 100);
 							}
 						}
-						else if (this->ItemUseSlot[this->selectingSlot]->tag == "Drink" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
+						else if (this->DrawField["ItemUseSlot"][this->selectingSlot]->tag == "Drink" && this->ItemUseSlotQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
 							Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
 							if (Elon->getStat("Thirst") > 100) {
 								Elon->setStat("Thirst", 100);
 							}
 						}
-						else if (this->ItemUseSlot[this->selectingSlot]->tag == "Tool" && this->ItemUseSlotQuantity[this->selectingSlot] > 0) {
-							if (this->ItemUseSlot[this->selectingSlot]->nowIs() == "Hammer") {
+						else if (this->DrawField["ItemUseSlot"][this->selectingSlot]->tag == "Tool" && this->ItemUseSlotQuantity[this->selectingSlot] > 0) {
+							if (this->DrawField["ItemUseSlot"][this->selectingSlot]->nowIs() == "Hammer") {
 								this->building = true;
 								/*
 								string ObjName = "Pump_" + to_string(rand() % 100000);
@@ -1220,9 +1212,9 @@ public:
 							this->ItemUseSlotQuantity[this->selectingSlot]--;
 						}
 						if (this->ItemUseSlotQuantity[this->selectingSlot] <= 0) {
-							this->ItemUseSlot[this->selectingSlot]->Is("None");
-							this->ItemUseSlot[this->selectingSlot]->tag = "None";
-							this->ItemUseSlot[this->selectingSlot]->setSpriteSize(0, 0);
+							this->DrawField["ItemUseSlot"][this->selectingSlot]->Is("None");
+							this->DrawField["ItemUseSlot"][this->selectingSlot]->tag = "None";
+							this->DrawField["ItemUseSlot"][this->selectingSlot]->setSpriteSize(0, 0);
 						}
 					}
 				}
@@ -1250,7 +1242,7 @@ public:
 								this->Field.registerObject(ObjName, "Pump");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
 								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
-								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
+								this->DrawField["DrawField_Dynamic"].push_back(this->Field.object(ObjName));
 								this->building = false;
 							}
 							if (clickHit(SlolarHitBox)) {
@@ -1258,7 +1250,7 @@ public:
 								this->Field.registerObject(ObjName, "SolarCell");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
 								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
-								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
+								this->DrawField["DrawField_Dynamic"].push_back(this->Field.object(ObjName));
 								this->building = false;
 							}
 						}
@@ -1287,14 +1279,14 @@ public:
 						this->selectingSlot = 0;
 					}
 				}
-				cout << this->ItemUseSlot[this->selectingSlot]->tag << "     " << this->ItemUseSlotQuantity[this->selectingSlot] << endl;
+				cout << this->DrawField["ItemUseSlot"][this->selectingSlot]->tag << "     " << this->ItemUseSlotQuantity[this->selectingSlot] << endl;
 			}
 		}
 
 	}
 	bool hasEnoughItem(string item, int quantity) {
 		for (int i = 0; i < 9; i++) {
-			if (this->ItemUseSlot[i]->nowIs() == item && this->ItemUseSlotQuantity[i] >= quantity) {
+			if (this->DrawField["ItemUseSlot"][i]->nowIs() == item && this->ItemUseSlotQuantity[i] >= quantity) {
 				this->ItemUseSlotQuantity[i] -= quantity;
 				return true;
 			}
@@ -1329,10 +1321,10 @@ public:
 		}
 		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
 		for (int i = 0; i < 9; i++) {
-			if (this->ItemUseSlot[i]->nowIs() != "None" && find(this->DrawField_Static.begin(), this->DrawField_Static.end(), this->ItemUseSlot[i]) == this->DrawField_Static.end()) {
-				this->ItemUseSlot[i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
-				this->ItemUseSlot[i]->setPosY(833);
-				this->DrawField_Static.push_back(this->ItemUseSlot[i]);
+			if (this->DrawField["ItemUseSlot"][i]->nowIs() != "None" && find(this->DrawField["DrawField_Static"].begin(), this->DrawField["DrawField_Static"].end(), this->DrawField["ItemUseSlot"][i]) == this->DrawField["DrawField_Static"].end()) {
+				this->DrawField["ItemUseSlot"][i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
+				this->DrawField["ItemUseSlot"][i]->setPosY(833);
+				this->DrawField["DrawField_Static"].push_back(this->DrawField["ItemUseSlot"][i]);
 			}
 		}
 		for (int i = 0; i < 3; i++) {
@@ -1468,13 +1460,13 @@ public:
 			}
 		}
 		int maxParam = 0;
-		for (int i = 0; i < this->DrawField_Dynamic.size(); i++) {
-			Object* A = this->DrawField_Dynamic[i];
+		for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
+			Object* A = this->DrawField["DrawField_Dynamic"][i];
 			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 50) {
-				this->DrawField_Dynamic[i]->usable = false;
+				this->DrawField["DrawField_Dynamic"][i]->usable = false;
 				bool found = false;
 				for (int i = 0; i < 9; i++) {
-					if (this->ItemUseSlot[i]->nowIs() == charOnly(A->nowIs())) {
+					if (this->DrawField["ItemUseSlot"][i]->nowIs() == charOnly(A->nowIs())) {
 						this->ItemUseSlotQuantity[i]++;
 						found = true;
 						break;
@@ -1482,13 +1474,13 @@ public:
 				}
 				if (!found) {
 					for (int i = 0; i < 9; i++) {
-						if (this->ItemUseSlot[i]->nowIs() == "None") {
-							this->ItemUseSlot[i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
+						if (this->DrawField["ItemUseSlot"][i]->nowIs() == "None") {
+							this->DrawField["ItemUseSlot"][i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
 							//cout << this->ItemUseSlot[i]->tag  << " = " << this->itemList.object(charOnly(A->nowIs()))->tag << endl;
-							this->ItemUseSlot[i]->Is(charOnly(A->nowIs()));
-							this->ItemUseSlot[i] = this->itemList.object(charOnly(A->nowIs()));
+							this->DrawField["ItemUseSlot"][i]->Is(charOnly(A->nowIs()));
+							this->DrawField["ItemUseSlot"][i] = this->itemList.object(charOnly(A->nowIs()));
 							this->ItemUseSlotQuantity[i] = 1;
-							this->ItemUseSlot[i]->setSpriteSize(0.06, 0.06);
+							this->DrawField["ItemUseSlot"][i]->setSpriteSize(0.06, 0.06);
 							//this->ItemUseSlot[i]->setPosX(503 + 1100 * 0.06 * i);
 							break;
 						}
@@ -1506,15 +1498,15 @@ public:
 		}
 		for (int i = 0; i < 9; i++) {
 			if (this->ItemUseSlotQuantity[i] <= 0) {
-				this->ItemUseSlot[i]->Is("None");
-				this->ItemUseSlot[i]->tag = "None";
-				this->ItemUseSlot[i]->setSpriteSize(0, 0);
+				this->DrawField["ItemUseSlot"][i]->Is("None");
+				this->DrawField["ItemUseSlot"][i]->tag = "None";
+				this->DrawField["ItemUseSlot"][i]->setSpriteSize(0, 0);
 				
-				this->InventoryUseSlot[i]->Is("None");
-				this->InventoryUseSlot[i]->tag = "None";
-				this->InventoryUseSlot[i]->setSpriteSize(0, 0);
+				this->DrawField["InventoryUseSlot"][i]->Is("None");
+				this->DrawField["InventoryUseSlot"][i]->tag = "None";
+				this->DrawField["InventoryUseSlot"][i]->setSpriteSize(0, 0);
 			}
-			if (this->ItemUseSlot[i]->nowIs() != "None" && this->ItemUseSlot[i]->getStat("showCount") == 1 && this->ItemUseSlotQuantity[i] > 0) {
+			if (this->DrawField["ItemUseSlot"][i]->nowIs() != "None" && this->DrawField["ItemUseSlot"][i]->getStat("showCount") == 1 && this->ItemUseSlotQuantity[i] > 0) {
 				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width/2, y = 830, x1 = x-0.7*IntDigit(this->ItemUseSlotQuantity[i]);
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({x,y});
 				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->ItemUseSlotQuantity[i]));
@@ -1533,13 +1525,13 @@ public:
 				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
 				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
 			}
-			*this->InventoryUseSlot[i] = *this->ItemUseSlot[i];
-			this->InventoryUseSlot[i]->setPosY(533);
+			*this->DrawField["InventoryUseSlot"][i] = *this->DrawField["ItemUseSlot"][i];
+			this->DrawField["InventoryUseSlot"][i]->setPosY(533);
 		}
-		if (this->ItemUseSlot[this->selectingSlot]->nowIs() != "None") {
+		if (this->DrawField["ItemUseSlot"][this->selectingSlot]->nowIs() != "None") {
 			const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
 			this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
-			this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->ItemUseSlot[this->selectingSlot]->nowIs());
+			this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->DrawField["ItemUseSlot"][this->selectingSlot]->nowIs());
 		}
 
 		for (int i = 0; i < 3; i++) {
@@ -1576,43 +1568,43 @@ public:
 		3. draw
 		*/
 		try {
-			for (int i = 0; i < this->DrawField_BG.size(); i++) {
-				this->window->draw(this->DrawField_BG[i]->getSprite());
+			for (int i = 0; i < this->DrawField["DrawField_BG"].size(); i++) {
+				this->window->draw(this->DrawField["DrawField_BG"][i]->getSprite());
 			}
-			for (int i = 0; i < this->DrawField_Dynamic.size() && DrawField_Dynamic[i]->tag != "BG"; i++) {
-				this->window->draw(this->DrawField_Dynamic[i]->getSprite());
+			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
+				this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
 			}
-			for (int i = 0; i < this->DrawField_Static.size() && DrawField_Static[i]; i++) {
-				this->window->draw(this->DrawField_Static[i]->getSprite());
+			for (int i = 0; i < this->DrawField["DrawField_Static"].size() && DrawField["DrawField_Static"][i]; i++) {
+				this->window->draw(this->DrawField["DrawField_Static"][i]->getSprite());
 			}
 			for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
 				this->window->draw(*this->Dialog["itemCount"].objectAt(i));
 			}
-			if (this->ItemUseSlot[this->selectingSlot]->nowIs() != "None") {
+			if (this->DrawField["ItemUseSlot"][this->selectingSlot]->nowIs() != "None") {
 				this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
 			}
 			if (this->paused) {
-				for (int i = 0; i < DrawField_pauseUI.size(); i++) {
-					this->window->draw(this->DrawField_pauseUI[i]->getSprite());
+				for (int i = 0; i < this->DrawField["DrawField_pauseUI"].size(); i++) {
+					this->window->draw(this->DrawField["DrawField_pauseUI"][i]->getSprite());
 				}
 				for (int i = 0; i < Dialog["PausedMenu"].entityNumber(); i++) {
 					this->window->draw(*this->Dialog["PausedMenu"].objectAt(i));
 				}
 			}
 			else if (this->building) {
-				for (int i = 0; i < DrawField_buildingUI.size(); i++) {
-					this->window->draw(this->DrawField_buildingUI[i]->getSprite());
+				for (int i = 0; i < this->DrawField["DrawField_buildingUI"].size(); i++) {
+					this->window->draw(this->DrawField["DrawField_buildingUI"][i]->getSprite());
 				}
 				for (int i = 0; i < this->Dialog["itemUse"].entityNumber(); i++) {
 					this->window->draw(*this->Dialog["itemUse"].objectAt(i));
 				}
 			}
 			else if (this->inventory) {
-				for (int i = 0; i < DrawField_inventoryUI.size(); i++) {
-					this->window->draw(this->DrawField_inventoryUI[i]->getSprite());
+				for (int i = 0; i < DrawField["DrawField_inventoryUI"].size(); i++) {
+					this->window->draw(this->DrawField["DrawField_inventoryUI"][i]->getSprite());
 				}
-				for (int i = 0; i < this->InventoryUseSlot.size(); i++) {
-					this->window->draw(this->InventoryUseSlot[i]->getSprite());
+				for (int i = 0; i < this->DrawField["InventoryUseSlot"].size(); i++) {
+					this->window->draw(this->DrawField["InventoryUseSlot"][i]->getSprite());
 				}
 				for (int i = 0; i < 3; i++) {
 					for (int j = 0; j < 9; j++) {
@@ -1645,10 +1637,10 @@ bool change = false;
 
 bool SortObj() {
 	bool swaped = false;
-	for (int i = 0; i < First_step.DrawField_Dynamic.size() - 1; i++) {
-		if (i < First_step.DrawField_Dynamic.size() - 1 && (First_step.DrawField_Dynamic[i]->PosY() + (First_step.DrawField_Dynamic[i]->getImgHeight() * First_step.DrawField_Dynamic[i]->getSizeY()) / 2 > First_step.DrawField_Dynamic[i + 1]->PosY() + (First_step.DrawField_Dynamic[i + 1]->getImgHeight() * First_step.DrawField_Dynamic[i + 1]->getSizeY()) / 2)) {
+	for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size() - 1; i++) {
+		if (i < First_step.DrawField["DrawField_Dynamic"].size() - 1 && (First_step.DrawField["DrawField_Dynamic"][i]->PosY() + (First_step.DrawField["DrawField_Dynamic"][i]->getImgHeight() * First_step.DrawField["DrawField_Dynamic"][i]->getSizeY()) / 2 > First_step.DrawField["DrawField_Dynamic"][i + 1]->PosY() + (First_step.DrawField["DrawField_Dynamic"][i + 1]->getImgHeight() * First_step.DrawField["DrawField_Dynamic"][i + 1]->getSizeY()) / 2)) {
 			//First_step.pause = true;
-			iter_swap(&First_step.DrawField_Dynamic[i], &First_step.DrawField_Dynamic[i + 1]);
+			iter_swap(&First_step.DrawField["DrawField_Dynamic"][i], &First_step.DrawField["DrawField_Dynamic"][i + 1]);
 			//First_step.pause = false;
 			swaped = true;
 		}
@@ -1660,14 +1652,14 @@ void CheckInsight() {
 	bool swaping = true;
 	try {
 		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
-			if (First_step.Field.objectAt(i)->usable && !First_step.pause && i < First_step.Field.entityNumber() - 1 && (First_step.Field.objectAt(i)->type() != "Static" && First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField_Dynamic.begin(), First_step.DrawField_Dynamic.end(), First_step.Field.objectAt(i)) != First_step.DrawField_Dynamic.end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
-				First_step.DrawField_Dynamic.push_back(First_step.Field.objectAt(i));
+			if (First_step.Field.objectAt(i)->usable && !First_step.pause && i < First_step.Field.entityNumber() - 1 && (First_step.Field.objectAt(i)->type() != "Static" && First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField["DrawField_Dynamic"].begin(), First_step.DrawField["DrawField_Dynamic"].end(), First_step.Field.objectAt(i)) != First_step.DrawField["DrawField_Dynamic"].end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
+				First_step.DrawField["DrawField_Dynamic"].push_back(First_step.Field.objectAt(i));
 			}
 			change = true;
 		}
-		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
-			if (First_step.DrawField_Dynamic[i]->nowIs() != "Elon" && (!First_step.DrawField_Dynamic[i]->usable || (First_step.pause && i < First_step.Field.entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_Dynamic[i], 1100) || First_step.DrawField_Dynamic[i]->nowIs() == "Anchor" || First_step.DrawField_Dynamic[i]->nowIs() == "BG" || First_step.DrawField_Dynamic[i]->nowIs() == "Elon")))) {
-				First_step.DrawField_Dynamic.erase(First_step.DrawField_Dynamic.begin() + i);
+		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
+			if (First_step.DrawField["DrawField_Dynamic"][i]->nowIs() != "Elon" && (!First_step.DrawField["DrawField_Dynamic"][i]->usable || (First_step.pause && i < First_step.Field.entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField["DrawField_Dynamic"][i], 1100) || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "Anchor" || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "BG" || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "Elon")))) {
+				First_step.DrawField["DrawField_Dynamic"].erase(First_step.DrawField["DrawField_Dynamic"].begin() + i);
 			}
 			change = true;
 		}
@@ -1683,17 +1675,17 @@ void CheckInsight() {
 void checkFloorInsight() {
 	while (First_step.isRuning()) {
 		Sleep(1);
-		while (First_step.BG_repo.size() == 0 || First_step.pause) {
+		while (First_step.DrawField["BG_repo"].size() == 0 || First_step.pause) {
 			Sleep(1);
 		}
-		for (int i = 0; i < First_step.BG_repo.size(); i++) {
-			if (!First_step.pause && !(find(First_step.DrawField_BG.begin(), First_step.DrawField_BG.end(), First_step.BG_repo[i]) != First_step.DrawField_BG.end()) && First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.BG_repo[i], 1500)) {
-				First_step.DrawField_BG.push_back(First_step.BG_repo[i]);
+		for (int i = 0; i < First_step.DrawField["BG_repo"].size(); i++) {
+			if (!First_step.pause && !(find(First_step.DrawField["DrawField_BG"].begin(), First_step.DrawField["DrawField_BG"].end(), First_step.DrawField["BG_repo"][i]) != First_step.DrawField["DrawField_BG"].end()) && First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField["BG_repo"][i], 1500)) {
+				First_step.DrawField["DrawField_BG"].push_back(First_step.DrawField["BG_repo"][i]);
 			}
 		}
-		for (int i = 0; i < First_step.DrawField_BG.size(); i++) {
-			if (!First_step.pause && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField_BG[i], 1500))) {
-				First_step.DrawField_BG.erase(First_step.DrawField_BG.begin() + i);
+		for (int i = 0; i < First_step.DrawField["DrawField_BG"].size(); i++) {
+			if (!First_step.pause && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField["DrawField_BG"][i], 1500))) {
+				First_step.DrawField["DrawField_BG"].erase(First_step.DrawField["DrawField_BG"].begin() + i);
 			}
 		}
 	}
@@ -1741,15 +1733,15 @@ void isMovable() {
 			Sleep(1);
 		}
 		CheckInsight();
-		for (int i = 0; i < First_step.DrawField_Dynamic.size(); i++) {
+		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
 			try {
 				ElonHitBox = First_step.Field.object("Elon")->getHitBoxData();
-				ObjHitBox = First_step.DrawField_Dynamic[i]->getHitBoxData();
+				ObjHitBox = First_step.DrawField["DrawField_Dynamic"][i]->getHitBoxData();
 			}
 			catch (const std::out_of_range& e) {
 				cout << "Out of Range error.";
 			}
-			if (!First_step.pause && First_step.DrawField_Dynamic[i]->usable && !First_step.DrawField_Dynamic[i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
+			if (!First_step.pause && First_step.DrawField["DrawField_Dynamic"][i]->usable && !First_step.DrawField["DrawField_Dynamic"][i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
 				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
 				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
 				if (HitVec[1] < 0) {
@@ -1778,7 +1770,7 @@ void isMovable() {
 					First_step.move_speed *= 5;
 				}
 				printf("************************************ with ");
-				cout << First_step.DrawField_Dynamic[i]->nowIs() << endl;
+				cout << First_step.DrawField["DrawField_Dynamic"][i]->nowIs() << endl;
 				break;
 			}
 		}
@@ -1820,17 +1812,17 @@ void ShowDrawingStat() {
 			Sleep(1);
 		}
 		try {
-			for (int num = 0; num < First_step.DrawField_Dynamic.size(); num++) {
-				vector<float> data = First_step.DrawField_Dynamic[num]->getHitBoxData();
-				cout << First_step.DrawField_Dynamic[num]->nowIs() << '\t';
+			for (int num = 0; num < First_step.DrawField["DrawField_Dynamic"].size(); num++) {
+				vector<float> data = First_step.DrawField["DrawField_Dynamic"][num]->getHitBoxData();
+				cout << First_step.DrawField["DrawField_Dynamic"][num]->nowIs() << '\t';
 				for (int i = 0; i < 6; i++) {
 					printf("%.1f ", data[i]);
 				}
 				printf("\n");
 			}
-			for (int num = 0; num < First_step.DrawField_Static.size(); num++) {
-				vector<float> data = First_step.DrawField_Static[num]->getHitBoxData();
-				cout << First_step.DrawField_Static[num]->nowIs() << '\t';
+			for (int num = 0; num < First_step.DrawField["DrawField_Static"].size(); num++) {
+				vector<float> data = First_step.DrawField["DrawField_Static"][num]->getHitBoxData();
+				cout << First_step.DrawField["DrawField_Static"][num]->nowIs() << '\t';
 				for (int i = 0; i < 6; i++) {
 					printf("%.1f ", data[i]);
 				}
@@ -1848,7 +1840,7 @@ void ShowDrawingStat1() {
 		while (First_step.Field.entityNumber() == 0 || First_step.pause) {
 			Sleep(1);
 		}
-		printf("BG : %d, Dynamic : %d, Static %d, Overall %d\n", First_step.DrawField_BG.size(), First_step.DrawField_Dynamic.size(), First_step.DrawField_Static.size(), First_step.Field.entityNumber());
+		printf("BG : %d, Dynamic : %d, Static %d, Overall %d\n", First_step.DrawField["DrawField_BG"].size(), First_step.DrawField["DrawField_Dynamic"].size(), First_step.DrawField["DrawField_Static"].size(), First_step.Field.entityNumber());
 	}
 }
 
@@ -1858,7 +1850,7 @@ void ShowDrawingStat2() {
 			Sleep(1);
 		}
 		for (int i = 0; i < 9; i++) {
-			printf("%d ", First_step.ItemUseSlot[i]->getStat("Quantity"));
+			printf("%d ", First_step.DrawField["ItemUseSlot"][i]->getStat("Quantity"));
 		}
 		printf("\n");
 	}
