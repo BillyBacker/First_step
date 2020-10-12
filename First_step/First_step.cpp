@@ -391,6 +391,21 @@ private:
 	ContextSettings settings;
 	void initVar() {
 		this->window = nullptr;
+
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				this->InventoryHitbox[i][j][0] = round(500 + 1100 * 0.06 * j); 
+				this->InventoryHitbox[i][j][1] = round(200 + 1100 * 0.06 * i);
+				this->InventoryHitbox[i][j][2] = round(560 + 1100 * 0.06 * j);
+				this->InventoryHitbox[i][j][3] = round(260 + 1100 * 0.06 * i);
+			}
+		}
+		for (int i = 0; i < 9; i++) {
+			this->InventoryHitbox[3][i][0] = round(500 + 1100 * 0.06 * i);
+			this->InventoryHitbox[3][i][1] = round(435 + 1100 * 0.06);
+			this->InventoryHitbox[3][i][2] = round(560 + 1100 * 0.06 * i);
+			this->InventoryHitbox[3][i][3] = round(495 + 1100 * 0.06);
+		}
 	}
 	void initWindow() {
 		this->mode.height = h;
@@ -1023,6 +1038,7 @@ public:
 	vector<int> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
+	int InventoryHitbox[4][9][4];
 	bool _time = true;
 	bool pass = true;
 	bool movable = true;
@@ -1216,11 +1232,11 @@ public:
 						if (this->paused) {
 							int BacktoGameHitBox[] = { 250, 200, 600, 250 };
 							int ExitHitBox[] = { 250, 600, 600, 650 };
-							if (clickHit(BacktoGameHitBox, this->mousePos[0], this->mousePos[1])) {
+							if (clickHit(BacktoGameHitBox)) {
 								printf("Hit");
 								this->paused = false;
 							}
-							if(clickHit(ExitHitBox, this->mousePos[0], this->mousePos[1])) {
+							if(clickHit(ExitHitBox)) {
 								printf("Hit");
 								this->window->close();
 								this->running = false;
@@ -1229,7 +1245,7 @@ public:
 						else if (this->building) {
 							int PumpHitBox[] = { 330, 100, 470, 280 };
 							int SlolarHitBox[] = { 330, 340, 460, 480 };
-							if (clickHit(PumpHitBox, this->mousePos[0], this->mousePos[1]) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
+							if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
 								string ObjName = "Pump_" + to_string(rand() % 100000);
 								this->Field.registerObject(ObjName, "Pump");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
@@ -1237,13 +1253,22 @@ public:
 								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
 								this->building = false;
 							}
-							if (clickHit(SlolarHitBox, this->mousePos[0], this->mousePos[1])) {
+							if (clickHit(SlolarHitBox)) {
 								string ObjName = "Solar_" + to_string(rand() % 100000);
 								this->Field.registerObject(ObjName, "SolarCell");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
 								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
 								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
 								this->building = false;
+							}
+						}
+						else if (this->inventory) {
+							for (int i = 0; i < 4; i++) {
+								for (int j = 0; j < 9; j++) {
+									if (clickHit(this->InventoryHitbox[i][j])) {
+										printf("ClickHit %d,%d\n", i, j);
+									}
+								}
 							}
 						}
 					}
@@ -1281,7 +1306,8 @@ public:
 			Elon->setStat(Stat, Elon->getStat(Stat) - amount);
 		}
 	}
-	bool clickHit(int hitboxData[4], int Mx, int My) {
+	bool clickHit(int hitboxData[4]) {
+		int Mx = this->mousePos[0], My = this->mousePos[1];
 		return Mx < hitboxData[2] && Mx > hitboxData[0] && My < hitboxData[3] && My >hitboxData[1];
 	}
 	int IntDigit(int In) {
