@@ -82,7 +82,7 @@ class Object {
 private:
 	string Type = "Dynamic";
 	unsigned __int64 ID;
-	string Name;
+	string Name = "None";
 	fltDic Stat;
 	float posX = 0;
 	float posY = 0;
@@ -101,7 +101,7 @@ public:
 	bool fliping = false;
 	float offsetPosX = 0;
 	float offsetPosY = 0;
-	string tag = "None";
+	string tag = "None", cat = "None";
 	bool usable = true;
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
@@ -121,6 +121,21 @@ public:
 		this->sprite = In.sprite;
 		this->slot = In.slot;
 		this->tag = In.tag;
+	}
+	void useStatNoPos(Object In) {
+		this->textureArray = In.textureArray;
+		this->duration = In.duration;
+		this->fliping = In.fliping;
+		this->setImgDim(In.imgWidth, In.imgHeight);
+		this->loop = In.loop;
+		this->passable = In.passable;
+		this->setSpriteSize(In.getSizeX(), In.getSizeY());
+		this->Stat = In.Stat;
+		this->Type = In.Type;
+		this->sprite = In.sprite;
+		this->slot = In.slot;
+		this->tag = In.tag;
+		this->Is(In.nowIs());
 	}
 	vector<float> getHitBoxData() {
 		return { this->PosX() - (this->getImgWigth() * this->Size[0] / 2), this->PosY(), this->PosX() + (this->getImgWigth() * this->Size[0] / 2), this->PosY() + (this->getImgHeight() * this->Size[1] * 3 / 10) , this->PosX(), this->PosY() + (this->getImgHeight() * this->Size[1]) / 2 };
@@ -300,10 +315,11 @@ public:
 		this->Templ[name] = p;
 		Templkey[this->Templ.size()] = name;
 	}
-	void registerObject(string Name, string Template) {
+	void registerObject(string Name, string Template, string Cat) {
 		Object* p = new Object(this->Tuple.size());
 		(*p).useStat(*this->Template(Template));
 		(*p).Is(Name);
+		p->cat = Cat;
 		this->Tuple[Name] = p;
 		this->Tuplekey[this->Tuple.size() - 1] = Name;
 	}
@@ -406,6 +422,9 @@ private:
 			this->InventoryHitbox[3][i][2] = round(560 + 1100 * 0.06 * i);
 			this->InventoryHitbox[3][i][3] = round(495 + 1100 * 0.06);
 		}
+		Object* ptr = new Object(54862);
+		this->DrawField["ItemOnMouse"].push_back(ptr);
+		this->DrawField["ItemOnMouse"][0]->Is("None");
 	}
 	void initWindow() {
 		this->mode.height = h;
@@ -452,132 +471,132 @@ private:
 		this->itemList.Template("Tool")->addStat("showCount", 0);
 
 		// Item registeration section
-		this->itemList.registerObject("Herb", "Item");
+		this->itemList.registerObject("Herb", "Item", "Herb");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
 		this->itemList.object("Herb")->setSpriteTexture("default", 0);
 		this->itemList.object("Herb")->tag = "Medicine";
 
-		this->itemList.registerObject("Apple", "Item");
+		this->itemList.registerObject("Apple", "Item", "Apple");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
 		this->itemList.object("Apple")->tag = "Food";
 
-		this->itemList.registerObject("Hydro Flask", "Item");
+		this->itemList.registerObject("Hydro Flask", "Item", "Hydro Flask");
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
 		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
 		this->itemList.object("Hydro Flask")->tag = "Drink";
 
-		this->itemList.registerObject("Composite Metal", "Item");
+		this->itemList.registerObject("Composite Metal", "Item", "Composite Metal");
 		this->itemList.object("Composite Metal")->addTexture("assets\\Prop\\Item\\metalPlate.png", "default", 1000);
 		this->itemList.object("Composite Metal")->setSpriteTexture("default", 0);
 		this->itemList.object("Composite Metal")->tag = "Material";
 
-		this->itemList.registerObject("Arclyic", "Item");
+		this->itemList.registerObject("Arclyic", "Item", "Arclyic");
 		this->itemList.object("Arclyic")->addTexture("assets\\Prop\\Item\\Arclyic.png", "default", 1000);
 		this->itemList.object("Arclyic")->setSpriteTexture("default", 0);
 		this->itemList.object("Arclyic")->tag = "Material";
 
-		this->itemList.registerObject("Aluminium Plate", "Item");
+		this->itemList.registerObject("Aluminium Plate", "Item","Aluminium Plate");
 		this->itemList.object("Aluminium Plate")->addTexture("assets\\Prop\\Item\\AluminiumPlate.png", "default", 1000);
 		this->itemList.object("Aluminium Plate")->setSpriteTexture("default", 0);
 		this->itemList.object("Aluminium Plate")->tag = "Material";
 
-		this->itemList.registerObject("Bread", "Item");
+		this->itemList.registerObject("Bread", "Item", "Bread");
 		this->itemList.object("Bread")->addTexture("assets\\Prop\\Item\\Bread.png", "default", 1000);
 		this->itemList.object("Bread")->setSpriteTexture("default", 0);
 		this->itemList.object("Bread")->tag = "Food";
 
-		this->itemList.registerObject("Carrot", "Item");
+		this->itemList.registerObject("Carrot", "Item", "Carrot");
 		this->itemList.object("Carrot")->addTexture("assets\\Prop\\Item\\Carrot.png", "default", 1000);
 		this->itemList.object("Carrot")->setSpriteTexture("default", 0);
 		this->itemList.object("Carrot")->tag = "Food";
 
-		this->itemList.registerObject("Carrot Seed", "Item");
+		this->itemList.registerObject("Carrot Seed", "Item", "Carrot Seed");
 		this->itemList.object("Carrot Seed")->addTexture("assets\\Prop\\Item\\CarrotSeed.png", "default", 1000);
 		this->itemList.object("Carrot Seed")->setSpriteTexture("default", 0);
 		this->itemList.object("Carrot Seed")->tag = "Material";
 
-		this->itemList.registerObject("Copper Nugget", "Item");
+		this->itemList.registerObject("Copper Nugget", "Item", "Copper Nugget");
 		this->itemList.object("Copper Nugget")->addTexture("assets\\Prop\\Item\\CopperNugget.png", "default", 1000);
 		this->itemList.object("Copper Nugget")->setSpriteTexture("default", 0);
 		this->itemList.object("Copper Nugget")->tag = "Material";
 
-		this->itemList.registerObject("Copper Plate", "Item");
+		this->itemList.registerObject("Copper Plate", "Item", "Copper Plate");
 		this->itemList.object("Copper Plate")->addTexture("assets\\Prop\\Item\\CopperPlate.png", "default", 1000);
 		this->itemList.object("Copper Plate")->setSpriteTexture("default", 0);
 		this->itemList.object("Copper Plate")->tag = "Material";
 
-		this->itemList.registerObject("Copper Wire", "Item");
+		this->itemList.registerObject("Copper Wire", "Item", "Copper Wire");
 		this->itemList.object("Copper Wire")->addTexture("assets\\Prop\\Item\\CopperWire.png", "default", 1000);
 		this->itemList.object("Copper Wire")->setSpriteTexture("default", 0);
 		this->itemList.object("Copper Wire")->tag = "Material";
 
-		this->itemList.registerObject("Flour", "Item");
+		this->itemList.registerObject("Flour", "Item", "Flour");
 		this->itemList.object("Flour")->addTexture("assets\\Prop\\Item\\Flour.png", "default", 1000);
 		this->itemList.object("Flour")->setSpriteTexture("default", 0);
 		this->itemList.object("Flour")->tag = "Material";
 
-		this->itemList.registerObject("Gold Nugget", "Item");
+		this->itemList.registerObject("Gold Nugget", "Item", "Gold Nugget");
 		this->itemList.object("Gold Nugget")->addTexture("assets\\Prop\\Item\\GoldNugget.png", "default", 1000);
 		this->itemList.object("Gold Nugget")->setSpriteTexture("default", 0);
 		this->itemList.object("Gold Nugget")->tag = "Material";
 
-		this->itemList.registerObject("Gold Plate", "Item");
+		this->itemList.registerObject("Gold Plate", "Item", "Gold Plate");
 		this->itemList.object("Gold Plate")->addTexture("assets\\Prop\\Item\\GoldPlate.png", "default", 1000);
 		this->itemList.object("Gold Plate")->setSpriteTexture("default", 0);
 		this->itemList.object("Gold Plate")->tag = "Material";
 
-		this->itemList.registerObject("Gold Wire", "Item");
+		this->itemList.registerObject("Gold Wire", "Item", "Gold Wire");
 		this->itemList.object("Gold Wire")->addTexture("assets\\Prop\\Item\\GoldWire.png", "default", 1000);
 		this->itemList.object("Gold Wire")->setSpriteTexture("default", 0);
 		this->itemList.object("Gold Wire")->tag = "Material";
 
-		this->itemList.registerObject("Herb Seed", "Item");
+		this->itemList.registerObject("Herb Seed", "Item", "Herb Seed");
 		this->itemList.object("Herb Seed")->addTexture("assets\\Prop\\Item\\HerbSeed.png", "default", 1000);
 		this->itemList.object("Herb Seed")->setSpriteTexture("default", 0);
 		this->itemList.object("Herb Seed")->tag = "Material";
 
-		this->itemList.registerObject("MRE", "Item");
+		this->itemList.registerObject("MRE", "Item", "MRE");
 		this->itemList.object("MRE")->addTexture("assets\\Prop\\Item\\MRE.png", "default", 1000);
 		this->itemList.object("MRE")->setSpriteTexture("default", 0);
 		this->itemList.object("MRE")->tag = "Food";
 
-		this->itemList.registerObject("Plastic", "Item");
+		this->itemList.registerObject("Plastic", "Item", "Plastic");
 		this->itemList.object("Plastic")->addTexture("assets\\Prop\\Item\\Plastic.png", "default", 1000);
 		this->itemList.object("Plastic")->setSpriteTexture("default", 0);
 		this->itemList.object("Plastic")->tag = "Material";
 
-		this->itemList.registerObject("Titanium Nugget", "Item");
+		this->itemList.registerObject("Titanium Nugget", "Item", "Titanium Nugget");
 		this->itemList.object("Titanium Nugget")->addTexture("assets\\Prop\\Item\\TitaniumNugget.png", "default", 1000);
 		this->itemList.object("Titanium Nugget")->setSpriteTexture("default", 0);
 		this->itemList.object("Titanium Nugget")->tag = "Material";
 
-		this->itemList.registerObject("Titanium Plate", "Item");
+		this->itemList.registerObject("Titanium Plate", "Item", "Titanium Plate");
 		this->itemList.object("Titanium Plate")->addTexture("assets\\Prop\\Item\\TitaniumPlate.png", "default", 1000);
 		this->itemList.object("Titanium Plate")->setSpriteTexture("default", 0);
 		this->itemList.object("Titanium Plate")->tag = "Material";
 
-		this->itemList.registerObject("Wheat Grain", "Item");
+		this->itemList.registerObject("Wheat Grain", "Item", "Wheat Grain");
 		this->itemList.object("Wheat Grain")->addTexture("assets\\Prop\\Item\\WheatGrain.png", "default", 1000);
 		this->itemList.object("Wheat Grain")->setSpriteTexture("default", 0);
 		this->itemList.object("Wheat Grain")->tag = "Material";
 
-		this->itemList.registerObject("Wheat Seed", "Item");
+		this->itemList.registerObject("Wheat Seed", "Item", "Wheat Seed");
 		this->itemList.object("Wheat Seed")->addTexture("assets\\Prop\\Item\\WheatSeed.png", "default", 1000);
 		this->itemList.object("Wheat Seed")->setSpriteTexture("default", 0);
 		this->itemList.object("Wheat Seed")->tag = "Material";
 
-		this->itemList.registerObject("Drill", "Tool");
+		this->itemList.registerObject("Drill", "Tool", "Drill");
 		this->itemList.object("Drill")->addTexture("assets\\Prop\\Item\\drill.png", "default", 1000);
 		this->itemList.object("Drill")->setSpriteTexture("default", 0);
 		this->itemList.object("Drill")->tag = "Tool";
 
-		this->itemList.registerObject("Shovel", "Tool");
+		this->itemList.registerObject("Shovel", "Tool", "Shovel");
 		this->itemList.object("Shovel")->addTexture("assets\\Prop\\Item\\Shovel.png", "default", 1000);
 		this->itemList.object("Shovel")->setSpriteTexture("default", 0);
 		this->itemList.object("Shovel")->tag = "Tool";
 
-		this->itemList.registerObject("Hammer", "Tool");
+		this->itemList.registerObject("Hammer", "Tool", "Hammer");
 		this->itemList.object("Hammer")->addTexture("assets\\Prop\\Item\\Hammer.png", "default", 1000);
 		this->itemList.object("Hammer")->setSpriteTexture("default", 0);
 		this->itemList.object("Hammer")->tag = "Tool";
@@ -725,7 +744,7 @@ private:
 		this->Field.Template("BG_Element")->setPosX(0);
 		this->Field.Template("BG_Element")->setPosY(0);
 
-		this->Field.registerObject("Anchor", "BG_Element");
+		this->Field.registerObject("Anchor", "BG_Element", "Anchor");
 		this->Field.object("Anchor")->setPosX(-3000);
 		this->Field.object("Anchor")->setPosY(-3000);
 		this->Field.object("Anchor")->isPassable(true);
@@ -740,14 +759,14 @@ private:
 		this->Field.Template("dropItem")->setType("Dynamic");
 
 		for (int i = 0; i < 50; i++) {
-			this->Field.registerObject("Apple_" + to_string(i), "dropItem");
+			this->Field.registerObject("Apple_" + to_string(i), "dropItem", "Apple");
 			this->Field.object("Apple_" + to_string(i))->setSpriteTexture("Apple", 0);
 			this->Field.object("Apple_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
 			this->Field.object("Apple_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
 			this->Field.object("Apple_" + to_string(i))->tag = "fallItem";
 		}
 		for (int i = 0; i < 50; i++) {
-			this->Field.registerObject("Herb_" + to_string(i), "dropItem");
+			this->Field.registerObject("Herb_" + to_string(i), "dropItem", "Herb");
 			this->Field.object("Herb_" + to_string(i))->setSpriteTexture("Herb", 0);
 			this->Field.object("Herb_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
 			this->Field.object("Herb_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
@@ -811,7 +830,7 @@ private:
 		for (int i = 0; i < 30; i++) {
 			for (int j = 0; j < 30; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
-				this->Field.registerObject(ObjName, "Floor");
+				this->Field.registerObject(ObjName, "Floor", "Floor");
 				this->Field.object(ObjName)->setOffsetPosX(i * 5000 * 0.1 / 1.1);
 				this->Field.object(ObjName)->setOffsetPosY(j * 5000 * 0.1 / 1.1);
 			}
@@ -819,13 +838,13 @@ private:
 
 		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
-			this->Field.registerObject(to_string(i) + to_string(j), "Rocky");
+			this->Field.registerObject(to_string(i) + to_string(j), "Rocky", "Rock");
 			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("default" + to_string(rand() % 3), 0);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
 			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
 		}
 
-		this->Field.registerObject("Hut", "Structure");
+		this->Field.registerObject("Hut", "Structure", "Hut");
 		this->Field.object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", "default", 1000);
 		this->Field.object("Hut")->setSpriteTexture("default", 0);
 		this->Field.object("Hut")->setSpriteSize(0.1, 0.1);
@@ -833,15 +852,7 @@ private:
 		this->Field.object("Hut")->setOffsetPosY(2500);
 		this->Field.object("Hut")->setImgDim(4800, 3200);
 
-		this->Field.registerObject("power", "Structure");
-		this->Field.object("power")->addTexture("assets\\Prop\\Building\\Solarcell.png", "default", 1000);
-		this->Field.object("power")->setSpriteTexture("default", 0);
-		this->Field.object("power")->setSpriteSize(0.1, 0.1);
-		this->Field.object("power")->setOffsetPosX(1000);
-		this->Field.object("power")->setOffsetPosY(500);
-		this->Field.object("power")->setImgDim(1200, 1600);
-
-		this->Field.registerObject("Elon", "Blank");
+		this->Field.registerObject("Elon", "Blank", "Elon");
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
 		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
@@ -878,13 +889,13 @@ private:
 			//}
 		//}
 		for (int i = 0; i < 9; i++) {
-			this->Field.registerObject("ItemFrame" + to_string(i), "itemFrame");
+			this->Field.registerObject("ItemFrame" + to_string(i), "itemFrame", "ItemFrame"                                                                );
 			this->Field.object("ItemFrame" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
 			this->Field.object("ItemFrame" + to_string(i))->setPosY(800);
 
 		}
 
-		this->Field.registerObject("ItemPrt", "Blank");
+		this->Field.registerObject("ItemPrt", "Blank", "ItemPrt");
 		this->Field.object("ItemPrt")->addTexture("assets\\Prop\\HUD\\ItemPointer.png", "default", 1000);
 		this->Field.object("ItemPrt")->setSpriteTexture("default", 0);
 		this->Field.object("ItemPrt")->setSpriteSize(0.06, 0.06);
@@ -894,14 +905,14 @@ private:
 		this->Field.object("ItemPrt")->setType("Static");
 
 		for (int i = 0; i < 4; i++) {
-			this->Field.registerObject("StatBar_Fill" + to_string(i), "StatBar");
+			this->Field.registerObject("StatBar_Fill" + to_string(i), "StatBar", "StatBar_Fill");
 			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06, -0.06);
 			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture("Stat" + to_string(i + 1), 0);
 			this->Field.object("StatBar_Fill" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
 			this->Field.object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200 * 0.06);
 		}
 		for (int i = 0; i < 4; i++) {
-			this->Field.registerObject("StatBar" + to_string(i), "StatBar");
+			this->Field.registerObject("StatBar" + to_string(i), "StatBar", "StatBar");
 			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
 			this->Field.object("StatBar" + to_string(i))->setPosY(600);
 		}
@@ -916,7 +927,7 @@ private:
 		this->Field.Template("PauseUI_BG")->setType("Static");
 		this->Field.Template("PauseUI_BG")->tag = "PauseUI";
 
-		this->Field.registerObject("PauseBG", "PauseUI_BG");
+		this->Field.registerObject("PauseBG", "PauseUI_BG", "PauseBG");
 		this->Field.object("PauseBG")->setSpriteTexture("default", 0);
 
 		this->Field.createTemplate("BuildUI_BG");
@@ -928,7 +939,7 @@ private:
 		this->Field.Template("BuildUI_BG")->setType("Static");
 		this->Field.Template("BuildUI_BG")->tag = "BuildUI";
 
-		this->Field.registerObject("BuildBG", "BuildUI_BG");
+		this->Field.registerObject("BuildBG", "BuildUI_BG", "BuiledBG");
 		this->Field.object("BuildBG")->setSpriteTexture("default", 0);
 
 		this->Field.createTemplate("Inventory_BG");
@@ -940,17 +951,17 @@ private:
 		this->Field.Template("Inventory_BG")->setType("Static");
 		this->Field.Template("Inventory_BG")->tag = "InventoryUI";
 
-		this->Field.registerObject("InventoryBG", "Inventory_BG");
+		this->Field.registerObject("InventoryBG", "Inventory_BG", "InventoryBG");
 		this->Field.object("InventoryBG")->setSpriteTexture("default", 0);
 		for (int i = 0; i < 9; i++) {
-			this->Field.registerObject("UseSlot" + to_string(i), "itemFrame");
+			this->Field.registerObject("UseSlot" + to_string(i), "itemFrame", "UseSlot");
 			this->Field.object("UseSlot" + to_string(i))->tag = "InventoryUI";
 			this->Field.object("UseSlot" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
 			this->Field.object("UseSlot" + to_string(i))->setPosY(500);
 		}
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				this->Field.registerObject("InventorySlot" + to_string(i) + to_string(j), "itemFrame");
+				this->Field.registerObject("InventorySlot" + to_string(i) + to_string(j), "itemFrame", "InventorySlot");
 				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->tag = "InventoryUI";
 				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->setPosX(503 + 1100 * 0.06 * j);
 				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->setPosY(200 + 1100*0.06*i);
@@ -964,12 +975,12 @@ private:
 		this->Field.Template("BuildingSample")->setType("Static");
 		this->Field.Template("BuildingSample")->tag = "BuildUI";
 
-		this->Field.registerObject("PumpSample", "BuildingSample");
+		this->Field.registerObject("PumpSample", "BuildingSample", "PumpSample");
 		this->Field.object("PumpSample")->setSpriteTexture("Pump", 0);
 		this->Field.object("PumpSample")->setPosX(400);
 		this->Field.object("PumpSample")->setPosY(200);
 
-		this->Field.registerObject("SolarCellSample", "BuildingSample");
+		this->Field.registerObject("SolarCellSample", "BuildingSample", "SolarSample");
 		this->Field.object("SolarCellSample")->setSpriteTexture("SolarCell", 0);
 		this->Field.object("SolarCellSample")->setPosX(400);
 		this->Field.object("SolarCellSample")->setPosY(400);
@@ -982,12 +993,12 @@ private:
 		this->Field.Template("ItemUse")->setType("Static");
 		this->Field.Template("ItemUse")->tag = "BuildUI";
 
-		this->Field.registerObject("Pump_metal", "ItemUse");
+		this->Field.registerObject("Pump_metal", "ItemUse", "Pump_metal");
 		this->Field.object("Pump_metal")->setSpriteTexture("CompositeMetal", 0);
 		this->Field.object("Pump_metal")->setPosX(550);
 		this->Field.object("Pump_metal")->setPosY(220);
 
-		this->Field.registerObject("Pump_Arclyic", "ItemUse");
+		this->Field.registerObject("Pump_Arclyic", "ItemUse", "Pump_Arclyic");
 		this->Field.object("Pump_Arclyic")->setSpriteTexture("Arclyic", 0);
 		this->Field.object("Pump_Arclyic")->setPosX(650);
 		this->Field.object("Pump_Arclyic")->setPosY(220);
@@ -1030,6 +1041,7 @@ public:
 	vector<int> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
+	Object* NoneItem = new Object(45678);
 	int InventoryHitbox[4][9][4];
 	bool _time = true;
 	bool pass = true;
@@ -1040,7 +1052,7 @@ public:
 	bool pause = false;
 	bool escPressed = false, escToggle = false, EToggle = false;
 	bool paused = false, building = false, inventory = false;
-	int selectingSlot = 0;
+	int selectingSlot = 0, ItemOnMouseQuantity = 0;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
 		srand(time_ui);
@@ -1152,25 +1164,10 @@ public:
 			if (ev.type == Event::MouseMoved) {
 				this->mousePos[0] = ev.mouseMove.x;
 				this->mousePos[1] = ev.mouseMove.y;
+				this->DrawField["ItemOnMouse"][0]->setPosX(this->mousePos[0]);
+				this->DrawField["ItemOnMouse"][0]->setPosY(this->mousePos[1]);
 			}
 			if (ev.type == Event::MouseButtonPressed) {
-				if (ev.mouseButton.button == Mouse::Middle) {
-					//for (int i = 0; i < this->Field.entityNumber(); i++) {
-						//cout << this->Field.objectAt(i)->nowIs() << endl;
-					//}
-					printf("\n");
-					string ObjName = "Pumpy" + to_string(rand() % 100000);
-					this->Field.registerObject(ObjName, "Pump");
-					this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
-					this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
-					vector<float> data = this->Field.object(ObjName)->getHitBoxData();
-					cout << this->Field.object(ObjName)->nowIs() << endl;
-					for (int i = 0; i < 6; i++) {
-						printf("%.1f ", data[i]);
-					}
-					printf("\n");
-
-				}
 				if (ev.mouseButton.button == Mouse::Right) {
 					cout << this->DrawField["ItemUseSlot"][this->selectingSlot]->tag << endl;
 					if (this->Elon->getStat("Alive") == 1) {
@@ -1239,7 +1236,7 @@ public:
 							int SlolarHitBox[] = { 330, 340, 460, 480 };
 							if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
 								string ObjName = "Pump_" + to_string(rand() % 100000);
-								this->Field.registerObject(ObjName, "Pump");
+								this->Field.registerObject(ObjName, "Pump", "Pump");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
 								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
 								this->DrawField["DrawField_Dynamic"].push_back(this->Field.object(ObjName));
@@ -1247,7 +1244,7 @@ public:
 							}
 							if (clickHit(SlolarHitBox)) {
 								string ObjName = "Solar_" + to_string(rand() % 100000);
-								this->Field.registerObject(ObjName, "SolarCell");
+								this->Field.registerObject(ObjName, "SolarCell", "Solar");
 								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
 								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
 								this->DrawField["DrawField_Dynamic"].push_back(this->Field.object(ObjName));
@@ -1257,8 +1254,41 @@ public:
 						else if (this->inventory) {
 							for (int i = 0; i < 4; i++) {
 								for (int j = 0; j < 9; j++) {
-									if (clickHit(this->InventoryHitbox[i][j])) {
-										printf("ClickHit %d,%d\n", i, j);
+									if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+										this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
+										this->ItemOnMouseQuantity = this->BackpackQuantity[i][j];
+										this->BackpackQuantity[i][j] = 0;
+										this->Backpack[i][j]->useStatNoPos(*NoneItem);
+										this->Backpack[i][j]->Is("None");
+										this->Backpack[i][j]->tag = "None";
+										this->Backpack[i][j]->setSpriteSize(0,0);
+										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+									}
+									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+										this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->DrawField["ItemUseSlot"][j]);
+										this->ItemOnMouseQuantity = this->ItemUseSlotQuantity[j];
+										this->DrawField["InventoryUseSlot"][j]->Is("None");
+										this->DrawField["InventoryUseSlot"][j]->tag = "None";
+										this->DrawField["InventoryUseSlot"][j]->setSpriteSize(0, 0);
+										this->ItemUseSlotQuantity[j] = 0;
+										this->DrawField["ItemUseSlot"][j]->Is("None");
+										this->DrawField["ItemUseSlot"][j]->tag = "None";
+										this->DrawField["ItemUseSlot"][j]->setSpriteSize(0, 0);
+										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+									}
+									else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
+										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+										this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
+										printf("++");
+										this->Backpack[i][j]->setPosX(200 + 1000 * 0.06 * i);
+										this->Backpack[i][j]->setPosY(503 + 1000 * 0.06 * j);
+										this->Backpack[i][j]->setSpriteSize(0.06, 0.06);
+										this->BackpackQuantity[i][j]+= this->ItemOnMouseQuantity;
+										this->DrawField["ItemOnMouse"][0]->Is("None");
+										this->DrawField["ItemOnMouse"][0]->tag = "None";
+										this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+										printf("---");
+										cout << this->Backpack[i][j]->nowIs() << endl;
 									}
 								}
 							}
@@ -1476,7 +1506,6 @@ public:
 					for (int i = 0; i < 9; i++) {
 						if (this->DrawField["ItemUseSlot"][i]->nowIs() == "None") {
 							this->DrawField["ItemUseSlot"][i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
-							//cout << this->ItemUseSlot[i]->tag  << " = " << this->itemList.object(charOnly(A->nowIs()))->tag << endl;
 							this->DrawField["ItemUseSlot"][i]->Is(charOnly(A->nowIs()));
 							this->DrawField["ItemUseSlot"][i] = this->itemList.object(charOnly(A->nowIs()));
 							this->ItemUseSlotQuantity[i] = 1;
@@ -1617,6 +1646,7 @@ public:
 				for (int i = 0; i < this->Dialog["InventoryItem"].entityNumber(); i++) {
 					this->window->draw(*this->Dialog["InventoryItem"].objectAt(i));
 				}
+				this->window->draw(this->DrawField["ItemOnMouse"][0]->getSprite());
 
 			}
 		}
@@ -1626,6 +1656,10 @@ public:
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
 
 		this->window->display();
+		for (int i = 0; i < 8; i++) {
+			cout << this->DrawField["ItemUseSlot"][i]->nowIs() << '\t';
+		}
+		cout << endl;
 	}
 	void sort() {
 
@@ -1860,7 +1894,10 @@ void ShowDrawingStat3() {
 		while (First_step.Field.entityNumber() == 0 || First_step.paused) {
 			Sleep(1);
 		}
-		printf("%d\n", First_step.escPressed);
+		for (int i = 0; i < 8; i++) {
+			cout << First_step.DrawField["ItemUseSlot"][i]->nowIs() << '\t';
+		}
+		cout << endl;
 	}
 }
 int main() { // Game loop
