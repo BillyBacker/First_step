@@ -720,308 +720,310 @@ private:
 	}
 	void initObject() {
 
-		this->Field.createTemplate("Blank");
+		this->Field["Dynamic"].createTemplate("Blank");
 
-		this->Field.createTemplate("Item");
-		this->Field.Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
-		this->Field.Template("Item")->setSpriteTexture("default", 0);
-		this->Field.Template("Item")->setSpriteSize(0.005, 0.005);
-		this->Field.Template("Item")->setImgDim(1000, 1000);
-		this->Field.Template("Item")->setType("Static");
+		this->Field["Dynamic"].createTemplate("Item");
+		this->Field["Dynamic"].Template("Item")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
+		this->Field["Dynamic"].Template("Item")->setSpriteTexture("default", 0);
+		this->Field["Dynamic"].Template("Item")->setSpriteSize(0.005, 0.005);
+		this->Field["Dynamic"].Template("Item")->setImgDim(1000, 1000);
+		this->Field["Dynamic"].Template("Item")->setType("Static");
 
-		this->Field.createTemplate("Rocky");
-		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", "default0", 1000);
-		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", "default1", 1000);
-		this->Field.Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", "default2", 1000);
-		this->Field.Template("Rocky")->setSpriteTexture("default1", 0);
-		this->Field.Template("Rocky")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("Rocky")->setImgDim(900, 900);
-		this->Field.Template("Rocky")->isPassable(false);
-		this->Field.Template("Rocky")->setType("Dynamic");
+		this->Field["Dynamic"].createTemplate("Rocky");
+		this->Field["Dynamic"].Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock1.png", "default0", 1000);
+		this->Field["Dynamic"].Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock2.png", "default1", 1000);
+		this->Field["Dynamic"].Template("Rocky")->addTexture("assets\\Prop\\Rock\\Rock3.png", "default2", 1000);
+		this->Field["Dynamic"].Template("Rocky")->setSpriteTexture("default1", 0);
+		this->Field["Dynamic"].Template("Rocky")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("Rocky")->setImgDim(900, 900);
+		this->Field["Dynamic"].Template("Rocky")->isPassable(false);
+		this->Field["Dynamic"].Template("Rocky")->setType("Dynamic");
 
-		this->Field.createTemplate("BG_Element");
-		this->Field.Template("BG_Element")->setType("Dynamic");
-		this->Field.Template("BG_Element")->setPosX(0);
-		this->Field.Template("BG_Element")->setPosY(0);
+		this->Field["Dynamic"].createTemplate("BG_Element");
+		this->Field["Dynamic"].Template("BG_Element")->setType("Dynamic");
+		this->Field["Dynamic"].Template("BG_Element")->setPosX(0);
+		this->Field["Dynamic"].Template("BG_Element")->setPosY(0);
 
-		this->Field.registerObject("Anchor", "BG_Element", "Anchor");
-		this->Field.object("Anchor")->setPosX(-3000);
-		this->Field.object("Anchor")->setPosY(-3000);
-		this->Field.object("Anchor")->isPassable(true);
-		this->Anchor = this->Field.object("Anchor");
+		this->Field["Dynamic"].registerObject("Anchor", "BG_Element", "Anchor");
+		this->Field["Dynamic"].object("Anchor")->setPosX(-3000);
+		this->Field["Dynamic"].object("Anchor")->setPosY(-3000);
+		this->Field["Dynamic"].object("Anchor")->isPassable(true);
+		this->Anchor = this->Field["Dynamic"].object("Anchor");
 
-		this->Field.createTemplate("dropItem");
-		this->Field.Template("dropItem")->addTexture("assets\\Prop\\Item\\Herb.png", "Herb", 1000);
-		this->Field.Template("dropItem")->addTexture("assets\\Prop\\Item\\Apple.png", "Apple", 1000);
-		this->Field.Template("dropItem")->setSpriteTexture("Apple", 0);
-		this->Field.Template("dropItem")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("dropItem")->setImgDim(1000, 1000);
-		this->Field.Template("dropItem")->setType("Dynamic");
+		this->Field["Dynamic"].createTemplate("dropItem");
+		this->Field["Dynamic"].Template("dropItem")->addTexture("assets\\Prop\\Item\\Herb.png", "Herb", 1000);
+		this->Field["Dynamic"].Template("dropItem")->addTexture("assets\\Prop\\Item\\Apple.png", "Apple", 1000);
+		this->Field["Dynamic"].Template("dropItem")->setSpriteTexture("Apple", 0);
+		this->Field["Dynamic"].Template("dropItem")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("dropItem")->setImgDim(1000, 1000);
+		this->Field["Dynamic"].Template("dropItem")->setType("Dynamic");
 
 		for (int i = 0; i < 50; i++) {
-			this->Field.registerObject("Apple_" + to_string(i), "dropItem", "Apple");
-			this->Field.object("Apple_" + to_string(i))->setSpriteTexture("Apple", 0);
-			this->Field.object("Apple_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
-			this->Field.object("Apple_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
-			this->Field.object("Apple_" + to_string(i))->tag = "fallItem";
+			this->Field["Dynamic"].registerObject("Apple_" + to_string(i), "dropItem", "Apple");
+			this->Field["Dynamic"].object("Apple_" + to_string(i))->setSpriteTexture("Apple", 0);
+			this->Field["Dynamic"].object("Apple_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field["Dynamic"].object("Apple_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
+			this->Field["Dynamic"].object("Apple_" + to_string(i))->tag = "fallItem";
 		}
 		for (int i = 0; i < 50; i++) {
-			this->Field.registerObject("Herb_" + to_string(i), "dropItem", "Herb");
-			this->Field.object("Herb_" + to_string(i))->setSpriteTexture("Herb", 0);
-			this->Field.object("Herb_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
-			this->Field.object("Herb_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
-			this->Field.object("Herb_" + to_string(i))->tag = "fallItem";
+			this->Field["Dynamic"].registerObject("Herb_" + to_string(i), "dropItem", "Herb");
+			this->Field["Dynamic"].object("Herb_" + to_string(i))->setSpriteTexture("Herb", 0);
+			this->Field["Dynamic"].object("Herb_" + to_string(i))->setOffsetPosX(2000 + rand() % 2000);
+			this->Field["Dynamic"].object("Herb_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
+			this->Field["Dynamic"].object("Herb_" + to_string(i))->tag = "fallItem";
 		}
 
-		this->Field.createTemplate("Structure");
-		this->Field.Template("Structure")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.Template("Structure")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.Template("Structure")->setType("Dynamic");
-		this->Field.Template("Structure")->isPassable(false);
+		this->Field["Dynamic"].createTemplate("Structure");
+		this->Field["Dynamic"].Template("Structure")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["Dynamic"].Template("Structure")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["Dynamic"].Template("Structure")->setType("Dynamic");
+		this->Field["Dynamic"].Template("Structure")->isPassable(false);
 
-		this->Field.createTemplate("itemFrame");
-		this->Field.Template("itemFrame")->addTexture("assets\\Prop\\HUD\\ItemFrameWhite.png", "default", 1000);
-		this->Field.Template("itemFrame")->setSpriteTexture("default", 0);
-		this->Field.Template("itemFrame")->setSpriteSize(0.06, 0.06);
-		this->Field.Template("itemFrame")->setType("Static");
-		this->Field.Template("itemFrame")->isPassable(false);
+		this->Field["Dynamic"].createTemplate("Pump");
+		this->Field["Dynamic"].Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png", "pump", 1000);
+		this->Field["Dynamic"].Template("Pump")->setSpriteTexture("pump", 0);
+		this->Field["Dynamic"].Template("Pump")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("Pump")->setImgDim(1200, 1600);
+		this->Field["Dynamic"].Template("Pump")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["Dynamic"].Template("Pump")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["Dynamic"].Template("Pump")->setType("Dynamic");
+		this->Field["Dynamic"].Template("Pump")->isPassable(false);
 
-		this->Field.createTemplate("StatBar");
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\StatFrame.png", "frame", 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Health.png", "Stat1", 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Hunger.png", "Stat2", 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Thirst.png", "Stat3", 1000);
-		this->Field.Template("StatBar")->addTexture("assets\\Prop\\HUD\\Air.png", "Stat4", 1000);
-		this->Field.Template("StatBar")->setSpriteTexture("frame", 0);
-		this->Field.Template("StatBar")->setSpriteSize(0.06, 0.06);
-		this->Field.Template("StatBar")->setType("Static");
+		this->Field["Dynamic"].createTemplate("SolarCell");
+		this->Field["Dynamic"].Template("SolarCell")->addTexture("assets\\Prop\\Building\\SolarCell.png", "SolarCell", 1000);
+		this->Field["Dynamic"].Template("SolarCell")->setSpriteTexture("SolarCell", 0);
+		this->Field["Dynamic"].Template("SolarCell")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("SolarCell")->setImgDim(1200, 1600);
+		this->Field["Dynamic"].Template("SolarCell")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["Dynamic"].Template("SolarCell")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["Dynamic"].Template("SolarCell")->setType("Dynamic");
+		this->Field["Dynamic"].Template("SolarCell")->isPassable(false);
 
-		this->Field.createTemplate("Pump");
-		this->Field.Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png", "pump", 1000);
-		this->Field.Template("Pump")->setSpriteTexture("pump", 0);
-		this->Field.Template("Pump")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("Pump")->setImgDim(1200, 1600);
-		this->Field.Template("Pump")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.Template("Pump")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.Template("Pump")->setType("Dynamic");
-		this->Field.Template("Pump")->isPassable(false);
-
-		this->Field.createTemplate("SolarCell");
-		this->Field.Template("SolarCell")->addTexture("assets\\Prop\\Building\\SolarCell.png", "SolarCell", 1000);
-		this->Field.Template("SolarCell")->setSpriteTexture("SolarCell", 0);
-		this->Field.Template("SolarCell")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("SolarCell")->setImgDim(1200, 1600);
-		this->Field.Template("SolarCell")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.Template("SolarCell")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.Template("SolarCell")->setType("Dynamic");
-		this->Field.Template("SolarCell")->isPassable(false);
-
-		this->Field.createTemplate("Floor");
-		this->Field.Template("Floor")->addTexture("assets\\Prop\\Floor\\Floor11.png", "default", 1000);
-		this->Field.Template("Floor")->setSpriteTexture("default", 0);
-		this->Field.Template("Floor")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("Floor")->setImgDim(5000, 5000);
-		this->Field.Template("Floor")->setPosX(this->Field.object("Anchor")->PosX());
-		this->Field.Template("Floor")->setPosY(this->Field.object("Anchor")->PosY());
-		this->Field.Template("Floor")->setType("Dynamic");
-		this->Field.Template("Floor")->isPassable(true);
-		this->Field.Template("Floor")->tag = "BG";
+		this->Field["GameBG"].createTemplate("Floor");
+		this->Field["GameBG"].Template("Floor")->addTexture("assets\\Prop\\Floor\\Floor11.png", "default", 1000);
+		this->Field["GameBG"].Template("Floor")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("Floor")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("Floor")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("Floor")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("Floor")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("Floor")->setType("Dynamic");
+		this->Field["GameBG"].Template("Floor")->isPassable(true);
+		this->Field["GameBG"].Template("Floor")->tag = "BG";
 
 		for (int i = 0; i < 30; i++) {
 			for (int j = 0; j < 30; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
-				this->Field.registerObject(ObjName, "Floor", "Floor");
-				this->Field.object(ObjName)->setOffsetPosX(i * 5000 * 0.1 / 1.1);
-				this->Field.object(ObjName)->setOffsetPosY(j * 5000 * 0.1 / 1.1);
+				this->Field["GameBG"].registerObject(ObjName, "Floor", "Floor");
+				this->Field["GameBG"].object(ObjName)->setOffsetPosX(i * 5000 * 0.1 / 1.1);
+				this->Field["GameBG"].object(ObjName)->setOffsetPosY(j * 5000 * 0.1 / 1.1);
 			}
 		}
-
+	
 		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
-			this->Field.registerObject(to_string(i) + to_string(j), "Rocky", "Rock");
-			this->Field.object(to_string(i) + to_string(j))->setSpriteTexture("default" + to_string(rand() % 3), 0);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
-			this->Field.object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
+			this->Field["Dynamic"].registerObject(to_string(i) + to_string(j), "Rocky", "Rock");
+			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setSpriteTexture("default" + to_string(rand() % 3), 0);
+			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
+			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
 		}
+		
+		this->Field["Dynamic"].registerObject("Hut", "Structure", "Hut");
+		this->Field["Dynamic"].object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", "default", 1000);
+		this->Field["Dynamic"].object("Hut")->setSpriteTexture("default", 0);
+		this->Field["Dynamic"].object("Hut")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].object("Hut")->setOffsetPosX(2500);
+		this->Field["Dynamic"].object("Hut")->setOffsetPosY(2500);
+		this->Field["Dynamic"].object("Hut")->setImgDim(4800, 3200);
 
-		this->Field.registerObject("Hut", "Structure", "Hut");
-		this->Field.object("Hut")->addTexture("assets\\Prop\\Building\\SurvivalHut.png", "default", 1000);
-		this->Field.object("Hut")->setSpriteTexture("default", 0);
-		this->Field.object("Hut")->setSpriteSize(0.1, 0.1);
-		this->Field.object("Hut")->setOffsetPosX(2500);
-		this->Field.object("Hut")->setOffsetPosY(2500);
-		this->Field.object("Hut")->setImgDim(4800, 3200);
+		this->Field["Dynamic"].registerObject("Elon", "Blank", "Elon");
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", "idle", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Dying1.png", "dying", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Dying2.png", "dying", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Dying3.png", "dying", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Dying4.png", "dying", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 8);
+		this->Field["Dynamic"].object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
+		this->Field["Dynamic"].object("Elon")->loop = true;
+		this->Field["Dynamic"].object("Elon")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].object("Elon")->setImgDim(1000, 1600);
+		this->Field["Dynamic"].object("Elon")->addStat("Health", 100);
+		this->Field["Dynamic"].object("Elon")->addStat("Thirst", 100);
+		this->Field["Dynamic"].object("Elon")->addStat("Hunger", 100);
+		this->Field["Dynamic"].object("Elon")->addStat("Air", 100);
+		this->Field["Dynamic"].object("Elon")->addStat("Alive", 1);
+		this->Field["Dynamic"].object("Elon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
+		this->Field["Dynamic"].object("Elon")->setPosY(400);
+		this->Field["Dynamic"].object("Elon")->setType("Static");
+		this->Elon = this->Field["Dynamic"].object("Elon");
+	}
+	void intitHUD() {
+		this->Field["HUD"].createTemplate("Blank");
 
-		this->Field.registerObject("Elon", "Blank", "Elon");
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk5.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Idle.png", "idle", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying1.png", "dying", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying2.png", "dying", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying3.png", "dying", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying4.png", "dying", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 8);
-		this->Field.object("Elon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
-		this->Field.object("Elon")->loop = true;
-		this->Field.object("Elon")->setSpriteSize(0.1, 0.1);
-		this->Field.object("Elon")->setImgDim(1000, 1600);
-		this->Field.object("Elon")->addStat("Health", 100);
-		this->Field.object("Elon")->addStat("Thirst", 100);
-		this->Field.object("Elon")->addStat("Hunger", 100);
-		this->Field.object("Elon")->addStat("Air", 100);
-		this->Field.object("Elon")->addStat("Alive", 1);
-		this->Field.object("Elon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
-		this->Field.object("Elon")->setPosY(400);
-		this->Field.object("Elon")->setType("Static");
-		this->Elon = this->Field.object("Elon");
+		this->Field["HUD"].createTemplate("StatBar");
+		this->Field["HUD"].Template("StatBar")->addTexture("assets\\Prop\\HUD\\StatFrame.png", "frame", 1000);
+		this->Field["HUD"].Template("StatBar")->addTexture("assets\\Prop\\HUD\\Health.png", "Stat1", 1000);
+		this->Field["HUD"].Template("StatBar")->addTexture("assets\\Prop\\HUD\\Hunger.png", "Stat2", 1000);
+		this->Field["HUD"].Template("StatBar")->addTexture("assets\\Prop\\HUD\\Thirst.png", "Stat3", 1000);
+		this->Field["HUD"].Template("StatBar")->addTexture("assets\\Prop\\HUD\\Air.png", "Stat4", 1000);
+		this->Field["HUD"].Template("StatBar")->setSpriteTexture("frame", 0);
+		this->Field["HUD"].Template("StatBar")->setSpriteSize(0.06, 0.06);
+		this->Field["HUD"].Template("StatBar")->setType("Static");
 
-		//for (int i = 0; i < 11; i++) {
-			//for (int j = 0; j < 17; j++) {
-				//this->Field.registerObject(to_string(i)+to_string(j), "Item");
-				//this->Field.object(to_string(i) + to_string(j))->setPosX(j*100);
-				//this->Field.object(to_string(i) + to_string(j))->setPosY(i*100);
-			//}
-		//}
+		this->Field["HUD"].createTemplate("itemFrame");
+		this->Field["HUD"].Template("itemFrame")->addTexture("assets\\Prop\\HUD\\ItemFrameWhite.png", "default", 1000);
+		this->Field["HUD"].Template("itemFrame")->setSpriteTexture("default", 0);
+		this->Field["HUD"].Template("itemFrame")->setSpriteSize(0.06, 0.06);
+		this->Field["HUD"].Template("itemFrame")->setType("Static");
+		this->Field["HUD"].Template("itemFrame")->isPassable(false);
+
 		for (int i = 0; i < 9; i++) {
-			this->Field.registerObject("ItemFrame" + to_string(i), "itemFrame", "ItemFrame"                                                                );
-			this->Field.object("ItemFrame" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
-			this->Field.object("ItemFrame" + to_string(i))->setPosY(800);
+			this->Field["HUD"].registerObject("ItemFrame" + to_string(i), "itemFrame", "ItemFrame");
+			this->Field["HUD"].object("ItemFrame" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
+			this->Field["HUD"].object("ItemFrame" + to_string(i))->setPosY(800);
 
 		}
 
-		this->Field.registerObject("ItemPrt", "Blank", "ItemPrt");
-		this->Field.object("ItemPrt")->addTexture("assets\\Prop\\HUD\\ItemPointer.png", "default", 1000);
-		this->Field.object("ItemPrt")->setSpriteTexture("default", 0);
-		this->Field.object("ItemPrt")->setSpriteSize(0.06, 0.06);
-		this->Field.object("ItemPrt")->setImgDim(1100, 1500);
-		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2);
-		this->Field.object("ItemPrt")->setPosY(833);
-		this->Field.object("ItemPrt")->setType("Static");
+		this->Field["HUD"].registerObject("ItemPrt", "Blank", "ItemPrt");
+		this->Field["HUD"].object("ItemPrt")->addTexture("assets\\Prop\\HUD\\ItemPointer.png", "default", 1000);
+		this->Field["HUD"].object("ItemPrt")->setSpriteTexture("default", 0);
+		this->Field["HUD"].object("ItemPrt")->setSpriteSize(0.06, 0.06);
+		this->Field["HUD"].object("ItemPrt")->setImgDim(1100, 1500);
+		this->Field["HUD"].object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2);
+		this->Field["HUD"].object("ItemPrt")->setPosY(833);
+		this->Field["HUD"].object("ItemPrt")->setType("Static");
 
 		for (int i = 0; i < 4; i++) {
-			this->Field.registerObject("StatBar_Fill" + to_string(i), "StatBar", "StatBar_Fill");
-			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06, -0.06);
-			this->Field.object("StatBar_Fill" + to_string(i))->setSpriteTexture("Stat" + to_string(i + 1), 0);
-			this->Field.object("StatBar_Fill" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
-			this->Field.object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200 * 0.06);
+			this->Field["HUD"].registerObject("StatBar_Fill" + to_string(i), "StatBar", "StatBar_Fill");
+			this->Field["HUD"].object("StatBar_Fill" + to_string(i))->setSpriteSize(0.06, -0.06);
+			this->Field["HUD"].object("StatBar_Fill" + to_string(i))->setSpriteTexture("Stat" + to_string(i + 1), 0);
+			this->Field["HUD"].object("StatBar_Fill" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
+			this->Field["HUD"].object("StatBar_Fill" + to_string(i))->setPosY(600 + 3200 * 0.06);
 		}
 		for (int i = 0; i < 4; i++) {
-			this->Field.registerObject("StatBar" + to_string(i), "StatBar", "StatBar");
-			this->Field.object("StatBar" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
-			this->Field.object("StatBar" + to_string(i))->setPosY(600);
+			this->Field["HUD"].registerObject("StatBar" + to_string(i), "StatBar", "StatBar");
+			this->Field["HUD"].object("StatBar" + to_string(i))->setPosX(1300 + 500 * 0.1 * i);
+			this->Field["HUD"].object("StatBar" + to_string(i))->setPosY(600);
 		}
 	}
 	void intitUI() {
-		this->Field.createTemplate("PauseUI_BG");
-		this->Field.Template("PauseUI_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
-		this->Field.Template("PauseUI_BG")->setSpriteSize(0.5, 0.5);
-		this->Field.Template("PauseUI_BG")->setImgDim(3200, 1800);
-		this->Field.Template("PauseUI_BG")->setPosX(800);
-		this->Field.Template("PauseUI_BG")->setPosY(450);
-		this->Field.Template("PauseUI_BG")->setType("Static");
-		this->Field.Template("PauseUI_BG")->tag = "PauseUI";
+		this->Field["PauseUI"].createTemplate("PauseUI_BG");
+		this->Field["PauseUI"].Template("PauseUI_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field["PauseUI"].Template("PauseUI_BG")->setSpriteSize(0.5, 0.5);
+		this->Field["PauseUI"].Template("PauseUI_BG")->setImgDim(3200, 1800);
+		this->Field["PauseUI"].Template("PauseUI_BG")->setPosX(800);
+		this->Field["PauseUI"].Template("PauseUI_BG")->setPosY(450);
+		this->Field["PauseUI"].Template("PauseUI_BG")->setType("Static");
+		this->Field["PauseUI"].Template("PauseUI_BG")->tag = "PauseUI";
 
-		this->Field.registerObject("PauseBG", "PauseUI_BG", "PauseBG");
-		this->Field.object("PauseBG")->setSpriteTexture("default", 0);
+		this->Field["PauseUI"].registerObject("PauseBG", "PauseUI_BG", "PauseBG");
+		this->Field["PauseUI"].object("PauseBG")->setSpriteTexture("default", 0);
 
-		this->Field.createTemplate("BuildUI_BG");
-		this->Field.Template("BuildUI_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
-		this->Field.Template("BuildUI_BG")->setSpriteSize(0.5, 0.5);
-		this->Field.Template("BuildUI_BG")->setImgDim(3200, 1800);
-		this->Field.Template("BuildUI_BG")->setPosX(800);
-		this->Field.Template("BuildUI_BG")->setPosY(450);
-		this->Field.Template("BuildUI_BG")->setType("Static");
-		this->Field.Template("BuildUI_BG")->tag = "BuildUI";
+		this->Field["BuildUI"].createTemplate("BuildUI_BG");
+		this->Field["BuildUI"].Template("BuildUI_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field["BuildUI"].Template("BuildUI_BG")->setSpriteSize(0.5, 0.5);
+		this->Field["BuildUI"].Template("BuildUI_BG")->setImgDim(3200, 1800);
+		this->Field["BuildUI"].Template("BuildUI_BG")->setPosX(800);
+		this->Field["BuildUI"].Template("BuildUI_BG")->setPosY(450);
+		this->Field["BuildUI"].Template("BuildUI_BG")->setType("Static");
+		this->Field["BuildUI"].Template("BuildUI_BG")->tag = "BuildUI";
 
-		this->Field.registerObject("BuildBG", "BuildUI_BG", "BuiledBG");
-		this->Field.object("BuildBG")->setSpriteTexture("default", 0);
+		this->Field["BuildUI"].registerObject("BuildBG", "BuildUI_BG", "BuiledBG");
+		this->Field["BuildUI"].object("BuildBG")->setSpriteTexture("default", 0);
 
-		this->Field.createTemplate("Inventory_BG");
-		this->Field.Template("Inventory_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
-		this->Field.Template("Inventory_BG")->setSpriteSize(0.5, 0.5);
-		this->Field.Template("Inventory_BG")->setImgDim(3200, 1800);
-		this->Field.Template("Inventory_BG")->setPosX(800);
-		this->Field.Template("Inventory_BG")->setPosY(450);
-		this->Field.Template("Inventory_BG")->setType("Static");
-		this->Field.Template("Inventory_BG")->tag = "InventoryUI";
+		this->Field["InventoryUI"].createTemplate("Inventory_BG");
+		this->Field["InventoryUI"].Template("Inventory_BG")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field["InventoryUI"].Template("Inventory_BG")->setSpriteSize(0.5, 0.5);
+		this->Field["InventoryUI"].Template("Inventory_BG")->setImgDim(3200, 1800);
+		this->Field["InventoryUI"].Template("Inventory_BG")->setPosX(800);
+		this->Field["InventoryUI"].Template("Inventory_BG")->setPosY(450);
+		this->Field["InventoryUI"].Template("Inventory_BG")->setType("Static");
+		this->Field["InventoryUI"].Template("Inventory_BG")->tag = "InventoryUI";
 
-		this->Field.registerObject("InventoryBG", "Inventory_BG", "InventoryBG");
-		this->Field.object("InventoryBG")->setSpriteTexture("default", 0);
+		this->Field["InventoryUI"].createTemplate("itemFrame");
+		this->Field["InventoryUI"].Template("itemFrame")->addTexture("assets\\Prop\\HUD\\ItemFrameWhite.png", "default", 1000);
+		this->Field["InventoryUI"].Template("itemFrame")->setSpriteTexture("default", 0);
+		this->Field["InventoryUI"].Template("itemFrame")->setSpriteSize(0.06, 0.06);
+		this->Field["InventoryUI"].Template("itemFrame")->setType("Static");
+		this->Field["InventoryUI"].Template("itemFrame")->isPassable(false);
+		this->Field["InventoryUI"].Template("itemFrame")->tag = "InventoryUI";
+
+		this->Field["InventoryUI"].registerObject("InventoryBG", "Inventory_BG", "InventoryBG");
+		this->Field["InventoryUI"].object("InventoryBG")->setSpriteTexture("default", 0);
+		
 		for (int i = 0; i < 9; i++) {
-			this->Field.registerObject("UseSlot" + to_string(i), "itemFrame", "UseSlot");
-			this->Field.object("UseSlot" + to_string(i))->tag = "InventoryUI";
-			this->Field.object("UseSlot" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
-			this->Field.object("UseSlot" + to_string(i))->setPosY(500);
+			this->Field["InventoryUI"].registerObject("UseSlot" + to_string(i), "itemFrame", "UseSlot");
+			this->Field["InventoryUI"].object("UseSlot" + to_string(i))->tag = "InventoryUI";
+			this->Field["InventoryUI"].object("UseSlot" + to_string(i))->setPosX(503 + 1100 * 0.06 * i);
+			this->Field["InventoryUI"].object("UseSlot" + to_string(i))->setPosY(500);
 		}
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				this->Field.registerObject("InventorySlot" + to_string(i) + to_string(j), "itemFrame", "InventorySlot");
-				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->tag = "InventoryUI";
-				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->setPosX(503 + 1100 * 0.06 * j);
-				this->Field.object("InventorySlot" + to_string(i) + to_string(j))->setPosY(200 + 1100*0.06*i);
+				this->Field["InventoryUI"].registerObject("InventorySlot" + to_string(i) + to_string(j), "itemFrame", "InventorySlot");
+				this->Field["InventoryUI"].object("InventorySlot" + to_string(i) + to_string(j))->tag = "InventoryUI";
+				this->Field["InventoryUI"].object("InventorySlot" + to_string(i) + to_string(j))->setPosX(503 + 1100 * 0.06 * j);
+				this->Field["InventoryUI"].object("InventorySlot" + to_string(i) + to_string(j))->setPosY(200 + 1100*0.06*i);
 			}
 		}
-		this->Field.createTemplate("BuildingSample");
-		this->Field.Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
-		this->Field.Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
-		this->Field.Template("BuildingSample")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("BuildingSample")->setImgDim(1200, 1600);
-		this->Field.Template("BuildingSample")->setType("Static");
-		this->Field.Template("BuildingSample")->tag = "BuildUI";
+		this->Field["BuildUI"].createTemplate("BuildingSample");
+		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
+		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
+		this->Field["BuildUI"].Template("BuildingSample")->setSpriteSize(0.1, 0.1);
+		this->Field["BuildUI"].Template("BuildingSample")->setImgDim(1200, 1600);
+		this->Field["BuildUI"].Template("BuildingSample")->setType("Static");
+		this->Field["BuildUI"].Template("BuildingSample")->tag = "BuildUI";
 
-		this->Field.registerObject("PumpSample", "BuildingSample", "PumpSample");
-		this->Field.object("PumpSample")->setSpriteTexture("Pump", 0);
-		this->Field.object("PumpSample")->setPosX(400);
-		this->Field.object("PumpSample")->setPosY(200);
+		this->Field["BuildUI"].registerObject("PumpSample", "BuildingSample", "PumpSample");
+		this->Field["BuildUI"].object("PumpSample")->setSpriteTexture("Pump", 0);
+		this->Field["BuildUI"].object("PumpSample")->setPosX(400);
+		this->Field["BuildUI"].object("PumpSample")->setPosY(200);
 
-		this->Field.registerObject("SolarCellSample", "BuildingSample", "SolarSample");
-		this->Field.object("SolarCellSample")->setSpriteTexture("SolarCell", 0);
-		this->Field.object("SolarCellSample")->setPosX(400);
-		this->Field.object("SolarCellSample")->setPosY(400);
+		this->Field["BuildUI"].registerObject("SolarCellSample", "BuildingSample", "SolarSample");
+		this->Field["BuildUI"].object("SolarCellSample")->setSpriteTexture("SolarCell", 0);
+		this->Field["BuildUI"].object("SolarCellSample")->setPosX(400);
+		this->Field["BuildUI"].object("SolarCellSample")->setPosY(400);
 
-		this->Field.createTemplate("ItemUse");
-		this->Field.Template("ItemUse")->addTexture("assets\\Prop\\Item\\metalPlate.png", "CompositeMetal", 1000);
-		this->Field.Template("ItemUse")->addTexture("assets\\Prop\\Item\\Arclyic.png", "Arclyic", 1000);
-		this->Field.Template("ItemUse")->setSpriteSize(0.1, 0.1);
-		this->Field.Template("ItemUse")->setImgDim(1000, 1000);
-		this->Field.Template("ItemUse")->setType("Static");
-		this->Field.Template("ItemUse")->tag = "BuildUI";
+		this->Field["BuildUI"].createTemplate("ItemUse");
+		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\metalPlate.png", "CompositeMetal", 1000);
+		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\Arclyic.png", "Arclyic", 1000);
+		this->Field["BuildUI"].Template("ItemUse")->setSpriteSize(0.1, 0.1);
+		this->Field["BuildUI"].Template("ItemUse")->setImgDim(1000, 1000);
+		this->Field["BuildUI"].Template("ItemUse")->setType("Static");
+		this->Field["BuildUI"].Template("ItemUse")->tag = "BuildUI";
 
-		this->Field.registerObject("Pump_metal", "ItemUse", "Pump_metal");
-		this->Field.object("Pump_metal")->setSpriteTexture("CompositeMetal", 0);
-		this->Field.object("Pump_metal")->setPosX(550);
-		this->Field.object("Pump_metal")->setPosY(220);
+		this->Field["BuildUI"].registerObject("Pump_metal", "ItemUse", "Pump_metal");
+		this->Field["BuildUI"].object("Pump_metal")->setSpriteTexture("CompositeMetal", 0);
+		this->Field["BuildUI"].object("Pump_metal")->setPosX(550);
+		this->Field["BuildUI"].object("Pump_metal")->setPosY(220);
 
-		this->Field.registerObject("Pump_Arclyic", "ItemUse", "Pump_Arclyic");
-		this->Field.object("Pump_Arclyic")->setSpriteTexture("Arclyic", 0);
-		this->Field.object("Pump_Arclyic")->setPosX(650);
-		this->Field.object("Pump_Arclyic")->setPosY(220);
+		this->Field["BuildUI"].registerObject("Pump_Arclyic", "ItemUse", "Pump_Arclyic");
+		this->Field["BuildUI"].object("Pump_Arclyic")->setSpriteTexture("Arclyic", 0);
+		this->Field["BuildUI"].object("Pump_Arclyic")->setPosX(650);
+		this->Field["BuildUI"].object("Pump_Arclyic")->setPosY(220);
 
 	}
 	void manageLayer() {
-		for (int i = 0; i < this->Field.entityNumber(); i++) {
-			this->Field.objectAt(i)->type();
-			if (this->Field.objectAt(i)->tag == "BG") {
-				this->DrawField["BG_repo"].push_back(this->Field.objectAt(i));
-			}
-			else if (this->Field.objectAt(i)->tag == "PauseUI") {
-				this->DrawField["DrawField_pauseUI"].push_back(this->Field.objectAt(i));
-			}
-			else if (this->Field.objectAt(i)->tag == "BuildUI") {
-				this->DrawField["DrawField_buildingUI"].push_back(this->Field.objectAt(i));
-			}
-			else if (this->Field.objectAt(i)->tag == "InventoryUI") {
-				this->DrawField["DrawField_inventoryUI"].push_back(this->Field.objectAt(i));
-			}
-			else if (this->Field.objectAt(i)->type() == "Static" && this->Field.objectAt(i)->nowIs() != "Elon") {
-				this->DrawField["DrawField_Static"].push_back(this->Field.objectAt(i));
-			}
+		for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
+			this->DrawField["BG_repo"].push_back(this->Field["GameBG"].objectAt(i));
+		}
+		for (int i = 0; i < this->Field["PauseUI"].entityNumber(); i++) {
+			this->DrawField["DrawField_pauseUI"].push_back(this->Field["PauseUI"].objectAt(i));
+		}
+		for (int i = 0; i < this->Field["BuildUI"].entityNumber(); i++) {
+			this->DrawField["DrawField_buildingUI"].push_back(this->Field["BuildUI"].objectAt(i));
+		}
+		for (int i = 0; i < this->Field["InventoryUI"].entityNumber(); i++) {
+			this->DrawField["DrawField_inventoryUI"].push_back(this->Field["InventoryUI"].objectAt(i));
+		}
+		for (int i = 0; i < this->Field["HUD"].entityNumber(); i++) {
+			this->DrawField["DrawField_HUD"].push_back(this->Field["HUD"].objectAt(i));
 		}
 	}
 	double ObjectDis(Object* A, Object* B) {
@@ -1032,7 +1034,7 @@ private:
 	}
 public:
 	RenderWindow* window;
-	Map Field;
+	unordered_map<string, Map> Field;
 	unordered_map<string, vector<Object*>> DrawField;
 	vector<int> ItemUseSlotQuantity;
 	vector<vector<Object*>> Backpack;
@@ -1062,6 +1064,7 @@ public:
 		this->intitDialog();
 		this->initObject();
 		this->intitUI();
+		this->intitHUD();
 		this->manageLayer();
 	}
 	virtual ~gameEngine() {
@@ -1120,12 +1123,6 @@ public:
 			}
 			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::E) {
 				this->E = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Q && pass) {
-				pass = false;
-				for (int i = 1; i < 40; i++) {
-					this->Field.remove(to_string(i));
-				}
 			}
 			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
 				W = true;
@@ -1192,14 +1189,6 @@ public:
 						else if (this->DrawField["ItemUseSlot"][this->selectingSlot]->tag == "Tool" && this->ItemUseSlotQuantity[this->selectingSlot] > 0) {
 							if (this->DrawField["ItemUseSlot"][this->selectingSlot]->nowIs() == "Hammer") {
 								this->building = true;
-								/*
-								string ObjName = "Pump_" + to_string(rand() % 100000);
-								this->Field.registerObject(ObjName, "Pump");
-								this->Field.object(ObjName)->setOffsetPosX(this->Elon->PosX() - this->Field.object("Anchor")->PosX());
-								this->Field.object(ObjName)->setOffsetPosY(this->Elon->PosY() - this->Field.object("Anchor")->PosY());
-								printf("+\n");
-								this->DrawField_Dynamic.push_back(this->Field.object(ObjName));
-								*/
 							}
 						}
 						else {
@@ -1236,18 +1225,18 @@ public:
 							int SlolarHitBox[] = { 330, 340, 460, 480 };
 							if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
 								string ObjName = "Pump_" + to_string(rand() % 100000);
-								this->Field.registerObject(ObjName, "Pump", "Pump");
-								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
-								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
-								this->DrawField["DrawField_Dynamic"].push_back(this->Field.object(ObjName));
+								this->Field["Dynamic"].registerObject(ObjName, "Pump", "Pump");
+								this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
+								this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
+								this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
 								this->building = false;
 							}
 							if (clickHit(SlolarHitBox)) {
 								string ObjName = "Solar_" + to_string(rand() % 100000);
-								this->Field.registerObject(ObjName, "SolarCell", "Solar");
-								this->Field.object(ObjName)->setOffsetPosX(this->Field.object("Elon")->PosX() - this->Field.object("Anchor")->PosX());
-								this->Field.object(ObjName)->setOffsetPosY(this->Field.object("Elon")->PosY() - this->Field.object("Anchor")->PosY());
-								this->DrawField["DrawField_Dynamic"].push_back(this->Field.object(ObjName));
+								this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
+								this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
+								this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
+								this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
 								this->building = false;
 							}
 						}
@@ -1337,24 +1326,24 @@ public:
 		return i;
 	}
 	void updateHUD() {
-		if (Elon->getStat("Health") > 0) {
-			this->Field.object("StatBar_Fill0")->setSpriteSize(0.06, -0.06 * Elon->getStat("Health") / 100);
+		if (this->Elon->getStat("Health") > 0) {
+			this->Field["HUD"].object("StatBar_Fill0")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Health")/100);
 		}
-		if (Elon->getStat("Hunger") > 0) {
-			this->Field.object("StatBar_Fill1")->setSpriteSize(0.06, -0.06 * Elon->getStat("Hunger") / 100);
+		if (this->Elon->getStat("Hunger") > 0) {
+			this->Field["HUD"].object("StatBar_Fill1")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Hunger") / 100);
 		}
-		if (Elon->getStat("Thirst")) {
-			this->Field.object("StatBar_Fill2")->setSpriteSize(0.06, -0.06 * Elon->getStat("Thirst") / 100);
+		if (this->Elon->getStat("Thirst") > 0) {
+			this->Field["HUD"].object("StatBar_Fill2")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Thirst") / 100);
 		}
-		if (Elon->getStat("Air")) {
-			this->Field.object("StatBar_Fill3")->setSpriteSize(0.06, -0.06 * Elon->getStat("Air") / 100);
+		if (this->Elon->getStat("Air") > 0) {
+			this->Field["HUD"].object("StatBar_Fill3")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Air") / 100);
 		}
-		this->Field.object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
+		this->Field["HUD"].object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
 		for (int i = 0; i < 9; i++) {
-			if (this->DrawField["ItemUseSlot"][i]->nowIs() != "None" && find(this->DrawField["DrawField_Static"].begin(), this->DrawField["DrawField_Static"].end(), this->DrawField["ItemUseSlot"][i]) == this->DrawField["DrawField_Static"].end()) {
+			if (this->DrawField["ItemUseSlot"][i]->nowIs() != "None" && find(this->DrawField["DrawField_HUD"].begin(), this->DrawField["DrawField_HUD"].end(), this->DrawField["ItemUseSlot"][i]) == this->DrawField["DrawField_HUD"].end()) {
 				this->DrawField["ItemUseSlot"][i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
 				this->DrawField["ItemUseSlot"][i]->setPosY(833);
-				this->DrawField["DrawField_Static"].push_back(this->DrawField["ItemUseSlot"][i]);
+				this->DrawField["DrawField_HUD"].push_back(this->DrawField["ItemUseSlot"][i]);
 			}
 		}
 		for (int i = 0; i < 3; i++) {
@@ -1454,11 +1443,15 @@ public:
 		}
 		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
 		try {
-			for (int i = 0; i < Field.entityNumber(); i++) {
-				if (this->Field.objectAt(i)->type() == "Dynamic" && i < this->Field.entityNumber() && this->Field.objectAt(i)->usable) {
-					this->Field.objectAt(i)->setPosX(this->Anchor->PosX());
-					this->Field.objectAt(i)->setPosY(this->Anchor->PosY());
+			for (int i = 0; i < this->Field["Dynamic"].entityNumber(); i++) {
+				if (this->Field["Dynamic"].objectAt(i)->type() == "Dynamic" && i < this->Field["Dynamic"].entityNumber() && this->Field["Dynamic"].objectAt(i)->usable) {
+					this->Field["Dynamic"].objectAt(i)->setPosX(this->Anchor->PosX());
+					this->Field["Dynamic"].objectAt(i)->setPosY(this->Anchor->PosY());
 				}
+			}
+			for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
+				this->Field["GameBG"].objectAt(i)->setPosX(this->Anchor->PosX());
+				this->Field["GameBG"].objectAt(i)->setPosY(this->Anchor->PosY());
 			}
 		}
 		catch (const std::out_of_range& e) {
@@ -1492,7 +1485,7 @@ public:
 		int maxParam = 0;
 		for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
 			Object* A = this->DrawField["DrawField_Dynamic"][i];
-			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 50) {
+			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 50) {
 				this->DrawField["DrawField_Dynamic"][i]->usable = false;
 				bool found = false;
 				for (int i = 0; i < 9; i++) {
@@ -1516,8 +1509,8 @@ public:
 					}
 				}
 			}
-			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field.object("Elon"), A) <= 200) {
-				const vector<float> moveVec = getHitVector(this->Field.object("Elon")->PosX(), this->Field.object("Elon")->PosY(), A->PosX(), A->PosY());
+			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 200) {
+				const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
 				A->setOffsetPosX(A->offsetPosX + 7*moveVec[0]/abs(moveVec[0]+1));
 				A->setOffsetPosY(A->offsetPosY + 7*moveVec[1] / abs(moveVec[1]+1));
 				//A->setSpriteSize(0, 0);
@@ -1598,13 +1591,14 @@ public:
 		*/
 		try {
 			for (int i = 0; i < this->DrawField["DrawField_BG"].size(); i++) {
+				//cout << this->DrawField["DrawField_BG"][i]->nowIs() << '\t' << this->DrawField["DrawField_BG"][i]->PosX() << ','<< this->DrawField["DrawField_BG"][i]->PosY() << '\t' << Elon->PosX() << ',' << Elon->PosY() << endl;
 				this->window->draw(this->DrawField["DrawField_BG"][i]->getSprite());
 			}
 			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
 				this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
 			}
-			for (int i = 0; i < this->DrawField["DrawField_Static"].size() && DrawField["DrawField_Static"][i]; i++) {
-				this->window->draw(this->DrawField["DrawField_Static"][i]->getSprite());
+			for (int i = 0; i < this->DrawField["DrawField_HUD"].size() && DrawField["DrawField_HUD"][i]; i++) {
+				this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
 			}
 			for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
 				this->window->draw(*this->Dialog["itemCount"].objectAt(i));
@@ -1656,10 +1650,12 @@ public:
 		//printf("%f, %f\n", this->dui.getPosX(), this->dui.getPosY());
 
 		this->window->display();
+/*
 		for (int i = 0; i < 8; i++) {
 			cout << this->DrawField["ItemUseSlot"][i]->nowIs() << '\t';
 		}
 		cout << endl;
+		*/
 	}
 	void sort() {
 
@@ -1685,14 +1681,14 @@ bool SortObj() {
 void CheckInsight() {
 	bool swaping = true;
 	try {
-		for (int i = 0; i < First_step.Field.entityNumber(); i++) {
-			if (First_step.Field.objectAt(i)->usable && !First_step.pause && i < First_step.Field.entityNumber() - 1 && (First_step.Field.objectAt(i)->type() != "Static" && First_step.Field.objectAt(i)->tag != "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField["DrawField_Dynamic"].begin(), First_step.DrawField["DrawField_Dynamic"].end(), First_step.Field.objectAt(i)) != First_step.DrawField["DrawField_Dynamic"].end()) && (First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.Field.objectAt(i), 1100) || First_step.Field.objectAt(i)->nowIs() == "Anchor" || First_step.Field.objectAt(i)->nowIs() == "BG" || First_step.Field.objectAt(i)->nowIs() == "Elon")) {
-				First_step.DrawField["DrawField_Dynamic"].push_back(First_step.Field.objectAt(i));
+		for (int i = 0; i < First_step.Field["Dynamic"].entityNumber(); i++) {
+			if (First_step.Field["Dynamic"].objectAt(i)->usable && !First_step.pause && (First_step.Field["Dynamic"].objectAt(i)->type() != "Static" && First_step.Field["Dynamic"].objectAt(i)->tag != "BG" || First_step.Field["Dynamic"].objectAt(i)->nowIs() == "Elon") && !(std::find(First_step.DrawField["DrawField_Dynamic"].begin(), First_step.DrawField["DrawField_Dynamic"].end(), First_step.Field["Dynamic"].objectAt(i)) != First_step.DrawField["DrawField_Dynamic"].end()) && (First_step.ObjIsOnSight(First_step.Elon, First_step.Field["Dynamic"].objectAt(i), 1100) || First_step.Field["Dynamic"].objectAt(i)->nowIs() == "Anchor" || First_step.Field["Dynamic"].objectAt(i)->nowIs() == "BG")) {
+				First_step.DrawField["DrawField_Dynamic"].push_back(First_step.Field["Dynamic"].objectAt(i));
 			}
 			change = true;
 		}
 		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
-			if (First_step.DrawField["DrawField_Dynamic"][i]->nowIs() != "Elon" && (!First_step.DrawField["DrawField_Dynamic"][i]->usable || (First_step.pause && i < First_step.Field.entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField["DrawField_Dynamic"][i], 1100) || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "Anchor" || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "BG" || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "Elon")))) {
+			if (First_step.DrawField["DrawField_Dynamic"][i]->nowIs() != "Elon" && (!First_step.DrawField["DrawField_Dynamic"][i]->usable || (First_step.pause && i < First_step.Field["Dynamic"].entityNumber() - 1 && !(First_step.ObjIsOnSight(First_step.Elon, First_step.DrawField["DrawField_Dynamic"][i], 1100) || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "Anchor" || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "BG" || First_step.DrawField["DrawField_Dynamic"][i]->nowIs() == "Elon")))) {
 				First_step.DrawField["DrawField_Dynamic"].erase(First_step.DrawField["DrawField_Dynamic"].begin() + i);
 			}
 			change = true;
@@ -1705,7 +1701,6 @@ void CheckInsight() {
 		printf("%d\n", e);
 	}
 }
-
 void checkFloorInsight() {
 	while (First_step.isRuning()) {
 		Sleep(1);
@@ -1713,18 +1708,17 @@ void checkFloorInsight() {
 			Sleep(1);
 		}
 		for (int i = 0; i < First_step.DrawField["BG_repo"].size(); i++) {
-			if (!First_step.pause && !(find(First_step.DrawField["DrawField_BG"].begin(), First_step.DrawField["DrawField_BG"].end(), First_step.DrawField["BG_repo"][i]) != First_step.DrawField["DrawField_BG"].end()) && First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField["BG_repo"][i], 1500)) {
+			if (!First_step.pause && !(find(First_step.DrawField["DrawField_BG"].begin(), First_step.DrawField["DrawField_BG"].end(), First_step.DrawField["BG_repo"][i]) != First_step.DrawField["DrawField_BG"].end()) && First_step.ObjIsOnSight(First_step.Field["Dynamic"].object("Elon"), First_step.DrawField["BG_repo"][i], 1500)) {
 				First_step.DrawField["DrawField_BG"].push_back(First_step.DrawField["BG_repo"][i]);
 			}
 		}
 		for (int i = 0; i < First_step.DrawField["DrawField_BG"].size(); i++) {
-			if (!First_step.pause && !(First_step.ObjIsOnSight(First_step.Field.object("Elon"), First_step.DrawField["DrawField_BG"][i], 1500))) {
+			if (!First_step.pause && !(First_step.ObjIsOnSight(First_step.Field["Dynamic"].object("Elon"), First_step.DrawField["DrawField_BG"][i], 1500))) {
 				First_step.DrawField["DrawField_BG"].erase(First_step.DrawField["DrawField_BG"].begin() + i);
 			}
 		}
 	}
 }
-
 bool anyBetween(float* x1, float* x2) {
 	bool ans = false;
 	for (int i = 0; i < 2; i++) {
@@ -1763,13 +1757,13 @@ void isMovable() {
 	while (First_step.isRuning()) {
 		Sleep(1);
 		bump = false;
-		while (First_step.Field.entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
 			Sleep(1);
 		}
 		CheckInsight();
 		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
 			try {
-				ElonHitBox = First_step.Field.object("Elon")->getHitBoxData();
+				ElonHitBox = First_step.Elon->getHitBoxData();
 				ObjHitBox = First_step.DrawField["DrawField_Dynamic"][i]->getHitBoxData();
 			}
 			catch (const std::out_of_range& e) {
@@ -1842,7 +1836,7 @@ void isMovable() {
 
 void ShowDrawingStat() {
 	while (First_step.isRuning()) {
-		while (First_step.Field.entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
 			Sleep(1);
 		}
 		try {
@@ -1871,16 +1865,16 @@ void ShowDrawingStat() {
 
 void ShowDrawingStat1() {
 	while (First_step.isRuning()) {
-		while (First_step.Field.entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
 			Sleep(1);
 		}
-		printf("BG : %d, Dynamic : %d, Static %d, Overall %d\n", First_step.DrawField["DrawField_BG"].size(), First_step.DrawField["DrawField_Dynamic"].size(), First_step.DrawField["DrawField_Static"].size(), First_step.Field.entityNumber());
+		printf("BG : %d, Dynamic : %d, Static %d, Overall %d\n", First_step.DrawField["DrawField_BG"].size(), First_step.DrawField["DrawField_Dynamic"].size(), First_step.DrawField["DrawField_Static"].size(), First_step.Field["Dynamic"].entityNumber());
 	}
 }
 
 void ShowDrawingStat2() {
 	while (First_step.isRuning()) {
-		while (First_step.Field.entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
 			Sleep(1);
 		}
 		for (int i = 0; i < 9; i++) {
@@ -1891,7 +1885,7 @@ void ShowDrawingStat2() {
 }
 void ShowDrawingStat3() {
 	while (First_step.isRuning()) {
-		while (First_step.Field.entityNumber() == 0 || First_step.paused) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.paused) {
 			Sleep(1);
 		}
 		for (int i = 0; i < 8; i++) {
@@ -1901,10 +1895,9 @@ void ShowDrawingStat3() {
 	}
 }
 int main() { // Game loop
-	Thread CheckInsight_Thread1(&CheckInsight), ChechFloor(&checkFloorInsight), CheckBump(&isMovable), monitor(&ShowDrawingStat3);
-	CheckBump.launch();
-	ChechFloor.launch();
-	//monitor.launch();
+	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable), CheckFloor(&checkFloorInsight), monitor(&ShowDrawingStat3);
+	CheckBump.launch(); 
+	CheckFloor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
