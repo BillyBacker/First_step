@@ -122,6 +122,9 @@ public:
 		this->slot = In.slot;
 		this->tag = In.tag;
 	}
+	void setTag(string Tag) {
+		this->tag = Tag;
+	}
 	void useStatNoPos(Object In) {
 		this->textureArray = In.textureArray;
 		this->duration = In.duration;
@@ -1171,7 +1174,7 @@ public:
 				if (ev.mouseButton.button == Mouse::Right) {
 					cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << endl;
 					if (this->Elon->getStat("Alive") == 1) {
-						if (this->DrawField["HotBar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
+						if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
 							Elon->setStat("Health", Elon->getStat("Health") + 10);
 							if (Elon->getStat("Health") > 100) {
 								Elon->setStat("Health", 100);
@@ -1266,6 +1269,7 @@ public:
 										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 									}
 									else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
+										printf("%d,%d\n", 3, j);
 										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 										this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
 										printf("++");
@@ -1280,16 +1284,20 @@ public:
 										cout << this->Backpack[i][j]->nowIs() << endl;
 									}
 									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
+										printf("%d,%d\n", 3, j);
+										/*
 										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << '\t' << this->DrawField["Hotbar"][j]->nowIs() << endl;
 										Object* A = this->DrawField["ItemOnMouse"][0];
-										this->DrawField["Hotbar"][j]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
+										this->DrawField["Hotbar"][j]->tag = this->DrawField["ItemOnMouse"][0]->tag;
 										this->DrawField["Hotbar"][j]->Is(charOnly(A->nowIs()));
 										this->DrawField["Hotbar"][j] = this->itemList.object(charOnly(A->nowIs()));
-										this->HotbarQuantity[j] = this->ItemOnMouseQuantity;
+										cout << '\t' << this->itemList.object(charOnly(A->nowIs()))->tag << '\t' << this->DrawField["Hotbar"][j]->tag << endl;
+										this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
 										this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
-										//this->DrawField["ItemOnMouse"][0]->Is("None");
-										//this->DrawField["ItemOnMouse"][0]->tag = "None";
-										//this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+										this->DrawField["ItemOnMouse"][0]->Is("None");
+										this->DrawField["ItemOnMouse"][0]->tag = "None";
+										this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+										*/
 									}
 								}
 							}
@@ -1508,14 +1516,17 @@ public:
 					}
 				}
 				if (!found) {
+					cout << A->nowIs() << endl;
 					for (int i = 0; i < 9; i++) {
 						if (this->DrawField["Hotbar"][i]->nowIs() == "None") {
-							this->DrawField["Hotbar"][i]->tag = this->itemList.object(charOnly(A->nowIs()))->tag;
+							printf("++++++%d\n",i);
+							*DrawField["Hotbar"][i] = *itemList.object(charOnly(A->nowIs()));
+							DrawField["Hotbar"][i]->setTag(A->cat);
 							this->DrawField["Hotbar"][i]->Is(charOnly(A->nowIs()));
-							this->DrawField["Hotbar"][i] = this->itemList.object(charOnly(A->nowIs()));
 							this->HotbarQuantity[i] = 1;
 							this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
 							//this->ItemUseSlot[i]->setPosX(503 + 1100 * 0.06 * i);
+							cout << itemList.object(charOnly(A->nowIs()))->tag << '\\'<< this->DrawField["Hotbar"][i]->nowIs() << '\t' << this->DrawField["Hotbar"][i]->tag << '\t' << charOnly(A->nowIs()) << endl;
 							break;
 						}
 					}
@@ -1531,14 +1542,12 @@ public:
 			}
 		}
 		for (int i = 0; i < 9; i++) {
-			if (this->HotbarQuantity[i] <= 0) {
+			if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
+				printf("Remove slot %d\n", i);
 				this->DrawField["Hotbar"][i]->Is("None");
 				this->DrawField["Hotbar"][i]->tag = "None";
 				this->DrawField["Hotbar"][i]->setSpriteSize(0, 0);
 
-				this->DrawField["InventoryUseSlot"][i]->Is("None");
-				this->DrawField["InventoryUseSlot"][i]->tag = "None";
-				this->DrawField["InventoryUseSlot"][i]->setSpriteSize(0, 0);
 			}
 			if (this->DrawField["Hotbar"][i]->nowIs() != "None" && this->DrawField["Hotbar"][i]->getStat("showCount") == 1 && this->HotbarQuantity[i] > 0) {
 				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width / 2, y = 830, x1 = x - 0.7 * IntDigit(this->HotbarQuantity[i]);
