@@ -86,7 +86,6 @@ private:
 	fltDic Stat;
 	float posX = 0;
 	float posY = 0;
-	Sprite sprite;
 	float Size[2];
 	int imgHeight;
 	int imgWidth;
@@ -103,6 +102,7 @@ public:
 	float offsetPosY = 0;
 	string tag = "None", cat = "None";
 	bool usable = true;
+	Sprite sprite;
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
 	}
@@ -271,42 +271,6 @@ public:
 	}
 };
 
-class objPtrTuple {
-public:
-	vector<Object*> Tuple;
-	Object* var(unsigned __int64 i) {
-		return this->Tuple[i];
-	}
-	void set(unsigned __int64 Index, Object* In) {
-		this->Tuple.at(Index) = In;
-	}
-	void append(Object* In) {
-		this->Tuple.push_back(In);
-	}
-	void remove(Object* In) {
-		this->Tuple.erase(std::remove(this->Tuple.begin(), this->Tuple.end(), In), this->Tuple.end());
-	}
-	void popOut(unsigned __int64 index) {
-		this->Tuple.erase(Tuple.begin() + index);
-	}
-	unsigned __int64 length() {
-		return this->Tuple.size();
-	}
-	unsigned __int64 index(Object* In) {
-		auto pos = find(this->Tuple.begin(), this->Tuple.end(), In);
-		if (pos != this->Tuple.end()) {
-			unsigned __int64 index = distance(this->Tuple.begin(), pos);
-			return index;
-		}
-		else {
-			return -1;
-		}
-	}
-	void insert(unsigned __int64 pos, Object* In) {
-		this->Tuple.insert(Tuple.begin() + pos, In);
-	}
-};
-
 class Map {
 public:
 	unordered_map<string, Object*> Tuple;
@@ -408,6 +372,10 @@ private:
 	int i = 0;
 	Map itemList;
 	ContextSettings settings;
+	void addItem(int x, int y, int amount,string name) {
+		this->Backpack[x][y] = itemList.object(name);
+		this->BackpackQuantity[x][y] = amount;
+	}
 	void initVar() {
 		this->window = nullptr;
 
@@ -608,27 +576,12 @@ private:
 		this->itemList.object("Hammer")->tag = "Tool";
 
 		// Default item
-		this->DrawField["Hotbar"][2] = itemList.object("Hydro Flask");
-		this->HotbarQuantity[2] = 100;
-		this->DrawField["Hotbar"][6] = itemList.object("MRE");
-		this->HotbarQuantity[6] = 10;
-		this->DrawField["Hotbar"][7] = itemList.object("Gold Wire");
-		this->HotbarQuantity[7] = 100;
-		this->DrawField["Hotbar"][8] = itemList.object("Hammer");
-		this->HotbarQuantity[8] = 100;
-		this->DrawField["Hotbar"][4] = itemList.object("Arclyic");
-		this->HotbarQuantity[4] = 100;
-		this->DrawField["Hotbar"][5] = itemList.object("Composite Metal");
-		this->HotbarQuantity[5] = 100;
-
-		this->Backpack[0][0] = itemList.object("Wheat Grain");
-		this->BackpackQuantity[0][0] = 100;
-
-		this->Backpack[2][7] = itemList.object("Gold Nugget");
-		this->BackpackQuantity[2][7] = 53;
-
-		this->Backpack[1][5] = itemList.object("Bread");
-		this->BackpackQuantity[1][5] = 53;
+		addItem(0, 0, 10, "MRE");
+		addItem(0, 1, 100, "Hydro Flask");
+		addItem(0, 2, 100, "Hammer");
+		addItem(0, 3, 1, "Drill");
+		addItem(0, 4, 200, "Composite Metal");
+		addItem(0, 5, 100, "Arclyic");
 	}
 	void intitDialog() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -1260,13 +1213,13 @@ public:
 										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 									}
 									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
-										this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->DrawField["Hotbar"][j]);
+										cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+										*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
 										this->ItemOnMouseQuantity = this->HotbarQuantity[j];
 										this->HotbarQuantity[j] = 0;
 										this->DrawField["Hotbar"][j]->Is("None");
 										this->DrawField["Hotbar"][j]->tag = "None";
 										this->DrawField["Hotbar"][j]->setSpriteSize(0, 0);
-										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 									}
 									else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
 										printf("%d,%d\n", 3, j);
@@ -1284,20 +1237,17 @@ public:
 										cout << this->Backpack[i][j]->nowIs() << endl;
 									}
 									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
-										printf("%d,%d\n", 3, j);
-										/*
-										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << '\t' << this->DrawField["Hotbar"][j]->nowIs() << endl;
-										Object* A = this->DrawField["ItemOnMouse"][0];
-										this->DrawField["Hotbar"][j]->tag = this->DrawField["ItemOnMouse"][0]->tag;
-										this->DrawField["Hotbar"][j]->Is(charOnly(A->nowIs()));
-										this->DrawField["Hotbar"][j] = this->itemList.object(charOnly(A->nowIs()));
-										cout << '\t' << this->itemList.object(charOnly(A->nowIs()))->tag << '\t' << this->DrawField["Hotbar"][j]->tag << endl;
-										this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
-										this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
+										cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+										Object A = *this->DrawField["ItemOnMouse"][0];
+										*DrawField["Hotbar"][j] = A;
 										this->DrawField["ItemOnMouse"][0]->Is("None");
 										this->DrawField["ItemOnMouse"][0]->tag = "None";
 										this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
-										*/
+										(*DrawField["Hotbar"][j]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * j));
+										(*DrawField["Hotbar"][j]).setTag(A.tag);
+										this->DrawField["Hotbar"][j]->Is(charOnly(A.nowIs()));
+										this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
+										this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
 									}
 								}
 							}
@@ -1330,6 +1280,14 @@ public:
 				return true;
 			}
 		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				if (this->Backpack[i][j]->nowIs() == item && this->BackpackQuantity[i][j] >= quantity) {
+					this->BackpackQuantity[i][j] -= quantity;
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 	void DecStat(string Stat, float amount) {
@@ -1360,10 +1318,10 @@ public:
 		}
 		this->Field["HUD"].object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
 		for (int i = 0; i < 9; i++) {
-			if (this->DrawField["Hotbar"][i]->nowIs() != "None" && find(this->DrawField["DrawField_HUD"].begin(), this->DrawField["DrawField_HUD"].end(), this->DrawField["Hotbar"][i]) == this->DrawField["DrawField_HUD"].end()) {
-				this->DrawField["Hotbar_HUD"][i]->useStatNoPos(*this->DrawField["Hotbar"][i]);
-				this->DrawField["Hotbar_HUD"][i]->setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
-				this->DrawField["Hotbar_HUD"][i]->setPosY(833);
+			if (this->DrawField["Hotbar"][i]->nowIs() != "None" && find(this->DrawField["Hotbar_HUD"].begin(), this->DrawField["Hotbar_HUD"].end(), this->DrawField["Hotbar"][i]) == this->DrawField["Hotbar_HUD"].end()) {
+				*DrawField["Hotbar_HUD"][i] = *DrawField["Hotbar"][i];
+				(*DrawField["Hotbar_HUD"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
+				(*DrawField["Hotbar_HUD"][i]).setSpriteSize(0.06, 0.06);
 			}
 		}
 		for (int i = 0; i < 3; i++) {
@@ -1518,15 +1476,12 @@ public:
 				if (!found) {
 					cout << A->nowIs() << endl;
 					for (int i = 0; i < 9; i++) {
-						if (this->DrawField["Hotbar"][i]->nowIs() == "None") {
-							printf("++++++%d\n",i);
+						if (this->DrawField["Hotbar"][i]->nowIs() == "None") { 
 							*DrawField["Hotbar"][i] = *itemList.object(charOnly(A->nowIs()));
-							DrawField["Hotbar"][i]->setTag(A->cat);
+							(*DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
 							this->DrawField["Hotbar"][i]->Is(charOnly(A->nowIs()));
 							this->HotbarQuantity[i] = 1;
 							this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
-							//this->ItemUseSlot[i]->setPosX(503 + 1100 * 0.06 * i);
-							cout << itemList.object(charOnly(A->nowIs()))->tag << '\\'<< this->DrawField["Hotbar"][i]->nowIs() << '\t' << this->DrawField["Hotbar"][i]->tag << '\t' << charOnly(A->nowIs()) << endl;
 							break;
 						}
 					}
@@ -1568,8 +1523,7 @@ public:
 				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
 				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
 			}
-			*this->DrawField["InventoryUseSlot"][i] = *this->DrawField["Hotbar"][i];
-			this->DrawField["InventoryUseSlot"][i]->setPosY(533);
+			*DrawField["InventoryUseSlot"][i] = *DrawField["Hotbar"][i];
 		}
 		if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
 			const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
@@ -1622,6 +1576,7 @@ public:
 				this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
 			}
 			for (int i = 0; i < this->DrawField["Hotbar_HUD"].size() && DrawField["Hotbar_HUD"][i]; i++) {
+				this->DrawField["Hotbar_HUD"][i]->setPosY(833);
 				this->window->draw(this->DrawField["Hotbar_HUD"][i]->getSprite());
 			}
 			for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
@@ -1651,6 +1606,7 @@ public:
 					this->window->draw(this->DrawField["DrawField_inventoryUI"][i]->getSprite());
 				}
 				for (int i = 0; i < this->DrawField["InventoryUseSlot"].size(); i++) {
+					this->DrawField["InventoryUseSlot"][i]->setPosY(533);
 					this->window->draw(this->DrawField["InventoryUseSlot"][i]->getSprite());
 				}
 				for (int i = 0; i < 3; i++) {
