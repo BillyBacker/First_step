@@ -373,7 +373,7 @@ private:
 	Map itemList;
 	ContextSettings settings;
 	void addItem(int x, int y, int amount,string name) {
-		this->Backpack[x][y] = itemList.object(name);
+		*this->Backpack[x][y] = *itemList.object(name);
 		this->BackpackQuantity[x][y] = amount;
 	}
 	void initVar() {
@@ -576,12 +576,13 @@ private:
 		this->itemList.object("Hammer")->tag = "Tool";
 
 		// Default item
-		addItem(0, 0, 10, "MRE");
-		addItem(0, 1, 100, "Hydro Flask");
-		addItem(0, 2, 100, "Hammer");
+		addItem(0, 0, 8, "MRE");
+		addItem(0, 1, 8, "Hydro Flask");
+		addItem(0, 2, 8, "Hammer");
 		addItem(0, 3, 1, "Drill");
-		addItem(0, 4, 200, "Composite Metal");
-		addItem(0, 5, 100, "Arclyic");
+		addItem(0, 4, 8, "Composite Metal");
+		addItem(0, 5, 2, "Composite Metal");
+		addItem(0, 6, 5, "Arclyic");
 	}
 	void intitDialog() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -1004,6 +1005,7 @@ public:
 	Object* Elon;
 	Object* NoneItem = new Object(45678);
 	int InventoryHitbox[4][9][4];
+	int maxItemStack = 8;
 	bool _time = true;
 	bool pass = true;
 	bool movable = true;
@@ -1221,33 +1223,46 @@ public:
 										this->DrawField["Hotbar"][j]->tag = "None";
 										this->DrawField["Hotbar"][j]->setSpriteSize(0, 0);
 									}
-									else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
-										printf("%d,%d\n", 3, j);
-										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
-										this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
-										printf("++");
-										this->Backpack[i][j]->setPosX(200 + 1000 * 0.06 * i);
-										this->Backpack[i][j]->setPosY(503 + 1000 * 0.06 * j);
-										this->Backpack[i][j]->setSpriteSize(0.06, 0.06);
-										this->BackpackQuantity[i][j] += this->ItemOnMouseQuantity;
-										this->DrawField["ItemOnMouse"][0]->Is("None");
-										this->DrawField["ItemOnMouse"][0]->tag = "None";
-										this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
-										printf("---");
-										cout << this->Backpack[i][j]->nowIs() << endl;
+									else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
+										printf("6++6+6+6+6+6++6+6+6\n");
+										if (this->ItemOnMouseQuantity + this->BackpackQuantity[i][j] <= this->maxItemStack ) {
+											printf("%d,%d\n", 3, j);
+											cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+											this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
+											printf("++");
+											this->Backpack[i][j]->setPosX(200 + 1000 * 0.06 * i);
+											this->Backpack[i][j]->setPosY(503 + 1000 * 0.06 * j);
+											this->Backpack[i][j]->setSpriteSize(0.06, 0.06);
+											this->BackpackQuantity[i][j] += this->ItemOnMouseQuantity;
+											this->DrawField["ItemOnMouse"][0]->Is("None");
+											this->DrawField["ItemOnMouse"][0]->tag = "None";
+											this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+											printf("---");
+											cout << this->Backpack[i][j]->nowIs() << endl;
+										}
+										else {
+											this->ItemOnMouseQuantity -= this->maxItemStack - this->BackpackQuantity[i][j];
+											this->BackpackQuantity[i][j] = this->maxItemStack;
+										}
 									}
-									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs())) {
-										cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
-										Object A = *this->DrawField["ItemOnMouse"][0];
-										*DrawField["Hotbar"][j] = A;
-										this->DrawField["ItemOnMouse"][0]->Is("None");
-										this->DrawField["ItemOnMouse"][0]->tag = "None";
-										this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
-										(*DrawField["Hotbar"][j]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * j));
-										(*DrawField["Hotbar"][j]).setTag(A.tag);
-										this->DrawField["Hotbar"][j]->Is(charOnly(A.nowIs()));
-										this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
-										this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
+									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack) {
+										if (this->ItemOnMouseQuantity + this->HotbarQuantity[j] <= this->maxItemStack) {
+											cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+											Object A = *this->DrawField["ItemOnMouse"][0];
+											*DrawField["Hotbar"][j] = A;
+											this->DrawField["ItemOnMouse"][0]->Is("None");
+											this->DrawField["ItemOnMouse"][0]->tag = "None";
+											this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+											(*DrawField["Hotbar"][j]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * j));
+											(*DrawField["Hotbar"][j]).setTag(A.tag);
+											this->DrawField["Hotbar"][j]->Is(charOnly(A.nowIs()));
+											this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
+											this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
+										}
+										else {
+											this->ItemOnMouseQuantity -= this->maxItemStack - this->HotbarQuantity[j];
+											this->HotbarQuantity[j] = this->maxItemStack;
+										}
 									}
 								}
 							}
@@ -1274,17 +1289,50 @@ public:
 
 	}
 	bool hasEnoughItem(string item, int quantity) {
+		int itemcount = 0;
+		int itemPickCount = quantity;
 		for (int i = 0; i < 9; i++) {
-			if (this->DrawField["Hotbar"][i]->nowIs() == item && this->HotbarQuantity[i] >= quantity) {
-				this->HotbarQuantity[i] -= quantity;
-				return true;
+			if (this->DrawField["Hotbar"][i]->nowIs() == item) {
+				itemcount += this->HotbarQuantity[i];
 			}
 		}
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
-				if (this->Backpack[i][j]->nowIs() == item && this->BackpackQuantity[i][j] >= quantity) {
-					this->BackpackQuantity[i][j] -= quantity;
+				if (this->Backpack[i][j]->nowIs() == item) {
+					itemcount += this->BackpackQuantity[i][j];
+				}
+			}
+		}
+		if (itemcount >= quantity) {
+			for (int i = 0; i < 9; i++) {
+				if (this->DrawField["Hotbar"][i]->nowIs() == item) {
+					if (itemPickCount <= this->HotbarQuantity[i]) {
+						this->HotbarQuantity[i] -= itemPickCount;
+					}
+					else {
+						this->HotbarQuantity[i] = 0;
+						itemPickCount -= this->maxItemStack;
+					}
+				}
+				if (itemPickCount == 0) {
 					return true;
+				}
+			}
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 9; j++) {
+					if (this->Backpack[i][j]->nowIs() == item) {
+						if (itemPickCount <= this->BackpackQuantity[i][j]) {
+							this->BackpackQuantity[i][j] -= itemPickCount;
+							return true;
+						}
+						else {
+							this->BackpackQuantity[i][j] = 0;
+							itemPickCount -= this->maxItemStack;
+						}
+					}
+					if (itemPickCount == 0) {
+						return true;
+					}
 				}
 			}
 		}
@@ -1467,10 +1515,19 @@ public:
 				this->DrawField["DrawField_Dynamic"][i]->usable = false;
 				bool found = false;
 				for (int i = 0; i < 9; i++) {
-					if (this->DrawField["Hotbar"][i]->nowIs() == charOnly(A->nowIs())) {
+					if (this->DrawField["Hotbar"][i]->nowIs() == charOnly(A->nowIs()) && this->HotbarQuantity[i] < this->maxItemStack) {
 						this->HotbarQuantity[i]++;
 						found = true;
 						break;
+					}
+				}
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 9; j++) {
+						if (this->Backpack[i][j]->nowIs() == charOnly(A->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
+							this->BackpackQuantity[i][j]++;
+							found = true;
+							break;
+						}
 					}
 				}
 				if (!found) {
