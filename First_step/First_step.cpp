@@ -676,6 +676,20 @@ private:
 			}
 		}
 
+		this->Dialog["MainMenuButton"].registerObject("Play", "MainMenu");
+		this->Dialog["MainMenuButton"].object("Play")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["MainMenuButton"].object("Play")->setString("Play");
+		this->Dialog["MainMenuButton"].object("Play")->setFillColor(Color::Black);
+		this->Dialog["MainMenuButton"].object("Play")->setCharacterSize(100);
+		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 450,230 });
+
+		this->Dialog["MainMenuButton"].registerObject("Exit", "MainMenu");
+		this->Dialog["MainMenuButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["MainMenuButton"].object("Exit")->setString("Exit");
+		this->Dialog["MainMenuButton"].object("Exit")->setFillColor(Color::Black);
+		this->Dialog["MainMenuButton"].object("Exit")->setCharacterSize(100);
+		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 450,600 });
+
 
 	}
 	void initObject() {
@@ -969,6 +983,16 @@ private:
 		this->Field["BuildUI"].object("Pump_Arclyic")->setPosY(220);
 
 	}
+	void initMainMenu() {
+		this->Field["MainMenu"].createTemplate("MainMenuBG");
+		this->Field["MainMenu"].Template("MainMenuBG")->setImgDim(1600, 1900);
+		this->Field["MainMenu"].Template("MainMenuBG")->addTexture("assets\\Prop\\Floor\\Graph.jpg", "ProtoPlate", 1000);
+		this->Field["MainMenu"].Template("MainMenuBG")->setImgDim(800, 800);
+		this->Field["MainMenu"].Template("MainMenuBG")->setSpriteSize(10, 10);
+
+		this->Field["MainMenu"].registerObject("_MainMenuBG", "MainMenuBG", "_MainMenuBG");
+		this->Field["MainMenu"].object("_MainMenuBG")->setSpriteTexture("ProtoPlate", 0);
+	}
 	void manageLayer() {
 		for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
 			this->DrawField["BG_repo"].push_back(this->Field["GameBG"].objectAt(i));
@@ -984,6 +1008,9 @@ private:
 		}
 		for (int i = 0; i < this->Field["HUD"].entityNumber(); i++) {
 			this->DrawField["DrawField_HUD"].push_back(this->Field["HUD"].objectAt(i));
+		}
+		for (int i = 0; i < this->Field["MainMenu"].entityNumber(); i++) {
+			this->DrawField["MainMenu"].push_back(this->Field["MainMenu"].objectAt(i));
 		}
 	}
 	double ObjectDis(Object* A, Object* B) {
@@ -1016,6 +1043,7 @@ public:
 	bool escPressed = false, escToggle = false, EToggle = false;
 	bool paused = false, building = false, inventory = false;
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
+	bool OnMainMenu = true;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
 		srand(time_ui);
@@ -1026,6 +1054,7 @@ public:
 		this->initObject();
 		this->intitUI();
 		this->intitHUD();
+		this->initMainMenu();
 		this->manageLayer();
 	}
 	virtual ~gameEngine() {
@@ -1073,195 +1102,197 @@ public:
 	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
-				this->escPressed = true;
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::Escape) {
-				this->escPressed = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::E) {
-				this->E = true;
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::E) {
-				this->E = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
-				W = true;
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::W) {
-				W = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::A) {
-				A = true;
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::A) {
-				A = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::S) {
-				S = true;
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::S) {
-				S = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::D) {
-				D = true;
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
-				D = false;
-			}
-			if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
-				shift = true;
-				this->move_speed = 3 * 2;
+			if (!this->OnMainMenu) {
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
+					this->escPressed = true;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::Escape) {
+					this->escPressed = false;
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::E) {
+					this->E = true;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::E) {
+					this->E = false;
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
+					W = true;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::W) {
+					W = false;
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::A) {
+					A = true;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::A) {
+					A = false;
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::S) {
+					S = true;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::S) {
+					S = false;
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::D) {
+					D = true;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
+					D = false;
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
+					shift = true;
+					this->move_speed = 3 * 2;
 
-			}
-			if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
-				shift = false;
-				this->move_speed = 3;
+				}
+				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
+					shift = false;
+					this->move_speed = 3;
 
-			}
-			if (ev.type == Event::MouseMoved) {
-				this->mousePos[0] = ev.mouseMove.x;
-				this->mousePos[1] = ev.mouseMove.y;
-				this->DrawField["ItemOnMouse"][0]->setPosX(this->mousePos[0]);
-				this->DrawField["ItemOnMouse"][0]->setPosY(this->mousePos[1]);
-			}
-			if (ev.type == Event::MouseButtonPressed) {
-				if (ev.mouseButton.button == Mouse::Right) {
-					cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << endl;
-					if (this->Elon->getStat("Alive") == 1) {
-						if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
-							Elon->setStat("Health", Elon->getStat("Health") + 10);
-							if (Elon->getStat("Health") > 100) {
-								Elon->setStat("Health", 100);
+				}
+				if (ev.type == Event::MouseMoved) {
+					this->mousePos[0] = ev.mouseMove.x;
+					this->mousePos[1] = ev.mouseMove.y;
+					this->DrawField["ItemOnMouse"][0]->setPosX(this->mousePos[0]);
+					this->DrawField["ItemOnMouse"][0]->setPosY(this->mousePos[1]);
+				}
+				if (ev.type == Event::MouseButtonPressed) {
+					if (ev.mouseButton.button == Mouse::Right) {
+						cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << endl;
+						if (this->Elon->getStat("Alive") == 1) {
+							if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
+								Elon->setStat("Health", Elon->getStat("Health") + 10);
+								if (Elon->getStat("Health") > 100) {
+									Elon->setStat("Health", 100);
+								}
 							}
-						}
-						else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Food" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
-							Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
-							if (Elon->getStat("Hunger") > 100) {
-								Elon->setStat("Hunger", 100);
+							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Food" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
+								Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
+								if (Elon->getStat("Hunger") > 100) {
+									Elon->setStat("Hunger", 100);
+								}
 							}
-						}
-						else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Drink" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
-							Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
-							if (Elon->getStat("Thirst") > 100) {
-								Elon->setStat("Thirst", 100);
+							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Drink" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
+								Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
+								if (Elon->getStat("Thirst") > 100) {
+									Elon->setStat("Thirst", 100);
+								}
 							}
-						}
-						else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0) {
-							if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hammer") {
-								this->building = true;
+							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0) {
+								if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hammer") {
+									this->building = true;
+								}
 							}
-						}
-						else {
-							continue;
-						}
-						if (this->HotbarQuantity[this->selectingSlot] > 0) {
-							this->HotbarQuantity[this->selectingSlot]--;
-						}
-						if (this->HotbarQuantity[this->selectingSlot] <= 0) {
-							this->DrawField["Hotbar"][this->selectingSlot]->Is("None");
-							this->DrawField["Hotbar"][this->selectingSlot]->tag = "None";
-							this->DrawField["Hotbar"][this->selectingSlot]->setSpriteSize(0, 0);
+							else {
+								continue;
+							}
+							if (this->HotbarQuantity[this->selectingSlot] > 0) {
+								this->HotbarQuantity[this->selectingSlot]--;
+							}
+							if (this->HotbarQuantity[this->selectingSlot] <= 0) {
+								this->DrawField["Hotbar"][this->selectingSlot]->Is("None");
+								this->DrawField["Hotbar"][this->selectingSlot]->tag = "None";
+								this->DrawField["Hotbar"][this->selectingSlot]->setSpriteSize(0, 0);
+							}
 						}
 					}
-				}
-				if (ev.mouseButton.button == Mouse::Left) {
-					printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
-					if (this->Elon->getStat("Alive") == 1) {
-						if (this->paused) {
-							int BacktoGameHitBox[] = { 250, 200, 600, 250 };
-							int ExitHitBox[] = { 250, 600, 600, 650 };
-							if (clickHit(BacktoGameHitBox)) {
-								printf("Hit");
-								this->paused = false;
+					if (ev.mouseButton.button == Mouse::Left) {
+						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
+						if (this->Elon->getStat("Alive") == 1) {
+							if (this->paused) {
+								int BacktoGameHitBox[] = { 250, 200, 600, 250 };
+								int ExitHitBox[] = { 250, 600, 600, 650 };
+								if (clickHit(BacktoGameHitBox)) {
+									printf("Hit");
+									this->paused = false;
+								}
+								if (clickHit(ExitHitBox)) {
+									printf("Hit");
+									this->OnMainMenu = true;
+									break;
+								}
 							}
-							if (clickHit(ExitHitBox)) {
-								printf("Hit");
-								this->window->close();
-								this->running = false;
+							else if (this->building) {
+								int PumpHitBox[] = { 330, 100, 470, 280 };
+								int SlolarHitBox[] = { 330, 340, 460, 480 };
+								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
+									string ObjName = "Pump_" + to_string(rand() % 100000);
+									this->Field["Dynamic"].registerObject(ObjName, "Pump", "Pump");
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
+									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->building = false;
+								}
+								if (clickHit(SlolarHitBox)) {
+									string ObjName = "Solar_" + to_string(rand() % 100000);
+									this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
+									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->building = false;
+								}
 							}
-						}
-						else if (this->building) {
-							int PumpHitBox[] = { 330, 100, 470, 280 };
-							int SlolarHitBox[] = { 330, 340, 460, 480 };
-							if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
-								string ObjName = "Pump_" + to_string(rand() % 100000);
-								this->Field["Dynamic"].registerObject(ObjName, "Pump", "Pump");
-								this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
-								this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
-								this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
-								this->building = false;
-							}
-							if (clickHit(SlolarHitBox)) {
-								string ObjName = "Solar_" + to_string(rand() % 100000);
-								this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
-								this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
-								this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
-								this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
-								this->building = false;
-							}
-						}
-						else if (this->inventory) {
-							for (int i = 0; i < 4; i++) {
-								for (int j = 0; j < 9; j++) {
-									if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
-										this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
-										this->ItemOnMouseQuantity = this->BackpackQuantity[i][j];
-										this->BackpackQuantity[i][j] = 0;
-										this->Backpack[i][j]->useStatNoPos(*NoneItem);
-										this->Backpack[i][j]->Is("None");
-										this->Backpack[i][j]->tag = "None";
-										this->Backpack[i][j]->setSpriteSize(0, 0);
-										cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
-									}
-									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
-										cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
-										*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
-										this->ItemOnMouseQuantity = this->HotbarQuantity[j];
-										this->HotbarQuantity[j] = 0;
-										this->DrawField["Hotbar"][j]->Is("None");
-										this->DrawField["Hotbar"][j]->tag = "None";
-										this->DrawField["Hotbar"][j]->setSpriteSize(0, 0);
-									}
-									else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
-										printf("6++6+6+6+6+6++6+6+6\n");
-										if (this->ItemOnMouseQuantity + this->BackpackQuantity[i][j] <= this->maxItemStack ) {
-											printf("%d,%d\n", 3, j);
+							else if (this->inventory) {
+								for (int i = 0; i < 4; i++) {
+									for (int j = 0; j < 9; j++) {
+										if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
+											this->ItemOnMouseQuantity = this->BackpackQuantity[i][j];
+											this->BackpackQuantity[i][j] = 0;
+											this->Backpack[i][j]->useStatNoPos(*NoneItem);
+											this->Backpack[i][j]->Is("None");
+											this->Backpack[i][j]->tag = "None";
+											this->Backpack[i][j]->setSpriteSize(0, 0);
 											cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
-											this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
-											printf("++");
-											this->Backpack[i][j]->setPosX(200 + 1000 * 0.06 * i);
-											this->Backpack[i][j]->setPosY(503 + 1000 * 0.06 * j);
-											this->Backpack[i][j]->setSpriteSize(0.06, 0.06);
-											this->BackpackQuantity[i][j] += this->ItemOnMouseQuantity;
-											this->DrawField["ItemOnMouse"][0]->Is("None");
-											this->DrawField["ItemOnMouse"][0]->tag = "None";
-											this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
-											printf("---");
-											cout << this->Backpack[i][j]->nowIs() << endl;
 										}
-										else {
-											this->ItemOnMouseQuantity -= this->maxItemStack - this->BackpackQuantity[i][j];
-											this->BackpackQuantity[i][j] = this->maxItemStack;
+										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+											*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
+											this->ItemOnMouseQuantity = this->HotbarQuantity[j];
+											this->HotbarQuantity[j] = 0;
+											this->DrawField["Hotbar"][j]->Is("None");
+											this->DrawField["Hotbar"][j]->tag = "None";
+											this->DrawField["Hotbar"][j]->setSpriteSize(0, 0);
 										}
-									}
-									else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack) {
-										if (this->ItemOnMouseQuantity + this->HotbarQuantity[j] <= this->maxItemStack) {
-											cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
-											Object A = *this->DrawField["ItemOnMouse"][0];
-											*DrawField["Hotbar"][j] = A;
-											this->DrawField["ItemOnMouse"][0]->Is("None");
-											this->DrawField["ItemOnMouse"][0]->tag = "None";
-											this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
-											(*DrawField["Hotbar"][j]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * j));
-											(*DrawField["Hotbar"][j]).setTag(A.tag);
-											this->DrawField["Hotbar"][j]->Is(charOnly(A.nowIs()));
-											this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
-											this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
+										else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
+											printf("6++6+6+6+6+6++6+6+6\n");
+											if (this->ItemOnMouseQuantity + this->BackpackQuantity[i][j] <= this->maxItemStack) {
+												printf("%d,%d\n", 3, j);
+												cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+												this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
+												printf("++");
+												this->Backpack[i][j]->setPosX(200 + 1000 * 0.06 * i);
+												this->Backpack[i][j]->setPosY(503 + 1000 * 0.06 * j);
+												this->Backpack[i][j]->setSpriteSize(0.06, 0.06);
+												this->BackpackQuantity[i][j] += this->ItemOnMouseQuantity;
+												this->DrawField["ItemOnMouse"][0]->Is("None");
+												this->DrawField["ItemOnMouse"][0]->tag = "None";
+												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												printf("---");
+												cout << this->Backpack[i][j]->nowIs() << endl;
+											}
+											else {
+												this->ItemOnMouseQuantity -= this->maxItemStack - this->BackpackQuantity[i][j];
+												this->BackpackQuantity[i][j] = this->maxItemStack;
+											}
 										}
-										else {
-											this->ItemOnMouseQuantity -= this->maxItemStack - this->HotbarQuantity[j];
-											this->HotbarQuantity[j] = this->maxItemStack;
+										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack) {
+											if (this->ItemOnMouseQuantity + this->HotbarQuantity[j] <= this->maxItemStack) {
+												cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+												Object A = *this->DrawField["ItemOnMouse"][0];
+												*DrawField["Hotbar"][j] = A;
+												this->DrawField["ItemOnMouse"][0]->Is("None");
+												this->DrawField["ItemOnMouse"][0]->tag = "None";
+												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												(*DrawField["Hotbar"][j]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * j));
+												(*DrawField["Hotbar"][j]).setTag(A.tag);
+												this->DrawField["Hotbar"][j]->Is(charOnly(A.nowIs()));
+												this->HotbarQuantity[j] += this->ItemOnMouseQuantity;
+												this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
+											}
+											else {
+												this->ItemOnMouseQuantity -= this->maxItemStack - this->HotbarQuantity[j];
+												this->HotbarQuantity[j] = this->maxItemStack;
+											}
 										}
 									}
 								}
@@ -1269,21 +1300,40 @@ public:
 						}
 					}
 				}
+				if (ev.type == Event::MouseWheelMoved) {
+					if (ev.mouseWheel.delta > 0) {
+						this->selectingSlot -= 1;
+						if (this->selectingSlot < 0) {
+							this->selectingSlot = 8;
+						}
+					}
+					else {
+						this->selectingSlot += 1;
+						if (this->selectingSlot > 8) {
+							this->selectingSlot = 0;
+						}
+					}
+					cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << "     " << this->HotbarQuantity[this->selectingSlot] << endl;
+				}
 			}
-			if (ev.type == Event::MouseWheelMoved) {
-				if (ev.mouseWheel.delta > 0) {
-					this->selectingSlot -= 1;
-					if (this->selectingSlot < 0) {
-						this->selectingSlot = 8;
+			else {
+			int PlayHitBox[] = { 435,240,680,360 }, ExitHitBox[] = {435,600,680,720};
+				if (ev.type == Event::MouseMoved) {
+					this->mousePos[0] = ev.mouseMove.x;
+					this->mousePos[1] = ev.mouseMove.y;
+				}
+				if (ev.type == Event::MouseButtonPressed) {
+					if (ev.mouseButton.button == Mouse::Left) {
+						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
+						if (clickHit(PlayHitBox)) {
+							this->OnMainMenu = false;
+						}
+						else if (clickHit(ExitHitBox)) {
+							this->window->close();
+							this->running = false;
+						}
 					}
 				}
-				else {
-					this->selectingSlot += 1;
-					if (this->selectingSlot > 8) {
-						this->selectingSlot = 0;
-					}
-				}
-				cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << "     " << this->HotbarQuantity[this->selectingSlot] << endl;
 			}
 		}
 
@@ -1383,235 +1433,237 @@ public:
 	void update() {
 		int updated = false;
 		this->pollEvents();
-		this->updateHUD();
-		if (this->escPressed && !this->escToggle) {
-			if (this->paused || this->building || this->inventory) {
-				this->paused = false;
-				this->building = false;
-				this->inventory = false;
-			}
-			else {
-				this->paused = true;
-			}
-			this->escToggle = true;
-		}
-		else if (!this->escPressed) {
-			this->escToggle = false;
-		}
-		if (this->E && !this->EToggle) {
-			if (this->inventory) {
-				this->inventory = false;
-			}
-			else {
-				this->inventory = true;
-			}
-			this->EToggle = true;
-		}
-		else if (!this->E) {
-			this->EToggle = false;
-		}
-		if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && !this->paused) {
-			Elon->setAnimationSeq("walk");
-			DecStat("Hunger", 0.0002);
-			DecStat("Thirst", 0.0003);
-			DecStat("Air", 0.005);
-			if (shift) {
-				this->Elon->UpdateAnimation(2);
-				DecStat("Hunger", 0.002);
-				DecStat("Thirst", 0.003);
-			}
-			if (S && !W) {
-				if (!updated) {
-					updated = true;
-					this->Elon->UpdateAnimation(1);
+		if (!this->OnMainMenu) {
+			this->updateHUD();
+			if (this->escPressed && !this->escToggle) {
+				if (this->paused || this->building || this->inventory) {
+					this->paused = false;
+					this->building = false;
+					this->inventory = false;
 				}
-				if (S_moveable) {
-					S_key();
+				else {
+					this->paused = true;
 				}
+				this->escToggle = true;
 			}
-			if (W && !S) {
-				if (!updated) {
-					updated = true;
-					this->Elon->UpdateAnimation(1);
+			else if (!this->escPressed) {
+				this->escToggle = false;
+			}
+			if (this->E && !this->EToggle) {
+				if (this->inventory) {
+					this->inventory = false;
 				}
-				if (W_moveable) {
-					W_key();
+				else {
+					this->inventory = true;
 				}
+				this->EToggle = true;
 			}
-			if (D && !A) {
-				if (!updated) {
-					updated = true;
-					this->Elon->UpdateAnimation(1);
+			else if (!this->E) {
+				this->EToggle = false;
+			}
+			if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && !this->paused) {
+				Elon->setAnimationSeq("walk");
+				DecStat("Hunger", 0.0002);
+				DecStat("Thirst", 0.0003);
+				DecStat("Air", 0.005);
+				if (shift) {
+					this->Elon->UpdateAnimation(2);
+					DecStat("Hunger", 0.002);
+					DecStat("Thirst", 0.003);
 				}
-				if (D_moveable) {
-					D_key(true);
-				}
-			}
-			if (A && !D) {
-				if (!updated) {
-					updated = true;
-					this->Elon->UpdateAnimation(1);
-				}
-				if (A_moveable) {
-					A_key(true);
-				}
-			}
-			if (W && S || A && D) {
-				if (!updated) {
-					updated = true;
-					Idle();
-				}
-			}
-		}
-		else if (Elon->getStat("Alive") == 1) {
-			Idle();
-			this->Elon->resetTimeSeq();
-		}
-		//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
-		try {
-			for (int i = 0; i < this->Field["Dynamic"].entityNumber(); i++) {
-				if (this->Field["Dynamic"].objectAt(i)->type() == "Dynamic" && i < this->Field["Dynamic"].entityNumber() && this->Field["Dynamic"].objectAt(i)->usable) {
-					this->Field["Dynamic"].objectAt(i)->setPosX(this->Anchor->PosX());
-					this->Field["Dynamic"].objectAt(i)->setPosY(this->Anchor->PosY());
-				}
-			}
-			for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
-				this->Field["GameBG"].objectAt(i)->setPosX(this->Anchor->PosX());
-				this->Field["GameBG"].objectAt(i)->setPosY(this->Anchor->PosY());
-			}
-		}
-		catch (const std::out_of_range& e) {
-			printf("%d\n", e);
-		}
-		if (!this->paused) {
-			DecStat("Health", 0.00025);
-			DecStat("Hunger", 0.0005);
-			DecStat("Thirst", 0.0007);
-			DecStat("Air", 0.005);
-
-			if (Elon->getStat("Hunger") <= 1) {
-				DecStat("Health", 0.005);
-			}
-			if (Elon->getStat("Thirst") <= 1) {
-				DecStat("Health", 0.007);
-			}
-			if (Elon->getStat("Air") <= 1) {
-				DecStat("Health", 0.05);
-			}
-			if (Elon->getStat("Health") <= 1) {
-				if (_time) {
-					this->Elon->resetTimeSeq();
-					_time = false;
-				}
-				Elon->setStat("Alive", 0);
-				Elon->setAnimationSeq("dying");
-				Elon->UpdateAnimation(1);
-			}
-		}
-		int maxParam = 0;
-		for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
-			Object* A = this->DrawField["DrawField_Dynamic"][i];
-			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 50) {
-				this->DrawField["DrawField_Dynamic"][i]->usable = false;
-				bool found = false;
-				for (int i = 0; i < 9; i++) {
-					if (this->DrawField["Hotbar"][i]->nowIs() == charOnly(A->nowIs()) && this->HotbarQuantity[i] < this->maxItemStack) {
-						this->HotbarQuantity[i]++;
-						found = true;
-						break;
+				if (S && !W) {
+					if (!updated) {
+						updated = true;
+						this->Elon->UpdateAnimation(1);
+					}
+					if (S_moveable) {
+						S_key();
 					}
 				}
-				for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 9; j++) {
-						if (this->Backpack[i][j]->nowIs() == charOnly(A->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
-							this->BackpackQuantity[i][j]++;
+				if (W && !S) {
+					if (!updated) {
+						updated = true;
+						this->Elon->UpdateAnimation(1);
+					}
+					if (W_moveable) {
+						W_key();
+					}
+				}
+				if (D && !A) {
+					if (!updated) {
+						updated = true;
+						this->Elon->UpdateAnimation(1);
+					}
+					if (D_moveable) {
+						D_key(true);
+					}
+				}
+				if (A && !D) {
+					if (!updated) {
+						updated = true;
+						this->Elon->UpdateAnimation(1);
+					}
+					if (A_moveable) {
+						A_key(true);
+					}
+				}
+				if (W && S || A && D) {
+					if (!updated) {
+						updated = true;
+						Idle();
+					}
+				}
+			}
+			else if (Elon->getStat("Alive") == 1) {
+				Idle();
+				this->Elon->resetTimeSeq();
+			}
+			//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
+			try {
+				for (int i = 0; i < this->Field["Dynamic"].entityNumber(); i++) {
+					if (this->Field["Dynamic"].objectAt(i)->type() == "Dynamic" && i < this->Field["Dynamic"].entityNumber() && this->Field["Dynamic"].objectAt(i)->usable) {
+						this->Field["Dynamic"].objectAt(i)->setPosX(this->Anchor->PosX());
+						this->Field["Dynamic"].objectAt(i)->setPosY(this->Anchor->PosY());
+					}
+				}
+				for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
+					this->Field["GameBG"].objectAt(i)->setPosX(this->Anchor->PosX());
+					this->Field["GameBG"].objectAt(i)->setPosY(this->Anchor->PosY());
+				}
+			}
+			catch (const std::out_of_range& e) {
+				printf("%d\n", e);
+			}
+			if (!this->paused) {
+				DecStat("Health", 0.00025);
+				DecStat("Hunger", 0.0005);
+				DecStat("Thirst", 0.0007);
+				DecStat("Air", 0.005);
+
+				if (Elon->getStat("Hunger") <= 1) {
+					DecStat("Health", 0.005);
+				}
+				if (Elon->getStat("Thirst") <= 1) {
+					DecStat("Health", 0.007);
+				}
+				if (Elon->getStat("Air") <= 1) {
+					DecStat("Health", 0.05);
+				}
+				if (Elon->getStat("Health") <= 1) {
+					if (_time) {
+						this->Elon->resetTimeSeq();
+						_time = false;
+					}
+					Elon->setStat("Alive", 0);
+					Elon->setAnimationSeq("dying");
+					Elon->UpdateAnimation(1);
+				}
+			}
+			int maxParam = 0;
+			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
+				Object* A = this->DrawField["DrawField_Dynamic"][i];
+				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 50) {
+					this->DrawField["DrawField_Dynamic"][i]->usable = false;
+					bool found = false;
+					for (int i = 0; i < 9; i++) {
+						if (this->DrawField["Hotbar"][i]->nowIs() == charOnly(A->nowIs()) && this->HotbarQuantity[i] < this->maxItemStack) {
+							this->HotbarQuantity[i]++;
 							found = true;
 							break;
 						}
 					}
-				}
-				if (!found) {
-					cout << A->nowIs() << endl;
-					for (int i = 0; i < 9; i++) {
-						if (this->DrawField["Hotbar"][i]->nowIs() == "None") { 
-							*DrawField["Hotbar"][i] = *itemList.object(charOnly(A->nowIs()));
-							(*DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
-							this->DrawField["Hotbar"][i]->Is(charOnly(A->nowIs()));
-							this->HotbarQuantity[i] = 1;
-							this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
-							break;
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 9; j++) {
+							if (this->Backpack[i][j]->nowIs() == charOnly(A->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
+								this->BackpackQuantity[i][j]++;
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found) {
+						cout << A->nowIs() << endl;
+						for (int i = 0; i < 9; i++) {
+							if (this->DrawField["Hotbar"][i]->nowIs() == "None") {
+								*DrawField["Hotbar"][i] = *itemList.object(charOnly(A->nowIs()));
+								(*DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
+								this->DrawField["Hotbar"][i]->Is(charOnly(A->nowIs()));
+								this->HotbarQuantity[i] = 1;
+								this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
+								break;
+							}
 						}
 					}
 				}
-			}
-			if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 200) {
-				const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
-				A->setOffsetPosX(A->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
-				A->setOffsetPosY(A->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
-				//A->setSpriteSize(0, 0);
-				//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
-				//this->Field.remove(A->nowIs());
-			}
-		}
-		for (int i = 0; i < 9; i++) {
-			if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
-				printf("Remove slot %d\n", i);
-				this->DrawField["Hotbar"][i]->Is("None");
-				this->DrawField["Hotbar"][i]->tag = "None";
-				this->DrawField["Hotbar"][i]->setSpriteSize(0, 0);
-
-			}
-			if (this->DrawField["Hotbar"][i]->nowIs() != "None" && this->DrawField["Hotbar"][i]->getStat("showCount") == 1 && this->HotbarQuantity[i] > 0) {
-				const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width / 2, y = 830, x1 = x - 0.7 * IntDigit(this->HotbarQuantity[i]);
-				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({ x,y });
-				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({ x1,y });
-				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-
-				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setPosition({ x,533 });
-				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setPosition({ x1,533 });
-				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-			}
-			else {
-				this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(" ");
-				this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(" ");
-
-				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
-				this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
-			}
-			*DrawField["InventoryUseSlot"][i] = *DrawField["Hotbar"][i];
-		}
-		if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
-			const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
-			this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
-			this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->DrawField["Hotbar"][this->selectingSlot]->nowIs());
-		}
-
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 9; j++) {
-				if (this->BackpackQuantity[i][j] <= 0) {
-					this->Backpack[i][j]->Is("None");
-					this->Backpack[i][j]->tag = "None";
-					this->Backpack[i][j]->setSpriteSize(0, 0);
+				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 200) {
+					const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
+					A->setOffsetPosX(A->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
+					A->setOffsetPosY(A->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
+					//A->setSpriteSize(0, 0);
+					//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
+					//this->Field.remove(A->nowIs());
 				}
+			}
+			for (int i = 0; i < 9; i++) {
+				if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
+					printf("Remove slot %d\n", i);
+					this->DrawField["Hotbar"][i]->Is("None");
+					this->DrawField["Hotbar"][i]->tag = "None";
+					this->DrawField["Hotbar"][i]->setSpriteSize(0, 0);
 
-				if (this->Backpack[i][j]->nowIs() != "None" && this->Backpack[i][j]->getStat("showCount") == 1 && this->BackpackQuantity[i][j] > 0) {
-					const float x = (535 + 1100.0 * 0.06 * j) - this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * i, x1 = x - 0.7 * IntDigit(this->BackpackQuantity[i][j]);
-					this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
-					this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
-					this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x1,y });
-					this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
+				}
+				if (this->DrawField["Hotbar"][i]->nowIs() != "None" && this->DrawField["Hotbar"][i]->getStat("showCount") == 1 && this->HotbarQuantity[i] > 0) {
+					const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width / 2, y = 830, x1 = x - 0.7 * IntDigit(this->HotbarQuantity[i]);
+					this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({ x,y });
+					this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
+					this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({ x1,y });
+					this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
+
+					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setPosition({ x,533 });
+					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
+					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setPosition({ x1,533 });
+					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
 				}
 				else {
-					this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(" ");
-					this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(" ");
+					this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(" ");
+					this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(" ");
+
+					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
+					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
+				}
+				*DrawField["InventoryUseSlot"][i] = *DrawField["Hotbar"][i];
+			}
+			if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
+				const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
+				this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
+				this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->DrawField["Hotbar"][this->selectingSlot]->nowIs());
+			}
+
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 9; j++) {
+					if (this->BackpackQuantity[i][j] <= 0) {
+						this->Backpack[i][j]->Is("None");
+						this->Backpack[i][j]->tag = "None";
+						this->Backpack[i][j]->setSpriteSize(0, 0);
+					}
+
+					if (this->Backpack[i][j]->nowIs() != "None" && this->Backpack[i][j]->getStat("showCount") == 1 && this->BackpackQuantity[i][j] > 0) {
+						const float x = (535 + 1100.0 * 0.06 * j) - this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * i, x1 = x - 0.7 * IntDigit(this->BackpackQuantity[i][j]);
+						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
+						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
+						this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x1,y });
+						this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
+					}
+					else {
+						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(" ");
+						this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(" ");
+					}
 				}
 			}
+			/*
+			This part is for update game event.
+			*/
 		}
-		/*
-		This part is for update game event.
-		*/
 	}
 	void render() {
 		this->window->clear();
@@ -1622,63 +1674,73 @@ public:
 		3. draw
 		*/
 		try {
-			for (int i = 0; i < this->DrawField["DrawField_BG"].size(); i++) {
-				//cout << this->DrawField["DrawField_BG"][i]->nowIs() << '\t' << this->DrawField["DrawField_BG"][i]->PosX() << ','<< this->DrawField["DrawField_BG"][i]->PosY() << '\t' << Elon->PosX() << ',' << Elon->PosY() << endl;
-				this->window->draw(this->DrawField["DrawField_BG"][i]->getSprite());
-			}
-			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
-				this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
-			}
-			for (int i = 0; i < this->DrawField["DrawField_HUD"].size() && DrawField["DrawField_HUD"][i]; i++) {
-				this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
-			}
-			for (int i = 0; i < this->DrawField["Hotbar_HUD"].size() && DrawField["Hotbar_HUD"][i]; i++) {
-				this->DrawField["Hotbar_HUD"][i]->setPosY(833);
-				this->window->draw(this->DrawField["Hotbar_HUD"][i]->getSprite());
-			}
-			for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
-				this->window->draw(*this->Dialog["itemCount"].objectAt(i));
-			}
-			if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
-				this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
-			}
-			if (this->paused) {
-				for (int i = 0; i < this->DrawField["DrawField_pauseUI"].size(); i++) {
-					this->window->draw(this->DrawField["DrawField_pauseUI"][i]->getSprite());
+			if (!this->OnMainMenu) {
+				for (int i = 0; i < this->DrawField["DrawField_BG"].size(); i++) {
+					//cout << this->DrawField["DrawField_BG"][i]->nowIs() << '\t' << this->DrawField["DrawField_BG"][i]->PosX() << ','<< this->DrawField["DrawField_BG"][i]->PosY() << '\t' << Elon->PosX() << ',' << Elon->PosY() << endl;
+					this->window->draw(this->DrawField["DrawField_BG"][i]->getSprite());
 				}
-				for (int i = 0; i < Dialog["PausedMenu"].entityNumber(); i++) {
-					this->window->draw(*this->Dialog["PausedMenu"].objectAt(i));
+				for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
+					this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
 				}
-			}
-			else if (this->building) {
-				for (int i = 0; i < this->DrawField["DrawField_buildingUI"].size(); i++) {
-					this->window->draw(this->DrawField["DrawField_buildingUI"][i]->getSprite());
+				for (int i = 0; i < this->DrawField["DrawField_HUD"].size() && DrawField["DrawField_HUD"][i]; i++) {
+					this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
 				}
-				for (int i = 0; i < this->Dialog["itemUse"].entityNumber(); i++) {
-					this->window->draw(*this->Dialog["itemUse"].objectAt(i));
+				for (int i = 0; i < this->DrawField["Hotbar_HUD"].size() && DrawField["Hotbar_HUD"][i]; i++) {
+					this->DrawField["Hotbar_HUD"][i]->setPosY(833);
+					this->window->draw(this->DrawField["Hotbar_HUD"][i]->getSprite());
 				}
-			}
-			else if (this->inventory) {
-				for (int i = 0; i < DrawField["DrawField_inventoryUI"].size(); i++) {
-					this->window->draw(this->DrawField["DrawField_inventoryUI"][i]->getSprite());
+				for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["itemCount"].objectAt(i));
 				}
-				for (int i = 0; i < this->DrawField["InventoryUseSlot"].size(); i++) {
-					this->DrawField["InventoryUseSlot"][i]->setPosY(533);
-					this->window->draw(this->DrawField["InventoryUseSlot"][i]->getSprite());
+				if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
+					this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
 				}
-				for (int i = 0; i < 3; i++) {
-					for (int j = 0; j < 9; j++) {
-						this->window->draw(this->Backpack[i][j]->getSprite());
+				if (this->paused) {
+					for (int i = 0; i < this->DrawField["DrawField_pauseUI"].size(); i++) {
+						this->window->draw(this->DrawField["DrawField_pauseUI"][i]->getSprite());
+					}
+					for (int i = 0; i < Dialog["PausedMenu"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["PausedMenu"].objectAt(i));
 					}
 				}
-				for (int i = 0; i < this->Dialog["InventoryItem_hotbar"].entityNumber(); i++) {
-					this->window->draw(*this->Dialog["InventoryItem_hotbar"].objectAt(i));
+				else if (this->building) {
+					for (int i = 0; i < this->DrawField["DrawField_buildingUI"].size(); i++) {
+						this->window->draw(this->DrawField["DrawField_buildingUI"][i]->getSprite());
+					}
+					for (int i = 0; i < this->Dialog["itemUse"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["itemUse"].objectAt(i));
+					}
 				}
-				for (int i = 0; i < this->Dialog["InventoryItem"].entityNumber(); i++) {
-					this->window->draw(*this->Dialog["InventoryItem"].objectAt(i));
-				}
-				this->window->draw(this->DrawField["ItemOnMouse"][0]->getSprite());
+				else if (this->inventory) {
+					for (int i = 0; i < DrawField["DrawField_inventoryUI"].size(); i++) {
+						this->window->draw(this->DrawField["DrawField_inventoryUI"][i]->getSprite());
+					}
+					for (int i = 0; i < this->DrawField["InventoryUseSlot"].size(); i++) {
+						this->DrawField["InventoryUseSlot"][i]->setPosY(533);
+						this->window->draw(this->DrawField["InventoryUseSlot"][i]->getSprite());
+					}
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 9; j++) {
+							this->window->draw(this->Backpack[i][j]->getSprite());
+						}
+					}
+					for (int i = 0; i < this->Dialog["InventoryItem_hotbar"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["InventoryItem_hotbar"].objectAt(i));
+					}
+					for (int i = 0; i < this->Dialog["InventoryItem"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["InventoryItem"].objectAt(i));
+					}
+					this->window->draw(this->DrawField["ItemOnMouse"][0]->getSprite());
 
+				}
+			}
+			else {
+				for (int i = 0; i < this->DrawField["MainMenu"].size(); i++) {
+					this->window->draw(this->DrawField["MainMenu"][i]->getSprite());
+				}
+				for (int i = 0; i < this->Dialog["MainMenuButton"].entityNumber(); i++) {
+					this->window->draw(*this->Dialog["MainMenuButton"].objectAt(i));
+				}
 			}
 		}
 		catch (int e) {
@@ -1794,7 +1856,7 @@ void isMovable() {
 	while (First_step.isRuning()) {
 		Sleep(1);
 		bump = false;
-		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu) {
 			Sleep(1);
 		}
 		CheckInsight();
@@ -1873,7 +1935,7 @@ void isMovable() {
 
 void ShowDrawingStat() {
 	while (First_step.isRuning()) {
-		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu) {
 			Sleep(1);
 		}
 		try {
