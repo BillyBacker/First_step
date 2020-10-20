@@ -276,6 +276,10 @@ public:
 	unordered_map<string, Object*> Tuple;
 	unordered_map<string, Object*> Templ;
 	unordered_map<unsigned __int64, string> Tuplekey, Templkey;
+	void clear() {
+		this->Templ.clear();
+		this->Tuple.clear();
+	}
 	void createTemplate(string name) {
 		Object* p = new Object(this->Templ.size());
 		p->Is(name);
@@ -675,22 +679,6 @@ private:
 				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x ,y });
 			}
 		}
-
-		this->Dialog["MainMenuButton"].registerObject("Play", "MainMenu");
-		this->Dialog["MainMenuButton"].object("Play")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
-		this->Dialog["MainMenuButton"].object("Play")->setString("Play");
-		this->Dialog["MainMenuButton"].object("Play")->setFillColor(Color::Black);
-		this->Dialog["MainMenuButton"].object("Play")->setCharacterSize(100);
-		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 450,230 });
-
-		this->Dialog["MainMenuButton"].registerObject("Exit", "MainMenu");
-		this->Dialog["MainMenuButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
-		this->Dialog["MainMenuButton"].object("Exit")->setString("Exit");
-		this->Dialog["MainMenuButton"].object("Exit")->setFillColor(Color::Black);
-		this->Dialog["MainMenuButton"].object("Exit")->setCharacterSize(100);
-		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 450,600 });
-
-
 	}
 	void initObject() {
 
@@ -984,6 +972,23 @@ private:
 
 	}
 	void initMainMenu() {
+		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
+		this->Dialog["Font"].addFont("Mitr-Bold", "assets\\font\\Mitr-Bold.ttf");
+
+		this->Dialog["MainMenuButton"].registerObject("Play", "MainMenu");
+		this->Dialog["MainMenuButton"].object("Play")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["MainMenuButton"].object("Play")->setString("Play");
+		this->Dialog["MainMenuButton"].object("Play")->setFillColor(Color::Black);
+		this->Dialog["MainMenuButton"].object("Play")->setCharacterSize(100);
+		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 450,230 });
+
+		this->Dialog["MainMenuButton"].registerObject("Exit", "MainMenu");
+		this->Dialog["MainMenuButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["MainMenuButton"].object("Exit")->setString("Exit");
+		this->Dialog["MainMenuButton"].object("Exit")->setFillColor(Color::Black);
+		this->Dialog["MainMenuButton"].object("Exit")->setCharacterSize(100);
+		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 450,600 });
+
 		this->Field["MainMenu"].createTemplate("MainMenuBG");
 		this->Field["MainMenu"].Template("MainMenuBG")->setImgDim(1600, 1900);
 		this->Field["MainMenu"].Template("MainMenuBG")->addTexture("assets\\Prop\\Floor\\Graph.jpg", "ProtoPlate", 1000);
@@ -992,6 +997,9 @@ private:
 
 		this->Field["MainMenu"].registerObject("_MainMenuBG", "MainMenuBG", "_MainMenuBG");
 		this->Field["MainMenu"].object("_MainMenuBG")->setSpriteTexture("ProtoPlate", 0);
+		for (int i = 0; i < this->Field["MainMenu"].entityNumber(); i++) {
+			this->DrawField["MainMenu"].push_back(this->Field["MainMenu"].objectAt(i));
+		}
 	}
 	void manageLayer() {
 		for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
@@ -1008,9 +1016,6 @@ private:
 		}
 		for (int i = 0; i < this->Field["HUD"].entityNumber(); i++) {
 			this->DrawField["DrawField_HUD"].push_back(this->Field["HUD"].objectAt(i));
-		}
-		for (int i = 0; i < this->Field["MainMenu"].entityNumber(); i++) {
-			this->DrawField["MainMenu"].push_back(this->Field["MainMenu"].objectAt(i));
 		}
 	}
 	double ObjectDis(Object* A, Object* B) {
@@ -1051,11 +1056,44 @@ public:
 		this->initVar();
 		this->initWindow();
 		this->intitDialog();
-		this->initObject();
-		this->intitUI();
-		this->intitHUD();
 		this->initMainMenu();
+	}
+	void construct() {
+		this->pause = true;
+		Sleep(500);
+		unsigned int time_ui = unsigned int(time(NULL));
+		srand(time_ui);
+		printf("Initialing Object...\t");
+		this->DrawField["ItemOnMouse"].push_back(new Object(1216543));
+		this->initObject();
+		this->initItem();
+		printf("Done\n");
+		printf("Initialing UI...\t");
+		this->intitUI();
+		this->intitDialog();
+		printf("Done\n");
+		printf("Initialing HUD...\t");
+		this->intitHUD();
+		printf("Done\n");
+		printf("Initialing Layer...\t");
 		this->manageLayer();
+		printf("Done\n");
+		this->pause = false;
+	}
+	void constructMainMenu() {
+		this->initMainMenu();
+	}
+	void destroy() {
+		this->pause = true;
+		Sleep(500);
+		this->ItemUseSlotQuantity.clear();
+		this->HotbarQuantity.clear();
+		this->Backpack.clear();
+		this->BackpackQuantity.clear();
+		this->Dialog.clear();
+		this->DrawField.clear();
+		this->itemList.clear();
+		this->pause = false;
 	}
 	virtual ~gameEngine() {
 		delete this->window;
@@ -1207,7 +1245,10 @@ public:
 								}
 								if (clickHit(ExitHitBox)) {
 									printf("Hit");
+									this->destroy();
 									this->OnMainMenu = true;
+									this->paused = false;
+									this->constructMainMenu();
 									break;
 								}
 							}
@@ -1326,6 +1367,7 @@ public:
 					if (ev.mouseButton.button == Mouse::Left) {
 						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
 						if (clickHit(PlayHitBox)) {
+							this->construct();
 							this->OnMainMenu = false;
 						}
 						else if (clickHit(ExitHitBox)) {
@@ -1803,8 +1845,11 @@ void CheckInsight() {
 void checkFloorInsight() {
 	while (First_step.isRuning()) {
 		Sleep(1);
-		while (First_step.DrawField["BG_repo"].size() == 0 || First_step.pause) {
+		while (First_step.isRuning() && (First_step.DrawField["BG_repo"].size() == 0 || First_step.pause || First_step.OnMainMenu)) {
 			Sleep(1);
+		}
+		if (!First_step.isRuning()) {
+			break;
 		}
 		for (int i = 0; i < First_step.DrawField["BG_repo"].size(); i++) {
 			if (!First_step.pause && !(find(First_step.DrawField["DrawField_BG"].begin(), First_step.DrawField["DrawField_BG"].end(), First_step.DrawField["BG_repo"][i]) != First_step.DrawField["DrawField_BG"].end()) && First_step.ObjIsOnSight(First_step.Field["Dynamic"].object("Elon"), First_step.DrawField["BG_repo"][i], 1500)) {
@@ -1817,6 +1862,7 @@ void checkFloorInsight() {
 			}
 		}
 	}
+	printf("checkFloor closed\n");
 }
 bool anyBetween(float* x1, float* x2) {
 	bool ans = false;
@@ -1856,8 +1902,11 @@ void isMovable() {
 	while (First_step.isRuning()) {
 		Sleep(1);
 		bump = false;
-		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu) {
+		while (First_step.isRuning() && (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu)) {
 			Sleep(1);
+		}
+		if (!First_step.isRuning()) {
+			break;
 		}
 		CheckInsight();
 		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
@@ -1931,6 +1980,7 @@ void isMovable() {
 		D_isbump = false;
 		//printf("****************************\n");
 	}
+	printf("checkBump closed\n");
 }
 
 void ShowDrawingStat() {
@@ -2002,5 +2052,6 @@ int main() { // Game loop
 		First_step.render();
 		Sleep(1);
 	}
+	printf("Exit\n");
 	return 0;
 }
