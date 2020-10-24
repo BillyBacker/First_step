@@ -15,6 +15,7 @@
 #include<unordered_map> 
 #include <time.h>
 
+
 using namespace sf;
 using namespace std;
 const vector<float> getHitVector(float, float, float, float);
@@ -374,7 +375,6 @@ private:
 	Event ev;
 	VideoMode mode;
 	int i = 0;
-	Map itemList;
 	ContextSettings settings;
 	void addItem(int x, int y, int amount,string name) {
 		*this->Backpack[x][y] = *itemList.object(name);
@@ -1018,12 +1018,6 @@ private:
 			this->DrawField["DrawField_HUD"].push_back(this->Field["HUD"].objectAt(i));
 		}
 	}
-	double ObjectDis(Object* A, Object* B) {
-		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
-	}
-	string charOnly(string In) {
-		return In.substr(0, In.find("_"));
-	}
 public:
 	RenderWindow* window;
 	unordered_map<string, Map> Field;
@@ -1036,6 +1030,7 @@ public:
 	Object* Anchor;
 	Object* Elon;
 	Object* NoneItem = new Object(45678);
+	Map itemList;
 	int InventoryHitbox[4][9][4];
 	int maxItemStack = 8;
 	bool _time = true;
@@ -1057,6 +1052,12 @@ public:
 		this->initWindow();
 		this->intitDialog();
 		this->initMainMenu();
+	}
+	double ObjectDis(Object* A, Object* B) {
+		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
+	}
+	string charOnly(string In) {
+		return In.substr(0, In.find("_"));
 	}
 	void construct() {
 		this->pause = true;
@@ -1561,21 +1562,6 @@ public:
 				this->Elon->resetTimeSeq();
 			}
 			//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
-			try {
-				for (int i = 0; i < this->Field["Dynamic"].entityNumber(); i++) {
-					if (this->Field["Dynamic"].objectAt(i)->type() == "Dynamic" && i < this->Field["Dynamic"].entityNumber() && this->Field["Dynamic"].objectAt(i)->usable) {
-						this->Field["Dynamic"].objectAt(i)->setPosX(this->Anchor->PosX());
-						this->Field["Dynamic"].objectAt(i)->setPosY(this->Anchor->PosY());
-					}
-				}
-				for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
-					this->Field["GameBG"].objectAt(i)->setPosX(this->Anchor->PosX());
-					this->Field["GameBG"].objectAt(i)->setPosY(this->Anchor->PosY());
-				}
-			}
-			catch (const std::out_of_range& e) {
-				printf("%d\n", e);
-			}
 			if (!this->paused) {
 				DecStat("Health", 0.00025);
 				DecStat("Hunger", 0.0005);
@@ -1602,106 +1588,6 @@ public:
 				}
 			}
 			int maxParam = 0;
-			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
-				Object* A = this->DrawField["DrawField_Dynamic"][i];
-				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 50) {
-					this->DrawField["DrawField_Dynamic"][i]->usable = false;
-					bool found = false;
-					for (int i = 0; i < 9; i++) {
-						if (this->DrawField["Hotbar"][i]->nowIs() == charOnly(A->nowIs()) && this->HotbarQuantity[i] < this->maxItemStack) {
-							this->HotbarQuantity[i]++;
-							found = true;
-							break;
-						}
-					}
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 9; j++) {
-							if (this->Backpack[i][j]->nowIs() == charOnly(A->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
-								this->BackpackQuantity[i][j]++;
-								found = true;
-								break;
-							}
-						}
-					}
-					if (!found) {
-						cout << A->nowIs() << endl;
-						for (int i = 0; i < 9; i++) {
-							if (this->DrawField["Hotbar"][i]->nowIs() == "None") {
-								*DrawField["Hotbar"][i] = *itemList.object(charOnly(A->nowIs()));
-								(*DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
-								this->DrawField["Hotbar"][i]->Is(charOnly(A->nowIs()));
-								this->HotbarQuantity[i] = 1;
-								this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
-								break;
-							}
-						}
-					}
-				}
-				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 200) {
-					const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
-					A->setOffsetPosX(A->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
-					A->setOffsetPosY(A->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
-					//A->setSpriteSize(0, 0);
-					//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
-					//this->Field.remove(A->nowIs());
-				}
-			}
-			for (int i = 0; i < 9; i++) {
-				if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
-					printf("Remove slot %d\n", i);
-					this->DrawField["Hotbar"][i]->Is("None");
-					this->DrawField["Hotbar"][i]->tag = "None";
-					this->DrawField["Hotbar"][i]->setSpriteSize(0, 0);
-
-				}
-				if (this->DrawField["Hotbar"][i]->nowIs() != "None" && this->DrawField["Hotbar"][i]->getStat("showCount") == 1 && this->HotbarQuantity[i] > 0) {
-					const float x = (535 + 1100.0 * 0.06 * i) - this->Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width / 2, y = 830, x1 = x - 0.7 * IntDigit(this->HotbarQuantity[i]);
-					this->Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({ x,y });
-					this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-					this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({ x1,y });
-					this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-
-					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setPosition({ x,533 });
-					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setPosition({ x1,533 });
-					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(to_string(this->HotbarQuantity[i]));
-				}
-				else {
-					this->Dialog["itemCount"].object("itemCount" + to_string(i))->setString(" ");
-					this->Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(" ");
-
-					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
-					this->Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
-				}
-				*DrawField["InventoryUseSlot"][i] = *DrawField["Hotbar"][i];
-			}
-			if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
-				const float x = 800 - this->Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
-				this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
-				this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->DrawField["Hotbar"][this->selectingSlot]->nowIs());
-			}
-
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 9; j++) {
-					if (this->BackpackQuantity[i][j] <= 0) {
-						this->Backpack[i][j]->Is("None");
-						this->Backpack[i][j]->tag = "None";
-						this->Backpack[i][j]->setSpriteSize(0, 0);
-					}
-
-					if (this->Backpack[i][j]->nowIs() != "None" && this->Backpack[i][j]->getStat("showCount") == 1 && this->BackpackQuantity[i][j] > 0) {
-						const float x = (535 + 1100.0 * 0.06 * j) - this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * i, x1 = x - 0.7 * IntDigit(this->BackpackQuantity[i][j]);
-						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
-						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
-						this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x1,y });
-						this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(to_string(this->BackpackQuantity[i][j]));
-					}
-					else {
-						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(" ");
-						this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(" ");
-					}
-				}
-			}
 			/*
 			This part is for update game event.
 			*/
@@ -1798,9 +1684,6 @@ public:
 				cout << endl;
 				*/
 	}
-	void sort() {
-
-	}
 };
 
 gameEngine First_step;
@@ -1861,8 +1744,67 @@ void checkFloorInsight() {
 				First_step.DrawField["DrawField_BG"].erase(First_step.DrawField["DrawField_BG"].begin() + i);
 			}
 		}
+		Sleep(1);
 	}
 	printf("checkFloor closed\n");
+}
+
+void checkFloorItem() {
+	while (First_step.isRuning()) {
+		Sleep(1);
+		while (First_step.isRuning() && (First_step.DrawField["DrawField_Dynamic"].size() == 0 || First_step.pause || First_step.OnMainMenu)) {
+			Sleep(1);
+		}
+		if (First_step.isRuning()) {
+			for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
+				Object* A = First_step.DrawField["DrawField_Dynamic"][i];
+				if (A->usable && A->tag == "fallItem" && First_step.ObjectDis(First_step.Field["Dynamic"].object("Elon"), A) <= 50) {
+					First_step.DrawField["DrawField_Dynamic"][i]->usable = false;
+					A->setSpriteSize(0, 0);
+					bool found = false;
+					for (int i = 0; i < 9; i++) {
+						if (First_step.DrawField["Hotbar"][i]->nowIs() == First_step.charOnly(A->nowIs()) && First_step.HotbarQuantity[i] < First_step.maxItemStack) {
+							First_step.HotbarQuantity[i]++;
+							found = true;
+							break;
+						}
+					}
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 9; j++) {
+							if (First_step.Backpack[i][j]->nowIs() == First_step.charOnly(A->nowIs()) && First_step.BackpackQuantity[i][j] < First_step.maxItemStack) {
+								First_step.BackpackQuantity[i][j]++;
+								found = true;
+								break;
+							}
+						}
+					}
+					if (!found) {
+						cout << A->nowIs() << endl;
+						for (int i = 0; i < 9; i++) {
+							if (First_step.DrawField["Hotbar"][i]->nowIs() == "None") {
+								*First_step.DrawField["Hotbar"][i] = *First_step.itemList.object(First_step.charOnly(A->nowIs()));
+								(*First_step.DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
+								First_step.DrawField["Hotbar"][i]->Is(First_step.charOnly(A->nowIs()));
+								First_step.HotbarQuantity[i] = 1;
+								First_step.DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
+								break;
+							}
+						}
+					}
+				}
+				if (A->usable && A->tag == "fallItem" && First_step.ObjectDis(First_step.Field["Dynamic"].object("Elon"), A) <= 200) {
+					const vector<float> moveVec = getHitVector(First_step.Field["Dynamic"].object("Elon")->PosX(), First_step.Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
+					A->setOffsetPosX(A->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
+					A->setOffsetPosY(A->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
+					//A->setSpriteSize(0, 0);
+					//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
+					//this->Field.remove(A->nowIs());
+				}
+			}
+		}
+		Sleep(1);
+	}
+	printf("checkFloorItem closed\n");
 }
 bool anyBetween(float* x1, float* x2) {
 	bool ans = false;
@@ -1905,84 +1847,176 @@ void isMovable() {
 		while (First_step.isRuning() && (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu)) {
 			Sleep(1);
 		}
-		if (!First_step.isRuning()) {
-			break;
-		}
-		CheckInsight();
-		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
-			try {
-				ElonHitBox = First_step.Elon->getHitBoxData();
-				ObjHitBox = First_step.DrawField["DrawField_Dynamic"][i]->getHitBoxData();
-			}
-			catch (const std::out_of_range& e) {
-				cout << "Out of Range error.";
-			}
-			if (!First_step.pause && First_step.DrawField["DrawField_Dynamic"][i]->usable && !First_step.DrawField["DrawField_Dynamic"][i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
-				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
-				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
-				if (HitVec[1] < 0) {
-					W_isbump = true;
-					First_step.move_speed /= 5;
-					First_step.S_key();
-					First_step.move_speed *= 5;
+		if (First_step.isRuning()) {
+			CheckInsight();
+			for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
+				try {
+					ElonHitBox = First_step.Elon->getHitBoxData();
+					ObjHitBox = First_step.DrawField["DrawField_Dynamic"][i]->getHitBoxData();
 				}
-				else if (HitVec[1] > 0) {
-					S_isbump = true;
-					First_step.move_speed /= 5;
-					First_step.W_key();
-					First_step.move_speed *= 5;
+				catch (const std::out_of_range& e) {
+					cout << "Out of Range error.";
 				}
-				if (HitVec[0] < 0) {
-					A_isbump = true;
-					First_step.move_speed /= 5;
-					First_step.D_key(false);
-					First_step.move_speed *= 5;
-				}
+				if (!First_step.pause && First_step.DrawField["DrawField_Dynamic"][i]->usable && !First_step.DrawField["DrawField_Dynamic"][i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
+					HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
+					printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
+					if (HitVec[1] < 0) {
+						W_isbump = true;
+						First_step.move_speed /= 5;
+						First_step.S_key();
+						First_step.move_speed *= 5;
+					}
+					else if (HitVec[1] > 0) {
+						S_isbump = true;
+						First_step.move_speed /= 5;
+						First_step.W_key();
+						First_step.move_speed *= 5;
+					}
+					if (HitVec[0] < 0) {
+						A_isbump = true;
+						First_step.move_speed /= 5;
+						First_step.D_key(false);
+						First_step.move_speed *= 5;
+					}
 
-				else if (HitVec[0] > 0) {
-					D_isbump = true;
-					First_step.move_speed /= 5;
-					First_step.A_key(false);
-					First_step.move_speed *= 5;
+					else if (HitVec[0] > 0) {
+						D_isbump = true;
+						First_step.move_speed /= 5;
+						First_step.A_key(false);
+						First_step.move_speed *= 5;
+					}
+					printf("************************************ with ");
+					cout << First_step.DrawField["DrawField_Dynamic"][i]->nowIs() << endl;
+					break;
 				}
-				printf("************************************ with ");
-				cout << First_step.DrawField["DrawField_Dynamic"][i]->nowIs() << endl;
-				break;
 			}
+			if (W_isbump) {
+				First_step.W_moveable = false;
+			}
+			else {
+				First_step.W_moveable = true;
+			}
+			if (A_isbump) {
+				First_step.A_moveable = false;
+			}
+			else {
+				First_step.A_moveable = true;
+			}
+			if (S_isbump) {
+				First_step.S_moveable = false;
+			}
+			else {
+				First_step.S_moveable = true;
+			}
+			if (D_isbump) {
+				First_step.D_moveable = false;
+			}
+			else {
+				First_step.D_moveable = true;
+			}
+			W_isbump = false;
+			A_isbump = false;
+			S_isbump = false;
+			D_isbump = false;
+			//printf("****************************\n");
 		}
-		if (W_isbump) {
-			First_step.W_moveable = false;
-		}
-		else {
-			First_step.W_moveable = true;
-		}
-		if (A_isbump) {
-			First_step.A_moveable = false;
-		}
-		else {
-			First_step.A_moveable = true;
-		}
-		if (S_isbump) {
-			First_step.S_moveable = false;
-		}
-		else {
-			First_step.S_moveable = true;
-		}
-		if (D_isbump) {
-			First_step.D_moveable = false;
-		}
-		else {
-			First_step.D_moveable = true;
-		}
-		W_isbump = false;
-		A_isbump = false;
-		S_isbump = false;
-		D_isbump = false;
-		//printf("****************************\n");
+		Sleep(1);
 	}
 	printf("checkBump closed\n");
 }
 
+void updateInventory() {
+	while (First_step.isRuning()) {
+		while (First_step.isRuning() && (First_step.Field["Hotbar"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu)) {
+			Sleep(1);
+		}
+		if (First_step.isRuning()) {
+			for (int i = 0; i < 9; i++) {
+				if (First_step.HotbarQuantity[i] == 0 && First_step.DrawField["Hotbar"][i]->nowIs() != "None") {
+					printf("Remove slot %d\n", i);
+					First_step.DrawField["Hotbar"][i]->Is("None");
+					First_step.DrawField["Hotbar"][i]->tag = "None";
+					First_step.DrawField["Hotbar"][i]->setSpriteSize(0, 0);
+
+				}
+				if (First_step.DrawField["Hotbar"][i]->nowIs() != "None" && First_step.DrawField["Hotbar"][i]->getStat("showCount") == 1 && First_step.HotbarQuantity[i] > 0) {
+					const float x = (535 + 1100.0 * 0.06 * i) - First_step.Dialog["itemCount"].object("itemCount" + to_string(i))->getLocalBounds().width / 2, y = 830, x1 = x - 0.7 * First_step.IntDigit(First_step.HotbarQuantity[i]);
+					First_step.Dialog["itemCount"].object("itemCount" + to_string(i))->setPosition({ x,y });
+					First_step.Dialog["itemCount"].object("itemCount" + to_string(i))->setString(to_string(First_step.HotbarQuantity[i]));
+					First_step.Dialog["itemCount"].object("itemCountBG" + to_string(i))->setPosition({ x1,y });
+					First_step.Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(to_string(First_step.HotbarQuantity[i]));
+
+					First_step.Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setPosition({ x,533 });
+					First_step.Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(to_string(First_step.HotbarQuantity[i]));
+					First_step.Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setPosition({ x1,533 });
+					First_step.Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(to_string(First_step.HotbarQuantity[i]));
+				}
+				else {
+					First_step.Dialog["itemCount"].object("itemCount" + to_string(i))->setString(" ");
+					First_step.Dialog["itemCount"].object("itemCountBG" + to_string(i))->setString(" ");
+
+					First_step.Dialog["InventoryItem_hotbar"].object("InventoryitemCount_hotbar" + to_string(i))->setString(" ");
+					First_step.Dialog["InventoryItem_hotbar"].object("InventoryitemCountBG_hotbar" + to_string(i))->setString(" ");
+				}
+				*First_step.DrawField["InventoryUseSlot"][i] = *First_step.DrawField["Hotbar"][i];
+			}
+			if (First_step.DrawField["Hotbar"][First_step.selectingSlot]->nowIs() != "None") {
+				const float x = 800 - First_step.Dialog["InGameStatus"].object("ItemInHand")->getLocalBounds().width / 2, y = 750;
+				First_step.Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
+				First_step.Dialog["InGameStatus"].object("ItemInHand")->setString(First_step.DrawField["Hotbar"][First_step.selectingSlot]->nowIs());
+			}
+
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 9; j++) {
+					if (First_step.BackpackQuantity[i][j] <= 0) {
+						First_step.Backpack[i][j]->Is("None");
+						First_step.Backpack[i][j]->tag = "None";
+						First_step.Backpack[i][j]->setSpriteSize(0, 0);
+					}
+
+					if (First_step.Backpack[i][j]->nowIs() != "None" && First_step.Backpack[i][j]->getStat("showCount") == 1 && First_step.BackpackQuantity[i][j] > 0) {
+						const float x = (535 + 1100.0 * 0.06 * j) - First_step.Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * i, x1 = x - 0.7 * First_step.IntDigit(First_step.BackpackQuantity[i][j]);
+						First_step.Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
+						First_step.Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(to_string(First_step.BackpackQuantity[i][j]));
+						First_step.Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x1,y });
+						First_step.Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(to_string(First_step.BackpackQuantity[i][j]));
+					}
+					else {
+						First_step.Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setString(" ");
+						First_step.Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setString(" ");
+					}
+				}
+			}
+		}
+		Sleep(1);
+	}
+	printf("UpdateInventory closed\n");
+}
+void updateObjectPos() {
+	while (First_step.isRuning()) {
+		while (First_step.isRuning() && (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.Field["GameBG"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu)) {
+			Sleep(1);
+		}
+		if (First_step.isRuning()) {
+			try {
+				for (int i = 0; i < First_step.Field["Dynamic"].entityNumber(); i++) {
+					if (First_step.Field["Dynamic"].objectAt(i)->type() == "Dynamic" && i < First_step.Field["Dynamic"].entityNumber() && First_step.Field["Dynamic"].objectAt(i)->usable) {
+						First_step.Field["Dynamic"].objectAt(i)->setPosX(First_step.Anchor->PosX());
+						First_step.Field["Dynamic"].objectAt(i)->setPosY(First_step.Anchor->PosY());
+					}
+				}
+				for (int i = 0; i < First_step.Field["GameBG"].entityNumber(); i++) {
+					First_step.Field["GameBG"].objectAt(i)->setPosX(First_step.Anchor->PosX());
+					First_step.Field["GameBG"].objectAt(i)->setPosY(First_step.Anchor->PosY());
+				}
+			}
+			catch (const std::out_of_range& e) {
+				printf("%d\n", e);
+			}
+		}
+		Sleep(1);
+	}
+}
 void ShowDrawingStat() {
 	while (First_step.isRuning()) {
 		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu) {
@@ -2044,14 +2078,17 @@ void ShowDrawingStat3() {
 	}
 }
 int main() { // Game loop
-	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable), CheckFloor(&checkFloorInsight), monitor(&ShowDrawingStat3);
+	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable), CheckFloor(&checkFloorInsight), CheckFloorItem(&checkFloorItem), CheckInventory(&updateInventory), UpdateObjPos(&updateObjectPos), monitor(&ShowDrawingStat3);
 	CheckBump.launch();
 	CheckFloor.launch();
+	CheckFloorItem.launch();
+	CheckInventory.launch();
+	UpdateObjPos.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
 		Sleep(1);
 	}
-	printf("Exit\n");
+	printf("First Step closed\n");
 	return 0;
 }
