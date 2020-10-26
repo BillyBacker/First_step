@@ -750,6 +750,7 @@ private:
 		this->Field["Dynamic"].Template("Pump")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
 		this->Field["Dynamic"].Template("Pump")->setType("Dynamic");
 		this->Field["Dynamic"].Template("Pump")->isPassable(false);
+		this->Field["Dynamic"].Template("Pump")->tag = "Building";
 
 		this->Field["Dynamic"].createTemplate("SolarCell");
 		this->Field["Dynamic"].Template("SolarCell")->addTexture("assets\\Prop\\Building\\SolarCell.png", "SolarCell", 1000);
@@ -760,6 +761,7 @@ private:
 		this->Field["Dynamic"].Template("SolarCell")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
 		this->Field["Dynamic"].Template("SolarCell")->setType("Dynamic");
 		this->Field["Dynamic"].Template("SolarCell")->isPassable(false);
+		this->Field["Dynamic"].Template("SolarCell")->tag = "Building";
 
 		this->Field["GameBG"].createTemplate("Floor");
 		this->Field["GameBG"].Template("Floor")->addTexture("assets\\Prop\\Floor\\Floor11.png", "default", 1000);
@@ -1334,6 +1336,25 @@ public:
 												this->ItemOnMouseQuantity -= this->maxItemStack - this->HotbarQuantity[j];
 												this->HotbarQuantity[j] = this->maxItemStack;
 											}
+										}
+									}
+								}
+							}
+							else {
+								for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
+									if (this->DrawField["DrawField_Dynamic"][i]->tag == "Building") {
+										printf("66\n");
+										Object* building = this->DrawField["DrawField_Dynamic"][i];
+										int buildingHitbox[4] = { building->getHitBoxData()[0],
+																	building->getHitBoxData()[1] - building->getImgHeight() * building->getSizeY()/2,
+																	building->getHitBoxData()[2],
+																	building->getHitBoxData()[3]+ building->getImgHeight() * building->getSizeY()*0.2, };
+										for (int i = 0; i < 4; i++) {
+											printf("%d ", building->getHitBoxData()[i]);
+										}
+										printf("\n");
+										if (clickHit(buildingHitbox)) {
+											cout << "Click hit : " << building->nowIs() << endl;
 										}
 									}
 								}
