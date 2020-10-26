@@ -452,17 +452,21 @@ private:
 		this->itemList.registerObject("Herb", "Item", "Herb");
 		this->itemList.object("Herb")->addTexture("assets\\Prop\\Item\\Herb.png", "default", 1000);
 		this->itemList.object("Herb")->setSpriteTexture("default", 0);
+		this->itemList.object("Herb")->addStat("healAmount", 20);
 		this->itemList.object("Herb")->tag = "Medicine";
 
 		this->itemList.registerObject("Apple", "Item", "Apple");
 		this->itemList.object("Apple")->addTexture("assets\\Prop\\Item\\Apple.png", "default", 1000);
 		this->itemList.object("Apple")->setSpriteTexture("default", 0);
+		this->itemList.object("Apple")->addStat("healAmount", 10);
 		this->itemList.object("Apple")->tag = "Food";
 
-		this->itemList.registerObject("Hydro Flask", "Item", "Hydro Flask");
+		this->itemList.registerObject("Hydro Flask", "Tool", "Hydro Flask");
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
 		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
-		this->itemList.object("Hydro Flask")->tag = "Drink";
+		this->itemList.object("Hydro Flask")->addStat("healAmount", 10);
+		this->itemList.object("Hydro Flask")->addStat("durability", 1);
+		this->itemList.object("Hydro Flask")->tag = "Tool";
 
 		this->itemList.registerObject("Composite Metal", "Item", "Composite Metal");
 		this->itemList.object("Composite Metal")->addTexture("assets\\Prop\\Item\\metalPlate.png", "default", 1000);
@@ -482,11 +486,13 @@ private:
 		this->itemList.registerObject("Bread", "Item", "Bread");
 		this->itemList.object("Bread")->addTexture("assets\\Prop\\Item\\Bread.png", "default", 1000);
 		this->itemList.object("Bread")->setSpriteTexture("default", 0);
+		this->itemList.object("Bread")->addStat("healAmount", 20);
 		this->itemList.object("Bread")->tag = "Food";
 
 		this->itemList.registerObject("Carrot", "Item", "Carrot");
 		this->itemList.object("Carrot")->addTexture("assets\\Prop\\Item\\Carrot.png", "default", 1000);
 		this->itemList.object("Carrot")->setSpriteTexture("default", 0);
+		this->itemList.object("Herb")->addStat("healAmount", 10);
 		this->itemList.object("Carrot")->tag = "Food";
 
 		this->itemList.registerObject("Carrot Seed", "Item", "Carrot Seed");
@@ -537,6 +543,7 @@ private:
 		this->itemList.registerObject("MRE", "Item", "MRE");
 		this->itemList.object("MRE")->addTexture("assets\\Prop\\Item\\MRE.png", "default", 1000);
 		this->itemList.object("MRE")->setSpriteTexture("default", 0);
+		this->itemList.object("MRE")->addStat("healAmount", 80);
 		this->itemList.object("MRE")->tag = "Food";
 
 		this->itemList.registerObject("Plastic", "Item", "Plastic");
@@ -567,16 +574,19 @@ private:
 		this->itemList.registerObject("Drill", "Tool", "Drill");
 		this->itemList.object("Drill")->addTexture("assets\\Prop\\Item\\drill.png", "default", 1000);
 		this->itemList.object("Drill")->setSpriteTexture("default", 0);
+		this->itemList.object("Drill")->addStat("durability", 200);
 		this->itemList.object("Drill")->tag = "Tool";
 
 		this->itemList.registerObject("Shovel", "Tool", "Shovel");
 		this->itemList.object("Shovel")->addTexture("assets\\Prop\\Item\\Shovel.png", "default", 1000);
 		this->itemList.object("Shovel")->setSpriteTexture("default", 0);
+		this->itemList.object("Shovel")->addStat("durability", 200);
 		this->itemList.object("Shovel")->tag = "Tool";
 
 		this->itemList.registerObject("Hammer", "Tool", "Hammer");
 		this->itemList.object("Hammer")->addTexture("assets\\Prop\\Item\\Hammer.png", "default", 1000);
 		this->itemList.object("Hammer")->setSpriteTexture("default", 0);
+		this->itemList.object("Hammer")->addStat("durability", 200);
 		this->itemList.object("Hammer")->tag = "Tool";
 
 		// Default item
@@ -819,9 +829,9 @@ private:
 		this->Field["Dynamic"].object("Elon")->setSpriteSize(0.1, 0.1);
 		this->Field["Dynamic"].object("Elon")->setImgDim(1000, 1600);
 		this->Field["Dynamic"].object("Elon")->addStat("Health", 100);
-		this->Field["Dynamic"].object("Elon")->addStat("Thirst", 100);
-		this->Field["Dynamic"].object("Elon")->addStat("Hunger", 100);
-		this->Field["Dynamic"].object("Elon")->addStat("Air", 100);
+		this->Field["Dynamic"].object("Elon")->addStat("Thirst", 20);
+		this->Field["Dynamic"].object("Elon")->addStat("Hunger", 20);
+		this->Field["Dynamic"].object("Elon")->addStat("Air", 10000);
 		this->Field["Dynamic"].object("Elon")->addStat("Alive", 1);
 		this->Field["Dynamic"].object("Elon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
 		this->Field["Dynamic"].object("Elon")->setPosY(400);
@@ -1140,6 +1150,37 @@ public:
 	void Idle() {
 		Elon->setSpriteTexture("idle", 0);
 	}
+	void giveItem(string itemName) {
+		bool found = false;
+		for (int i = 0; i < 9; i++) {
+			if (this->DrawField["Hotbar"][i]->nowIs() == itemName && this->HotbarQuantity[i] < this->maxItemStack) {
+				this->HotbarQuantity[i]++;
+				found = true;
+				break;
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				if (this->Backpack[i][j]->nowIs() == itemName && this->BackpackQuantity[i][j] < this->maxItemStack) {
+					this->BackpackQuantity[i][j]++;
+					found = true;
+					break;
+				}
+			}
+		}
+		if (!found) {
+			for (int i = 0; i < 9; i++) {
+				if (this->DrawField["Hotbar"][i]->nowIs() == "None") {
+					*DrawField["Hotbar"][i] = *itemList.object(itemName);
+					(*DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
+					this->DrawField["Hotbar"][i]->Is(itemName);
+					this->HotbarQuantity[i] = 1;
+					this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
+					break;
+				}
+			}
+		}
+	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
 			if (!this->OnMainMenu) {
@@ -1200,38 +1241,43 @@ public:
 						cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << endl;
 						if (this->Elon->getStat("Alive") == 1) {
 							if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
-								Elon->setStat("Health", Elon->getStat("Health") + 10);
+								Elon->setStat("Health", Elon->getStat("Health") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
 								if (Elon->getStat("Health") > 100) {
 									Elon->setStat("Health", 100);
 								}
 							}
 							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Food" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
-								Elon->setStat("Hunger", Elon->getStat("Hunger") + 10);
+								Elon->setStat("Hunger", Elon->getStat("Hunger") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
 								if (Elon->getStat("Hunger") > 100) {
 									Elon->setStat("Hunger", 100);
 								}
 							}
-							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Drink" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Thirst") < 100) {
-								Elon->setStat("Thirst", Elon->getStat("Thirst") + 10);
-								if (Elon->getStat("Thirst") > 100) {
-									Elon->setStat("Thirst", 100);
-								}
-							}
-							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0) {
+							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0 && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") > 0) {
 								if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hammer") {
 									this->building = true;
+								}
+								else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask") {
+									Elon->setStat("Thirst", Elon->getStat("Thirst") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
+									if (Elon->getStat("Thirst") > 100) {
+										Elon->setStat("Thirst", 100);
+									}
 								}
 							}
 							else {
 								continue;
 							}
-							if (this->HotbarQuantity[this->selectingSlot] > 0) {
-								this->HotbarQuantity[this->selectingSlot]--;
+							if (this->DrawField["Hotbar"][this->selectingSlot]->tag != "Tool") {
+								if (this->HotbarQuantity[this->selectingSlot] > 0) {
+									this->HotbarQuantity[this->selectingSlot]--;
+								}
+								if (this->HotbarQuantity[this->selectingSlot] <= 0) {
+									this->DrawField["Hotbar"][this->selectingSlot]->Is("None");
+									this->DrawField["Hotbar"][this->selectingSlot]->tag = "None";
+									this->DrawField["Hotbar"][this->selectingSlot]->setSpriteSize(0, 0);
+								}
 							}
-							if (this->HotbarQuantity[this->selectingSlot] <= 0) {
-								this->DrawField["Hotbar"][this->selectingSlot]->Is("None");
-								this->DrawField["Hotbar"][this->selectingSlot]->tag = "None";
-								this->DrawField["Hotbar"][this->selectingSlot]->setSpriteSize(0, 0);
+							else {
+								this->DrawField["Hotbar"][this->selectingSlot]->incread("durability", -1);
 							}
 						}
 					}
@@ -1353,8 +1399,9 @@ public:
 											printf("%d ", building->getHitBoxData()[i]);
 										}
 										printf("\n");
-										if (clickHit(buildingHitbox)) {
+										if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200) {
 											cout << "Click hit : " << building->nowIs() << endl;
+											giveItem("MRE");
 										}
 									}
 								}
@@ -1643,36 +1690,7 @@ public:
 				Object* A = this->DrawField["DrawField_Dynamic"][i];
 				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 50 && pickable(A)) {
 					this->DrawField["DrawField_Dynamic"][i]->usable = false;
-					bool found = false;
-					for (int i = 0; i < 9; i++) {
-						if (this->DrawField["Hotbar"][i]->nowIs() == charOnly(A->nowIs()) && this->HotbarQuantity[i] < this->maxItemStack) {
-							this->HotbarQuantity[i]++;
-							found = true;
-							break;
-						}
-					}
-					for (int i = 0; i < 3; i++) {
-						for (int j = 0; j < 9; j++) {
-							if (this->Backpack[i][j]->nowIs() == charOnly(A->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
-								this->BackpackQuantity[i][j]++;
-								found = true;
-								break;
-							}
-						}
-					}
-					if (!found) {
-						cout << A->nowIs() << endl;
-						for (int i = 0; i < 9; i++) {
-							if (this->DrawField["Hotbar"][i]->nowIs() == "None") {
-								*DrawField["Hotbar"][i] = *itemList.object(charOnly(A->nowIs()));
-								(*DrawField["Hotbar"][i]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * i));
-								this->DrawField["Hotbar"][i]->Is(charOnly(A->nowIs()));
-								this->HotbarQuantity[i] = 1;
-								this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
-								break;
-							}
-						}
-					}
+					giveItem(charOnly(A->nowIs()));
 				}
 				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 200 && pickable(A)) {
 					const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
