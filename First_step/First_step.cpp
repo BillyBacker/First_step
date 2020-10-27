@@ -70,7 +70,7 @@ public:
 	void remove(string keyIn) {
 		this->map.erase(keyIn);
 	}
-	void incread(string keyIn, int In) {
+	void incread(string keyIn, float In) {
 		this->map[keyIn] += In;
 	}
 	unsigned __int64 length() {
@@ -199,7 +199,7 @@ public:
 	void addStat(string KeyIn, float val) {
 		Stat.append(KeyIn, val);
 	}
-	void incread(string KeyIn, int amount) {
+	void incread(string KeyIn, float amount) {
 		this->Stat.incread(KeyIn, amount);
 	}
 	float getStat(string KeyIn) {
@@ -463,6 +463,7 @@ private:
 
 		this->itemList.registerObject("Hydro Flask", "Tool", "Hydro Flask");
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
+		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask_Empty.png", "Empty", 1000);
 		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
 		this->itemList.object("Hydro Flask")->addStat("healAmount", 10);
 		this->itemList.object("Hydro Flask")->addStat("durability", 1);
@@ -598,6 +599,7 @@ private:
 		addItem(0, 4, 8, "Composite Metal");
 		addItem(0, 5, 2, "Composite Metal");
 		addItem(0, 6, 5, "Arclyic");
+		addItem(0, 7, 1, "Shovel");
 	}
 	void intitDialog() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -730,7 +732,7 @@ private:
 		this->Field["Dynamic"].Template("dropItem")->setSpriteSize(0.1, 0.1);
 		this->Field["Dynamic"].Template("dropItem")->setImgDim(1000, 1000);
 		this->Field["Dynamic"].Template("dropItem")->setType("Dynamic");
-
+		/*
 		for (int i = 0; i < 50; i++) {
 			this->Field["Dynamic"].registerObject("Apple_" + to_string(i), "dropItem", "Apple");
 			this->Field["Dynamic"].object("Apple_" + to_string(i))->setSpriteTexture("Apple", 0);
@@ -745,7 +747,7 @@ private:
 			this->Field["Dynamic"].object("Herb_" + to_string(i))->setOffsetPosY(2000 + rand() % 2000);
 			this->Field["Dynamic"].object("Herb_" + to_string(i))->tag = "fallItem";
 		}
-
+		*/
 		this->Field["Dynamic"].createTemplate("Structure");
 		this->Field["Dynamic"].Template("Structure")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
 		this->Field["Dynamic"].Template("Structure")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
@@ -830,8 +832,8 @@ private:
 		this->Field["Dynamic"].object("Elon")->setSpriteSize(0.1, 0.1);
 		this->Field["Dynamic"].object("Elon")->setImgDim(1000, 1600);
 		this->Field["Dynamic"].object("Elon")->addStat("Health", 100);
-		this->Field["Dynamic"].object("Elon")->addStat("Thirst", 20);
-		this->Field["Dynamic"].object("Elon")->addStat("Hunger", 20);
+		this->Field["Dynamic"].object("Elon")->addStat("Thirst", 100);
+		this->Field["Dynamic"].object("Elon")->addStat("Hunger", 100);
 		this->Field["Dynamic"].object("Elon")->addStat("Air", 10000);
 		this->Field["Dynamic"].object("Elon")->addStat("Alive", 1);
 		this->Field["Dynamic"].object("Elon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
@@ -1153,6 +1155,7 @@ public:
 	}
 	void giveItem(string itemName) {
 		bool found = false;
+		bool placed = false;
 		for (int i = 0; i < 9; i++) {
 			if (this->DrawField["Hotbar"][i]->nowIs() == itemName && this->HotbarQuantity[i] < this->maxItemStack) {
 				this->HotbarQuantity[i]++;
@@ -1177,10 +1180,51 @@ public:
 					this->DrawField["Hotbar"][i]->Is(itemName);
 					this->HotbarQuantity[i] = 1;
 					this->DrawField["Hotbar"][i]->setSpriteSize(0.06, 0.06);
+					placed = true;
 					break;
 				}
 			}
+			if (!placed) {
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 9; j++) {
+						if (this->Backpack[i][j]->nowIs() == "None") {
+							float Pos[] = { Backpack[i][j]->PosX(), Backpack[i][j]->PosY() };
+							*Backpack[i][j] = *itemList.object(itemName);
+							Backpack[i][j]->Is(itemName);
+							Backpack[i][j]->setPosX(Pos[0]);
+							Backpack[i][j]->setPosY(Pos[1]);
+							BackpackQuantity[i][j] = 1;
+							Backpack[i][j]->setSpriteSize(0.06, 0.06);
+							placed = true;
+							break;
+						}
+					}
+					if (placed) {
+						break;
+					}
+				}
+			}
 		}
+	}
+	bool boolRandTen() {
+		return rand() % 10 == 0;
+	}
+	bool boolRandOne() {
+		return rand() % 100 == 0;
+	}
+	bool boolRand(int chance) {
+		for (int i = 0; i < (int)chance % 10; i++) {
+			if (boolRandOne()) {
+				return true;
+			}
+		}
+		chance /= 10;
+		for (int i = 0; i < (int)chance; i++) {
+			if (boolRandTen()) {
+				return true;
+			}
+		}
+		return false;
 	}
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
@@ -1263,6 +1307,39 @@ public:
 										Elon->setStat("Thirst", 100);
 									}
 								}
+								else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Shovel") {
+									int num = rand() % 100;
+									if (Elon->getStat("Hunger") - 5 > 0) {
+										Elon->incread("Hunger", -5);
+									}
+									else {
+										Elon->setStat("Hunger", 0);
+									}
+									if (Elon->getStat("Thirst") - 7 > 0) {
+										Elon->incread("Thirst", -7);
+									}
+									else {
+										Elon->setStat("Thirst", 0);
+									}
+									if (boolRand(10)) {
+										int quant = rand() % 3 + 1;
+										for (int i = 0; i < 1; i++) {
+											giveItem("Gold Nugget");
+										}
+									}
+									if (boolRand(50)) {
+										int quant = rand() % 5 + 1;
+										for (int i = 0; i < 1; i++) {
+											giveItem("Titanium Nugget");
+										}
+									}
+									if (boolRand(200)) {
+										int quant = rand() % 10 + 1;
+										for (int i = 0; i < 1; i++) {
+											giveItem("Copper Nugget");
+										}
+									}
+								}
 							}
 							else {
 								continue;
@@ -1279,6 +1356,9 @@ public:
 							}
 							else {
 								this->DrawField["Hotbar"][this->selectingSlot]->incread("durability", -1);
+								if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") <= 0) {
+									this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("Empty", 0);
+								}
 							}
 						}
 					}
@@ -1406,6 +1486,7 @@ public:
 											if (flaskPos[0] == 1) {
 												cout << this->DrawField["Hotbar"][flaskPos[2]]->nowIs() << endl;
 												this->DrawField["Hotbar"][flaskPos[2]]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
+												this->DrawField["Hotbar"][flaskPos[2]]->setSpriteTexture("default", 0);
 												cout << this->DrawField["Hotbar"][flaskPos[2]]->getStat("durability") << endl;
 											}
 										}
@@ -1717,21 +1798,23 @@ public:
 				}
 			}
 			int maxParam = 0;
-			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
-				Object* A = this->DrawField["DrawField_Dynamic"][i];
-				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 50 && pickable(A)) {
+/////////////////////////////////////////////////////////////////////////////////////////
+			// Item following player
+			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) { // repeate for every object on the ground
+				Object* Obj = this->DrawField["DrawField_Dynamic"][i];
+				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 50 && pickable(Obj)) {
 					this->DrawField["DrawField_Dynamic"][i]->usable = false;
-					giveItem(charOnly(A->nowIs()));
+					giveItem(charOnly(Obj->nowIs()));
 				}
-				if (A->usable && A->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), A) <= 200 && pickable(A)) {
-					const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), A->PosX(), A->PosY());
-					A->setOffsetPosX(A->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
-					A->setOffsetPosY(A->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
-					//A->setSpriteSize(0, 0);
-					//this->DrawField_Dynamic.erase(this->DrawField_Dynamic.begin() + i);
-					//this->Field.remove(A->nowIs());
+				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 200 && pickable(Obj)) {
+					const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), Obj->PosX(), Obj->PosY());
+					Obj->setOffsetPosX(Obj->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
+					Obj->setOffsetPosY(Obj->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
 				}
 			}
+			// end
+/////////////////////////////////////////////////////////////////////////////////////////
+			// item dialog controlling unit
 			for (int i = 0; i < 9; i++) {
 				if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
 					printf("Remove slot %d\n", i);
@@ -1766,7 +1849,6 @@ public:
 				this->Dialog["InGameStatus"].object("ItemInHand")->setPosition({ x,y });
 				this->Dialog["InGameStatus"].object("ItemInHand")->setString(this->DrawField["Hotbar"][this->selectingSlot]->nowIs());
 			}
-
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 9; j++) {
 					if (this->BackpackQuantity[i][j] <= 0) {
@@ -1774,7 +1856,6 @@ public:
 						this->Backpack[i][j]->tag = "None";
 						this->Backpack[i][j]->setSpriteSize(0, 0);
 					}
-
 					if (this->Backpack[i][j]->nowIs() != "None" && this->Backpack[i][j]->getStat("showCount") == 1 && this->BackpackQuantity[i][j] > 0) {
 						const float x = (535 + 1100.0 * 0.06 * j) - this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * i, x1 = x - 0.7 * IntDigit(this->BackpackQuantity[i][j]);
 						this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
@@ -1788,9 +1869,7 @@ public:
 					}
 				}
 			}
-			/*
-			This part is for update game event.
-			*/
+			//end
 		}
 	}
 	void render() {
