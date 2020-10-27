@@ -397,6 +397,14 @@ private:
 			this->InventoryHitbox[3][i][2] = round(560 + 1100 * 0.06 * i);
 			this->InventoryHitbox[3][i][3] = round(495 + 1100 * 0.06);
 		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				this->CraftingHitbox[i][j][0] = round(1200 + 1100 * 0.06 * j);
+				this->CraftingHitbox[i][j][1] = round(200 + 1100 * 0.06 * i);
+				this->CraftingHitbox[i][j][2] = round(1260 + 1100 * 0.06 * j);
+				this->CraftingHitbox[i][j][3] = round(260 + 1100 * 0.06 * i);
+			}
+		}
 		Object* ptr = new Object(54862);
 		this->DrawField["ItemOnMouse"].push_back(ptr);
 		this->DrawField["ItemOnMouse"][0]->Is("None");
@@ -436,6 +444,19 @@ private:
 				ptr->Is("None");
 				Backpack[i].push_back(ptr);
 				BackpackQuantity[i].push_back(0);
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			Crafting.push_back({});
+			CraftingQuantity.push_back({});
+			for (int j = 0; j < 3; j++) {
+				Object* ptr = new Object(rand() % 10000);
+				ptr->setImgDim(1000, 1000);
+				ptr->setPosX(200 + 1000 * 0.06 * i);
+				ptr->setPosY(503 + 1000 * 0.06 * j);
+				ptr->Is("None");
+				Crafting[i].push_back(ptr);
+				CraftingQuantity[i].push_back(0);
 			}
 		}
 		this->itemList.createTemplate("Item");
@@ -949,6 +970,14 @@ private:
 				this->Field["InventoryUI"].object("InventorySlot" + to_string(i) + to_string(j))->setPosY(200 + 1100 * 0.06 * i);
 			}
 		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				this->Field["InventoryUI"].registerObject("CraftingSlot" + to_string(i) + to_string(j), "itemFrame", "CraftingSlot");
+				this->Field["InventoryUI"].object("CraftingSlot" + to_string(i) + to_string(j))->tag = "InventoryUI";
+				this->Field["InventoryUI"].object("CraftingSlot" + to_string(i) + to_string(j))->setPosX(503 + 1100 * 0.06 * 9 + 100 + 1100 * 0.06 * j);
+				this->Field["InventoryUI"].object("CraftingSlot" + to_string(i) + to_string(j))->setPosY(200 + 1100 * 0.06 * i);
+			}
+		}
 		this->Field["BuildUI"].createTemplate("BuildingSample");
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
@@ -1044,14 +1073,14 @@ public:
 	unordered_map<string, Map> Field;
 	unordered_map<string, vector<Object*>> DrawField;
 	vector<int> ItemUseSlotQuantity, HotbarQuantity;
-	vector<vector<Object*>> Backpack;
-	vector<vector<int>> BackpackQuantity;
+	vector<vector<Object*>> Backpack, Crafting;
+	vector<vector<int>> BackpackQuantity, CraftingQuantity;
 	unordered_map<string, strMap> Dialog;
 	vector<int> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
 	Object* NoneItem = new Object(45678);
-	int InventoryHitbox[4][9][4];
+	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4];
 	int maxItemStack = 8;
 	bool _time = true;
 	bool pass = true;
@@ -1463,6 +1492,14 @@ public:
 												this->ItemOnMouseQuantity -= this->maxItemStack - this->HotbarQuantity[j];
 												this->HotbarQuantity[j] = this->maxItemStack;
 											}
+										}
+									}
+								}
+								for (int i = 0; i < 3; i++) {
+									for (int j = 0; j < 3; j++) {
+										if (clickHit(this->CraftingHitbox[i][j])) {
+											if(this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Crafting[i][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack)
+											printf("Click Hit Crafting %d,%d\n", i, j);
 										}
 									}
 								}
