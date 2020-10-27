@@ -466,6 +466,7 @@ private:
 		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
 		this->itemList.object("Hydro Flask")->addStat("healAmount", 10);
 		this->itemList.object("Hydro Flask")->addStat("durability", 1);
+		this->itemList.object("Hydro Flask")->addStat("MaxDurability", 10);
 		this->itemList.object("Hydro Flask")->tag = "Tool";
 
 		this->itemList.registerObject("Composite Metal", "Item", "Composite Metal");
@@ -1303,7 +1304,7 @@ public:
 							else if (this->building) {
 								int PumpHitBox[] = { 330, 100, 470, 280 };
 								int SlolarHitBox[] = { 330, 340, 460, 480 };
-								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10) && hasEnoughItem("Arclyic", 5)) {
+								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10, true) && hasEnoughItem("Arclyic", 5, true)) {
 									string ObjName = "Pump_" + to_string(rand() % 100000);
 									this->Field["Dynamic"].registerObject(ObjName, "Pump", "Pump");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
@@ -1399,9 +1400,14 @@ public:
 											printf("%d ", building->getHitBoxData()[i]);
 										}
 										printf("\n");
-										if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200) {
+										if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200 && building->cat == "Pump") {
 											cout << "Click hit : " << building->nowIs() << endl;
-											giveItem("MRE");
+											vector<int> flaskPos = searchFor("Hydro Flask");
+											if (flaskPos[0] == 1) {
+												cout << this->DrawField["Hotbar"][flaskPos[2]]->nowIs() << endl;
+												this->DrawField["Hotbar"][flaskPos[2]]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
+												cout << this->DrawField["Hotbar"][flaskPos[2]]->getStat("durability") << endl;
+											}
 										}
 									}
 								}
@@ -1448,7 +1454,7 @@ public:
 		}
 
 	}
-	bool hasEnoughItem(string item, int quantity) {
+	bool hasEnoughItem(string item, int quantity, bool remove) {
 		int itemcount = 0;
 		int itemPickCount = quantity;
 		for (int i = 0; i < 9; i++) {
@@ -1463,30 +1469,15 @@ public:
 				}
 			}
 		}
-		if (itemcount >= quantity) {
-			for (int i = 0; i < 9; i++) {
-				if (this->DrawField["Hotbar"][i]->nowIs() == item) {
-					if (itemPickCount <= this->HotbarQuantity[i]) {
-						this->HotbarQuantity[i] -= itemPickCount;
-					}
-					else {
-						this->HotbarQuantity[i] = 0;
-						itemPickCount -= this->maxItemStack;
-					}
-				}
-				if (itemPickCount == 0) {
-					return true;
-				}
-			}
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 9; j++) {
-					if (this->Backpack[i][j]->nowIs() == item) {
-						if (itemPickCount <= this->BackpackQuantity[i][j]) {
-							this->BackpackQuantity[i][j] -= itemPickCount;
-							return true;
+		if (remove) {
+			if (itemcount >= quantity) {
+				for (int i = 0; i < 9; i++) {
+					if (this->DrawField["Hotbar"][i]->nowIs() == item) {
+						if (itemPickCount <= this->HotbarQuantity[i]) {
+							this->HotbarQuantity[i] -= itemPickCount;
 						}
 						else {
-							this->BackpackQuantity[i][j] = 0;
+							this->HotbarQuantity[i] = 0;
 							itemPickCount -= this->maxItemStack;
 						}
 					}
@@ -1494,9 +1485,49 @@ public:
 						return true;
 					}
 				}
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 9; j++) {
+						if (this->Backpack[i][j]->nowIs() == item) {
+							if (itemPickCount <= this->BackpackQuantity[i][j]) {
+								this->BackpackQuantity[i][j] -= itemPickCount;
+								return true;
+							}
+							else {
+								this->BackpackQuantity[i][j] = 0;
+								itemPickCount -= this->maxItemStack;
+							}
+						}
+						if (itemPickCount == 0) {
+							return true;
+						}
+					}
+				}
 			}
 		}
-		return false;
+		else {
+			if (itemcount >= quantity) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+	}
+	vector<int> searchFor(string item) {
+		for (int i = 0; i < 9; i++) {
+			if (this->DrawField["Hotbar"][i]->nowIs() == item) {
+				vector<int> out = { 1,0,i };
+				return out;
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				if (this->Backpack[i][j]->nowIs() == item) {
+					vector<int> out = { 0,i,j };
+					return out;
+				}
+			}
+		}
 	}
 	void DecStat(string Stat, float amount) {
 		if (Elon->getStat(Stat) > 1) {
