@@ -367,16 +367,29 @@ public:
 
 class RecipeTable {
 private:
+	vector<string> itemNameList;
+	unordered_map<string, int> itemNameIndex;
 	unordered_map<string, int> outputNumber;
 	unordered_map<string, vector<string>> itemRequiredName;
 	unordered_map<string, vector<int>> itemRequiredQuantity;
 public:
 	void registerRecipe(string name, int outNum) {
+		this->itemNameIndex[name] = itemNameList.size();
+		this->itemNameList.push_back(name);
 		this->outputNumber[name] = outNum;
 	}
 	void addedRequiredItem(string itemName, string materialName, int materialNumber) {
 		itemRequiredName[itemName].push_back(materialName);
 		itemRequiredQuantity[itemName].push_back(materialNumber);
+	}
+	string RecipeAt(int Index) {
+		return itemNameList[Index];
+	}
+	int outputNum(string itemName) {
+		return this->outputNumber[itemName];
+	}
+	int indexOf(string itemName) {
+		return itemNameIndex[itemName];
 	}
 	int MatUseNumber(string itemName) {
 		return itemRequiredName[itemName].size();
@@ -384,8 +397,45 @@ public:
 	int itemUseQuantity(string itemName, int index) {
 		return itemRequiredQuantity[itemName][index];
 	}
+	int recipeNumber() {
+		return itemNameList.size();
+	}
 	string itemUseName(string itemName, int index) {
 		return itemRequiredName[itemName][index];
+	}
+	bool matIsUse(string itemName, string matName) {
+		for (int i = 0; i < this->itemRequiredName[itemName].size(); i++) {
+			if (this->itemRequiredName[itemName][i] == matName) {
+				return true;
+			}
+		}
+		return false;
+	}
+	bool IsUse(int Index, string matName, int number) {
+		for (int i = 0; i < this->itemRequiredName[RecipeAt(Index)].size(); i++) {
+			if (this->itemRequiredName[RecipeAt(Index)][i] == matName && this->itemRequiredQuantity[RecipeAt(Index)][i] <= number) {
+				return true;
+			}
+		}
+		return false;
+	}
+	bool matIsReady(int itemIndex, vector<vector<Object*>> Crafting, vector<vector<int>> CraftingQuantity) {
+		bool found = true;
+		int foundCount = 0;
+		for (int i = 0; i < this->itemRequiredName[RecipeAt(itemIndex)].size(); i++) { // for every material required list element
+			for (int j = 0; j < 3; j++) {
+				for (int k = 0; k < 3; k++) { // for every item on crafting slot
+					if (Crafting[j][k]->nowIs() != "None" && this->IsUse(itemIndex, Crafting[j][k]->nowIs(), CraftingQuantity[j][k])) {
+						found = found && true;
+						foundCount++;
+					}
+					else if(Crafting[j][k]->nowIs() != "None"){
+						found = found && false;
+					}
+				}
+			}
+		}
+		return found && (this->itemRequiredName[RecipeAt(itemIndex)].size() == foundCount);
 	}
 };
 class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
@@ -483,6 +533,9 @@ private:
 				CraftingQuantity[i].push_back(0);
 			}
 		}
+		this->itemOutput.setPosX(503 + 1100 * 0.06 * 9 + 100 + 1100 * 0.06);
+		this->itemOutput.setPosX(200 + 1100 * 0.06 * 4);
+
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
 		this->itemList.Template("Item")->setImgDim(1000, 1000);
@@ -539,7 +592,7 @@ private:
 		this->itemList.registerObject("Carrot", "Item", "Carrot");
 		this->itemList.object("Carrot")->addTexture("assets\\Prop\\Item\\Carrot.png", "default", 1000);
 		this->itemList.object("Carrot")->setSpriteTexture("default", 0);
-		this->itemList.object("Herb")->addStat("healAmount", 10);
+		this->itemList.object("Carrot")->addStat("healAmount", 10);
 		this->itemList.object("Carrot")->tag = "Food";
 
 		this->itemList.registerObject("Carrot Seed", "Item", "Carrot Seed");
@@ -645,6 +698,7 @@ private:
 		addItem(0, 5, 2, "Composite Metal");
 		addItem(0, 6, 5, "Arclyic");
 		addItem(0, 7, 1, "Shovel");
+		addItem(0, 8, 8, "Carrot");
 	}
 	void intiRecipe() {
 		this->Recipe.registerRecipe("Copper Wire", 1);
@@ -667,6 +721,8 @@ private:
 
 		this->Recipe.registerRecipe("Herb Seed", 4);
 		this->Recipe.addedRequiredItem("Herb Seed", "Herb", 1);
+
+		printf("Recipe Number = %d\n", this->Recipe.recipeNumber());
 	}
 	void intitDialog() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -1044,6 +1100,12 @@ private:
 				this->Field["InventoryUI"].object("CraftingSlot" + to_string(i) + to_string(j))->setPosY(200 + 1100 * 0.06 * i);
 			}
 		}
+
+		this->Field["InventoryUI"].registerObject("craftingOutput", "itemFrame", "craftingOutput");
+		this->Field["InventoryUI"].object("craftingOutput")->tag = "InventoryUI";
+		this->Field["InventoryUI"].object("craftingOutput")->setPosX(503 + 1100 * 0.06 * 9 + 100 + 1100 * 0.06);
+		this->Field["InventoryUI"].object("craftingOutput")->setPosY(200 + 1100 * 0.06 * 4);
+
 		this->Field["BuildUI"].createTemplate("BuildingSample");
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
@@ -1146,6 +1208,8 @@ public:
 	Object* Anchor;
 	Object* Elon;
 	Object* NoneItem = new Object(45678);
+	Object itemOutput = *NoneItem;
+	int itemOutoutQuantity = 0;
 	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4];
 	int maxItemStack = 8;
 	bool _time = true;
@@ -1166,6 +1230,7 @@ public:
 		this->initVar();
 		this->initWindow();
 		this->intitDialog();
+		this->intiRecipe();
 		this->initMainMenu();
 	}
 	void construct() {
@@ -1175,6 +1240,7 @@ public:
 		srand(time_ui);
 		printf("Initialing Object...\t");
 		this->DrawField["ItemOnMouse"].push_back(new Object(1216543));
+		this->DrawField["CraftingOutput"].push_back(new Object(1216543));
 		this->initObject();
 		this->initItem();
 		printf("Done\n");
@@ -1597,6 +1663,21 @@ public:
 													this->ItemOnMouseQuantity -= this->maxItemStack - this->CraftingQuantity[i][j];
 													this->CraftingQuantity[i][j] = this->maxItemStack;
 												}
+											}
+											bool foundAnyRecipe = false;
+											for (int i = 0; i < this->Recipe.recipeNumber(); i++) {
+												if (this->Recipe.matIsReady(i, this->Crafting, this->CraftingQuantity)) {
+													cout << "Craftable : " << this->Recipe.RecipeAt(i) << '\t' << "X" << this->Recipe.outputNum(this->Recipe.RecipeAt(i)) << endl;
+													*this->DrawField["CraftingOutput"][0] = *itemList.object(this->Recipe.RecipeAt(i));
+													this->DrawField["CraftingOutput"][0]->setPosX(this->Field["InventoryUI"].object("craftingOutput")->PosX() + 1100*0.06/2);
+													this->DrawField["CraftingOutput"][0]->setPosY(this->Field["InventoryUI"].object("craftingOutput")->PosY() + 1100*0.06/2);
+													this->DrawField["CraftingOutput"][0]->setSpriteSize(0.06, 0.06);
+													foundAnyRecipe = true;
+													break;
+												}
+											}
+											if (!foundAnyRecipe) {
+												this->DrawField["CraftingOutput"][0]->setSpriteSize(0, 0);
 											}
 										}
 									}
@@ -2113,6 +2194,7 @@ public:
 						this->window->draw(*this->Dialog["CraftingItem"].objectAt(i));
 					}
 					this->window->draw(this->DrawField["ItemOnMouse"][0]->getSprite());
+					this->window->draw(this->DrawField["CraftingOutput"][0]->getSprite());
 
 				}
 			}
