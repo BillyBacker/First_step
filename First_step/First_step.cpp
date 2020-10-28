@@ -365,6 +365,29 @@ public:
 
 };
 
+class RecipeTable {
+private:
+	unordered_map<string, int> outputNumber;
+	unordered_map<string, vector<string>> itemRequiredName;
+	unordered_map<string, vector<int>> itemRequiredQuantity;
+public:
+	void registerRecipe(string name, int outNum) {
+		this->outputNumber[name] = outNum;
+	}
+	void addedRequiredItem(string itemName, string materialName, int materialNumber) {
+		itemRequiredName[itemName].push_back(materialName);
+		itemRequiredQuantity[itemName].push_back(materialNumber);
+	}
+	int MatUseNumber(string itemName) {
+		return itemRequiredName[itemName].size();
+	}
+	int itemUseQuantity(string itemName, int index) {
+		return itemRequiredQuantity[itemName][index];
+	}
+	string itemUseName(string itemName, int index) {
+		return itemRequiredName[itemName][index];
+	}
+};
 class gameEngine { //this a main class of this game. resposibility for render object, recieve input event, draw graphic.
 private:
 	//Add a variable down here.
@@ -375,6 +398,7 @@ private:
 	VideoMode mode;
 	int i = 0;
 	Map itemList;
+	RecipeTable Recipe;
 	ContextSettings settings;
 	void addItem(int x, int y, int amount, string name) {
 		*this->Backpack[x][y] = *itemList.object(name);
@@ -452,8 +476,8 @@ private:
 			for (int j = 0; j < 3; j++) {
 				Object* ptr = new Object(rand() % 10000);
 				ptr->setImgDim(1000, 1000);
-				ptr->setPosX(200 + 1000 * 0.06 * i);
-				ptr->setPosY(503 + 1000 * 0.06 * j);
+				ptr->setPosX(1230 + 1100 * 0.06 * i);
+				ptr->setPosY(233 + 1100 * 0.06 * j);
 				ptr->Is("None");
 				Crafting[i].push_back(ptr);
 				CraftingQuantity[i].push_back(0);
@@ -622,6 +646,28 @@ private:
 		addItem(0, 6, 5, "Arclyic");
 		addItem(0, 7, 1, "Shovel");
 	}
+	void intiRecipe() {
+		this->Recipe.registerRecipe("Copper Wire", 1);
+		this->Recipe.addedRequiredItem("Copper Wire", "Copper Nugget", 4);
+
+		this->Recipe.registerRecipe("Flour", 1);
+		this->Recipe.addedRequiredItem("Flour","Wheat Grain", 1);
+
+		this->Recipe.registerRecipe("Bread", 1);
+		this->Recipe.addedRequiredItem("Bread", "Flour", 4);
+
+		this->Recipe.registerRecipe("Carrot Seed", 4);
+		this->Recipe.addedRequiredItem("Carrot Seed", "Carrot", 1);
+
+		this->Recipe.registerRecipe("Wheat Seed", 4);
+		this->Recipe.addedRequiredItem("Wheat Seed", "Wheat", 1);
+
+		this->Recipe.registerRecipe("Wheat Grain", 1);
+		this->Recipe.addedRequiredItem("Wheat Grain", "Wheat", 1);
+
+		this->Recipe.registerRecipe("Herb Seed", 4);
+		this->Recipe.addedRequiredItem("Herb Seed", "Herb", 1);
+	}
 	void intitDialog() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
 		this->Dialog["Font"].addFont("Mitr-Bold", "assets\\font\\Mitr-Bold.ttf");
@@ -711,6 +757,26 @@ private:
 				const float x = 200 + 1100 * 0.06 * i, y = 503 + 1100 * 0.06 * j;
 				this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->setPosition({ x ,y });
 				this->Dialog["InventoryItem"].object("InventoryitemCountBG" + to_string(i) + to_string(j))->setPosition({ x ,y });
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				this->Dialog["CraftingItem"].registerObject("CraftingItemCountBG" + to_string(i) + to_string(j), "itemCountBG");
+				this->Dialog["CraftingItem"].registerObject("CraftingItemCount" + to_string(i) + to_string(j), "itemCount");
+
+				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setFont(this->Dialog["Font"].font["Mitr-Bold"]);
+				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setCharacterSize(25);
+				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setString(to_string(i));
+				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setStyle(Text::Bold);
+				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setFillColor(Color::White);
+
+				this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+				this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setCharacterSize(25);
+				this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setString(to_string(i));
+				this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setFillColor(Color::Black);
+				const float x = 1230 + 1100 * 0.06 * i, y = 263 + 1100 * 0.06 * j;
+				this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setPosition({ x ,y });
+				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setPosition({ x ,y });
 			}
 		}
 	}
@@ -1343,12 +1409,14 @@ public:
 									}
 									else {
 										Elon->setStat("Hunger", 0);
+										Elon->incread("Health", -5);
 									}
 									if (Elon->getStat("Thirst") - 7 > 0) {
 										Elon->incread("Thirst", -7);
 									}
 									else {
 										Elon->setStat("Thirst", 0);
+										Elon->incread("Health", -7);
 									}
 									if (boolRand(10)) {
 										int quant = rand() % 3 + 1;
@@ -1497,9 +1565,39 @@ public:
 								}
 								for (int i = 0; i < 3; i++) {
 									for (int j = 0; j < 3; j++) {
-										if (clickHit(this->CraftingHitbox[i][j])) {
-											if(this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Crafting[i][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack)
-											printf("Click Hit Crafting %d,%d\n", i, j);
+										if (clickHit(this->CraftingHitbox[j][i])) {
+											if (this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && this->Crafting[i][j]->nowIs() == "None") {
+												printf("Click Hit Crafting %d,%d\n", i, j);
+												float pos[] = { Crafting[i][j]->PosX(), Crafting[i][j]->PosY() };
+												*Crafting[i][j] = *this->DrawField["ItemOnMouse"][0];
+												this->Crafting[i][j]->setPosX(pos[0]);
+												this->Crafting[i][j]->setPosY(pos[1]);
+												this->Crafting[i][j]->setSpriteSize(0.06, 0.06);
+												this->CraftingQuantity[i][j] += this->ItemOnMouseQuantity;
+												this->DrawField["ItemOnMouse"][0]->Is("None");
+												this->DrawField["ItemOnMouse"][0]->tag = "None";
+												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												this->ItemOnMouseQuantity = 0;
+											}
+											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" && this->Crafting[i][j]->nowIs() != "None") {
+												*this->DrawField["ItemOnMouse"][0] = *Crafting[i][j];
+												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0.06, 0.06);
+												this->Crafting[i][j]->Is("None");
+												this->Crafting[i][j]->tag = "None";
+												this->Crafting[i][j]->setSpriteSize(0, 0);
+												this->ItemOnMouseQuantity = this->CraftingQuantity[i][j];
+												this->CraftingQuantity[i][j] = 0;
+											}
+											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == this->Crafting[i][j]->nowIs() && this->CraftingQuantity[i][j] < this->maxItemStack) {
+												if (this->CraftingQuantity[i][j] + this->ItemOnMouseQuantity <= 8) {
+													this->CraftingQuantity[i][j] += this->ItemOnMouseQuantity;
+													this->ItemOnMouseQuantity = 0;
+												}
+												else {
+													this->ItemOnMouseQuantity -= this->maxItemStack - this->CraftingQuantity[i][j];
+													this->CraftingQuantity[i][j] = this->maxItemStack;
+												}
+											}
 										}
 									}
 								}
@@ -1664,14 +1762,26 @@ public:
 		if (this->Elon->getStat("Health") > 0) {
 			this->Field["HUD"].object("StatBar_Fill0")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Health") / 100);
 		}
+		else {
+			this->Field["HUD"].object("StatBar_Fill0")->setSpriteSize(0.06, 0);
+		}
 		if (this->Elon->getStat("Hunger") > 0) {
 			this->Field["HUD"].object("StatBar_Fill1")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Hunger") / 100);
+		}
+		else {
+			this->Field["HUD"].object("StatBar_Fill1")->setSpriteSize(0.06, 0);
 		}
 		if (this->Elon->getStat("Thirst") > 0) {
 			this->Field["HUD"].object("StatBar_Fill2")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Thirst") / 100);
 		}
+		else {
+			this->Field["HUD"].object("StatBar_Fill2")->setSpriteSize(0.06, 0);
+		}
 		if (this->Elon->getStat("Air") > 0) {
 			this->Field["HUD"].object("StatBar_Fill3")->setSpriteSize(0.06, -0.06 * this->Elon->getStat("Air") / 100);
+		}
+		else {
+			this->Field["HUD"].object("StatBar_Fill3")->setSpriteSize(0.06, 0);
 		}
 		this->Field["HUD"].object("ItemPrt")->setPosX(503 + 1100 * 0.06 / 2 + (this->selectingSlot * 1100 * 0.06));
 		for (int i = 0; i < 9; i++) {
@@ -1906,6 +2016,26 @@ public:
 					}
 				}
 			}
+			for (int i = 0; i < 3; i++) {
+				for (int j = 0; j < 3; j++) {
+					if (this->CraftingQuantity[i][j] <= 0) {
+						this->Crafting[i][j]->Is("None");
+						this->Crafting[i][j]->tag = "None";
+						this->Crafting[i][j]->setSpriteSize(0, 0);
+					}
+					if (this->Crafting[i][j]->nowIs() != "None" && this->Crafting[i][j]->getStat("showCount") == 1 && this->CraftingQuantity[i][j] > 0) {
+						const float x = (1230 + 1100.0 * 0.06 * i) - this->Dialog["InventoryItem"].object("InventoryitemCount" + to_string(i) + to_string(j))->getLocalBounds().width / 2, y = 233 + 1100 * 0.06 * j, x1 = x - 0.7 * IntDigit(this->CraftingQuantity[i][j]);
+						this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setPosition({ x,y });
+						this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setString(to_string(this->CraftingQuantity[i][j]));
+						this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setPosition({ x1,y });
+						this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setString(to_string(this->CraftingQuantity[i][j]));
+					}
+					else {
+						this->Dialog["CraftingItem"].object("CraftingItemCount" + to_string(i) + to_string(j))->setString(" ");
+						this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setString(" ");
+					}
+				}
+			}
 			//end
 		}
 	}
@@ -1968,11 +2098,19 @@ public:
 							this->window->draw(this->Backpack[i][j]->getSprite());
 						}
 					}
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							this->window->draw(this->Crafting[i][j]->getSprite());
+						}
+					}
 					for (int i = 0; i < this->Dialog["InventoryItem_hotbar"].entityNumber(); i++) {
 						this->window->draw(*this->Dialog["InventoryItem_hotbar"].objectAt(i));
 					}
 					for (int i = 0; i < this->Dialog["InventoryItem"].entityNumber(); i++) {
 						this->window->draw(*this->Dialog["InventoryItem"].objectAt(i));
+					}
+					for (int i = 0; i < this->Dialog["CraftingItem"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["CraftingItem"].objectAt(i));
 					}
 					this->window->draw(this->DrawField["ItemOnMouse"][0]->getSprite());
 
