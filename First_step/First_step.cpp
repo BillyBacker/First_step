@@ -1499,87 +1499,236 @@ public:
 					if (ev.mouseButton.button == Mouse::Right) {
 						cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << endl;
 						if (this->Elon->getStat("Alive") == 1) {
-							if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
-								Elon->setStat("Health", Elon->getStat("Health") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
-								if (Elon->getStat("Health") > 100) {
-									Elon->setStat("Health", 100);
-								}
-							}
-							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Food" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
-								Elon->setStat("Hunger", Elon->getStat("Hunger") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
-								if (Elon->getStat("Hunger") > 100) {
-									Elon->setStat("Hunger", 100);
-								}
-							}
-							else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0 && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") > 0) {
-								if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hammer") {
-									this->building = true;
-								}
-								else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask") {
-									Elon->setStat("Thirst", Elon->getStat("Thirst") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
-									if (Elon->getStat("Thirst") > 100) {
-										Elon->setStat("Thirst", 100);
-									}
-								}
-								else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Shovel") {
-									int num = rand() % 100;
-									if (Elon->getStat("Hunger") - 5 > 0) {
-										Elon->incread("Hunger", -5);
-									}
-									else {
-										Elon->setStat("Hunger", 0);
-										Elon->incread("Health", -5);
-									}
-									if (Elon->getStat("Thirst") - 7 > 0) {
-										Elon->incread("Thirst", -7);
-									}
-									else {
-										Elon->setStat("Thirst", 0);
-										Elon->incread("Health", -7);
-									}
-									if (boolRand(20)) {
-										int quant = rand() % 3 + 1;
-										for (int i = 0; i < 1; i++) {
-											giveItem("Gold Nugget");
+							if (this->inventory) {
+								for (int i = 0; i < 4; i++) {
+									for (int j = 0; j < 9; j++) {
+										if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
+											this->ItemOnMouseQuantity = ceil(this->BackpackQuantity[i][j]/2.0);
+											this->BackpackQuantity[i][j] = floor(this->BackpackQuantity[i][j]/2.0);
+											cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+										}
+										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+											*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
+											this->ItemOnMouseQuantity = ceil(this->HotbarQuantity[j]/2.0);
+											this->HotbarQuantity[j] = floor(this->HotbarQuantity[j]/2.0);
+										}
+										else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
+											printf("6++6+6+6+6+6++6+6+6\n");
+											if (this->BackpackQuantity[i][j] < this->maxItemStack) {
+												
+												printf("%d,%d\n", 3, j);
+												cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
+												this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
+												printf("++");
+												this->Backpack[i][j]->setPosX(200 + 1000 * 0.06 * i);
+												this->Backpack[i][j]->setPosY(503 + 1000 * 0.06 * j);
+												this->Backpack[i][j]->setSpriteSize(0.06, 0.06);
+												this->BackpackQuantity[i][j] += 1;
+												this->ItemOnMouseQuantity--;
+												printf("---");
+												cout << this->Backpack[i][j]->nowIs() << endl;
+												if (this->ItemOnMouseQuantity == 0) {
+													this->DrawField["ItemOnMouse"][0]->Is("None");
+													this->DrawField["ItemOnMouse"][0]->tag = "None";
+													this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												}
+											}
+										}
+										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack) {
+											if (this->HotbarQuantity[j] < this->maxItemStack) {
+												cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
+												Object A = *this->DrawField["ItemOnMouse"][0];
+												*DrawField["Hotbar"][j] = A;
+												(*DrawField["Hotbar"][j]).setPosX(503 + 1100 * 0.06 / 2 + (1100 * 0.06 * j));
+												(*DrawField["Hotbar"][j]).setTag(A.tag);
+												this->DrawField["Hotbar"][j]->Is(charOnly(A.nowIs()));
+												this->HotbarQuantity[j] += 1;
+												this->DrawField["Hotbar"][j]->setSpriteSize(0.06, 0.06);
+												this->ItemOnMouseQuantity--;
+												if (this->ItemOnMouseQuantity == 0) {
+													this->DrawField["ItemOnMouse"][0]->Is("None");
+													this->DrawField["ItemOnMouse"][0]->tag = "None";
+													this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												}
+											}
 										}
 									}
-									if (boolRand(50)) {
-										int quant = rand() % 5 + 1;
-										for (int i = 0; i < 1; i++) {
-											giveItem("Titanium Nugget");
+								}
+								for (int i = 0; i < 3; i++) {
+									for (int j = 0; j < 3; j++) {
+										if (clickHit(this->CraftingHitbox[j][i])) {
+											if (this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && this->Crafting[i][j]->nowIs() == "None") {
+												printf("Click Hit Crafting %d,%d\n", i, j);
+												float pos[] = { Crafting[i][j]->PosX(), Crafting[i][j]->PosY() };
+												*Crafting[i][j] = *this->DrawField["ItemOnMouse"][0];
+												this->Crafting[i][j]->setPosX(pos[0]);
+												this->Crafting[i][j]->setPosY(pos[1]);
+												this->Crafting[i][j]->setSpriteSize(0.06, 0.06);
+												this->CraftingQuantity[i][j] = 1;
+												this->ItemOnMouseQuantity--;
+												if (this->ItemOnMouseQuantity == 0) {
+													this->DrawField["ItemOnMouse"][0]->Is("None");
+													this->DrawField["ItemOnMouse"][0]->tag = "None";
+													this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												}
+											}
+											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" && this->Crafting[i][j]->nowIs() != "None") {
+												*this->DrawField["ItemOnMouse"][0] = *Crafting[i][j];
+												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0.06, 0.06);
+												this->ItemOnMouseQuantity = ceil(this->CraftingQuantity[i][j]/2.0);
+												this->CraftingQuantity[i][j] = floor(this->CraftingQuantity[i][j] / 2.0);
+												if(this->CraftingQuantity[i][j] == 0){
+													this->Crafting[i][j]->Is("None");
+													this->Crafting[i][j]->tag = "None";
+													this->Crafting[i][j]->setSpriteSize(0, 0);
+												}
+											}
+											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == this->Crafting[i][j]->nowIs() && this->CraftingQuantity[i][j] < this->maxItemStack) {
+												if (this->ItemOnMouseQuantity < this->maxItemStack) {
+													this->CraftingQuantity[i][j] += 1;
+													this->ItemOnMouseQuantity--;
+												}
+												if (this->ItemOnMouseQuantity == 0) {
+													this->DrawField["ItemOnMouse"][0]->Is("None");
+													this->DrawField["ItemOnMouse"][0]->tag = "None";
+													this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+												}
+											}
+											bool foundAnyRecipe = false;
+											for (int i = 0; i < this->Recipe.recipeNumber(); i++) {
+												if (this->Recipe.matIsReady(i, this->Crafting, this->CraftingQuantity)) {
+													*this->DrawField["CraftingOutput"][0] = *itemList.object(this->Recipe.RecipeAt(i));
+													this->DrawField["CraftingOutput"][0]->setPosX(this->Field["InventoryUI"].object("craftingOutput")->PosX() + 1100 * 0.06 / 2);
+													this->DrawField["CraftingOutput"][0]->setPosY(this->Field["InventoryUI"].object("craftingOutput")->PosY() + 1100 * 0.06 / 2);
+													this->DrawField["CraftingOutput"][0]->setSpriteSize(0.06, 0.06);
+													foundAnyRecipe = true;
+													break;
+												}
+											}
+											if (!foundAnyRecipe) {
+												this->DrawField["CraftingOutput"][0]->setSpriteSize(0, 0);
+											}
 										}
 									}
-									if (boolRand(100)) {
-										int quant = rand() % 7 + 1;
-										for (int i = 0; i < 1; i++) {
-											giveItem("Aluminium Nugget");
+								}
+								if (clickHit(CraftingOutputHitbox) && this->DrawField["CraftingOutput"][0]->nowIs() != "None" && (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" || this->DrawField["CraftingOutput"][0]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->ItemOnMouseQuantity + this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs()) <= this->maxItemStack) {
+									cout << "Craftable : " << this->DrawField["CraftingOutput"][0]->nowIs() << '\t' << "X" << this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs()) << endl;
+									*this->DrawField["ItemOnMouse"][0] = *this->DrawField["CraftingOutput"][0];
+									this->ItemOnMouseQuantity += this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs());
+									bool foundAnyRecipe = false;
+									for (int i = 0; i < this->Recipe.MatUseNumber(this->DrawField["CraftingOutput"][0]->nowIs()); i++) {
+										for (int j = 0; j < 3; j++) {
+											for (int k = 0; k < 3; k++) {
+												if (this->DrawField["CraftingOutput"][0]->nowIs() == "None" || this->Crafting[j][k]->nowIs() == "None") {
+													continue;
+												}
+												if (this->Crafting[j][k]->nowIs() == this->Recipe.matAt(this->DrawField["CraftingOutput"][0]->nowIs(), i) && this->Crafting[j][k]->tag != "Tool") {
+													this->CraftingQuantity[j][k] -= this->Recipe.itemUseQuantity(this->DrawField["CraftingOutput"][0]->nowIs(), i);
+												}
+											}
 										}
 									}
-									if (boolRand(200)) {
-										int quant = rand() % 10 + 1;
-										for (int i = 0; i < 1; i++) {
-											giveItem("Copper Nugget");
+									for (int i = 0; i < this->Recipe.recipeNumber(); i++) {
+										if (this->Recipe.matIsReady(i, this->Crafting, this->CraftingQuantity)) {
+											*this->DrawField["CraftingOutput"][0] = *itemList.object(this->Recipe.RecipeAt(i));
+											this->DrawField["CraftingOutput"][0]->setPosX(this->Field["InventoryUI"].object("craftingOutput")->PosX() + 1100 * 0.06 / 2);
+											this->DrawField["CraftingOutput"][0]->setPosY(this->Field["InventoryUI"].object("craftingOutput")->PosY() + 1100 * 0.06 / 2);
+											this->DrawField["CraftingOutput"][0]->setSpriteSize(0.06, 0.06);
+											foundAnyRecipe = true;
+											break;
 										}
+									}
+									if (!foundAnyRecipe) {
+										this->DrawField["CraftingOutput"][0]->setSpriteSize(0, 0);
+										*this->DrawField["CraftingOutput"][0] = *NoneItem;
 									}
 								}
 							}
 							else {
-								continue;
-							}
-							if (this->DrawField["Hotbar"][this->selectingSlot]->tag != "Tool") {
-								if (this->HotbarQuantity[this->selectingSlot] > 0) {
-									this->HotbarQuantity[this->selectingSlot]--;
+								if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Medicine" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Health") < 100) {
+									Elon->setStat("Health", Elon->getStat("Health") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
+									if (Elon->getStat("Health") > 100) {
+										Elon->setStat("Health", 100);
+									}
 								}
-								if (this->HotbarQuantity[this->selectingSlot] <= 0) {
-									this->DrawField["Hotbar"][this->selectingSlot]->Is("None");
-									this->DrawField["Hotbar"][this->selectingSlot]->tag = "None";
-									this->DrawField["Hotbar"][this->selectingSlot]->setSpriteSize(0, 0);
+								else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Food" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
+									Elon->setStat("Hunger", Elon->getStat("Hunger") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
+									if (Elon->getStat("Hunger") > 100) {
+										Elon->setStat("Hunger", 100);
+									}
 								}
-							}
-							else {
-								this->DrawField["Hotbar"][this->selectingSlot]->incread("durability", -1);
-								if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") <= 0) {
-									this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("Empty", 0);
+								else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0 && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") > 0) {
+									if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hammer") {
+										this->building = true;
+									}
+									else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask") {
+										Elon->setStat("Thirst", Elon->getStat("Thirst") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
+										if (Elon->getStat("Thirst") > 100) {
+											Elon->setStat("Thirst", 100);
+										}
+									}
+									else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Shovel") {
+										int num = rand() % 100;
+										if (Elon->getStat("Hunger") - 5 > 0) {
+											Elon->incread("Hunger", -5);
+										}
+										else {
+											Elon->setStat("Hunger", 0);
+											Elon->incread("Health", -5);
+										}
+										if (Elon->getStat("Thirst") - 7 > 0) {
+											Elon->incread("Thirst", -7);
+										}
+										else {
+											Elon->setStat("Thirst", 0);
+											Elon->incread("Health", -7);
+										}
+										if (boolRand(20)) {
+											int quant = rand() % 3 + 1;
+											for (int i = 0; i < 1; i++) {
+												giveItem("Gold Nugget");
+											}
+										}
+										if (boolRand(50)) {
+											int quant = rand() % 5 + 1;
+											for (int i = 0; i < 1; i++) {
+												giveItem("Titanium Nugget");
+											}
+										}
+										if (boolRand(100)) {
+											int quant = rand() % 7 + 1;
+											for (int i = 0; i < 1; i++) {
+												giveItem("Aluminium Nugget");
+											}
+										}
+										if (boolRand(200)) {
+											int quant = rand() % 10 + 1;
+											for (int i = 0; i < 1; i++) {
+												giveItem("Copper Nugget");
+											}
+										}
+									}
+								}
+								else {
+									continue;
+								}
+								if (this->DrawField["Hotbar"][this->selectingSlot]->tag != "Tool") {
+									if (this->HotbarQuantity[this->selectingSlot] > 0) {
+										this->HotbarQuantity[this->selectingSlot]--;
+									}
+									if (this->HotbarQuantity[this->selectingSlot] <= 0) {
+										this->DrawField["Hotbar"][this->selectingSlot]->Is("None");
+										this->DrawField["Hotbar"][this->selectingSlot]->tag = "None";
+										this->DrawField["Hotbar"][this->selectingSlot]->setSpriteSize(0, 0);
+									}
+								}
+								else {
+									this->DrawField["Hotbar"][this->selectingSlot]->incread("durability", -1);
+									if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") <= 0) {
+										this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("Empty", 0);
+									}
 								}
 							}
 						}
@@ -1718,10 +1867,18 @@ public:
 												if (this->CraftingQuantity[i][j] + this->ItemOnMouseQuantity <= 8) {
 													this->CraftingQuantity[i][j] += this->ItemOnMouseQuantity;
 													this->ItemOnMouseQuantity = 0;
+													this->DrawField["ItemOnMouse"][0]->Is("None");
+													this->DrawField["ItemOnMouse"][0]->tag = "None";
+													this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
 												}
 												else {
 													this->ItemOnMouseQuantity -= this->maxItemStack - this->CraftingQuantity[i][j];
 													this->CraftingQuantity[i][j] = this->maxItemStack;
+													if (this->ItemOnMouseQuantity == 0) {
+														this->DrawField["ItemOnMouse"][0]->Is("None");
+														this->DrawField["ItemOnMouse"][0]->tag = "None";
+														this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+													}
 												}
 											}
 											bool foundAnyRecipe = false;
@@ -1900,6 +2057,7 @@ public:
 				return false;
 			}
 		}
+		return false;
 	}
 	vector<int> searchFor(string item) {
 		for (int i = 0; i < 9; i++) {
