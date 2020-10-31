@@ -17,7 +17,7 @@
 
 using namespace sf;
 using namespace std;
-const vector<float> getHitVector(float, float, float, float);
+const vector<float> getVector(float, float, float, float);
 
 void Break() {
 	while (true) {
@@ -1036,6 +1036,33 @@ private:
 		this->Field["Dynamic"].object("Elon")->setPosY(400);
 		this->Field["Dynamic"].object("Elon")->setType("Static");
 		this->Elon = this->Field["Dynamic"].object("Elon");
+
+		this->Field["MiniElon"].createTemplate("Blank");
+
+		this->Field["MiniElon"].registerObject("MiniElon", "Blank", "MiniElon");
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk5.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Idle.png", "idle", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying1.png", "dying", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying2.png", "dying", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying3.png", "dying", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying4.png", "dying", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 8);
+		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
+		this->Field["MiniElon"].object("MiniElon")->loop = true;
+		this->Field["MiniElon"].object("MiniElon")->setSpriteSize(0.05, 0.05);
+		this->Field["MiniElon"].object("MiniElon")->setImgDim(1000, 1600);
+		this->Field["MiniElon"].object("MiniElon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
+		this->Field["MiniElon"].object("MiniElon")->setPosY(400);
+		this->Field["MiniElon"].object("MiniElon")->setType("Dynamic");
+		this->MiniElon = this->Field["MiniElon"].object("MiniElon");
+
 	}
 	void intitHUD() {
 		this->Field["HUD"].createTemplate("Blank");
@@ -1260,6 +1287,7 @@ public:
 	vector<int> mousePos = { 0,0 };
 	Object* Anchor;
 	Object* Elon;
+	Object* MiniElon;
 	Object* NoneItem = new Object(45678);
 	Object itemOutput = *NoneItem;
 	int itemOutoutQuantity = 0;
@@ -2249,6 +2277,8 @@ public:
 			catch (const std::out_of_range& e) {
 				printf("%d\n", e);
 			}
+			MiniElon->setPosX(this->Anchor->PosX());
+			MiniElon->setPosY(this->Anchor->PosY());
 			if (!this->paused) {
 				DecStat("Health", 0.00025);
 				DecStat("Hunger", 0.0005);
@@ -2278,20 +2308,42 @@ public:
 /////////////////////////////////////////////////////////////////////////////////////////
 			// Item following player
 			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) { // repeate for every object on the ground
-				Object* Obj = this->DrawField["DrawField_Dynamic"][i];
-				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 50 && pickable(Obj)) {
-					this->DrawField["DrawField_Dynamic"][i]->usable = false;
-					giveItem(charOnly(Obj->nowIs()));
+				Object* Obj = this->DrawField["DrawField_Dynamic"][i]; // get object to check
+				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 50 && pickable(Obj)) { // check if this object is item and it came close enough to pick
+					this->DrawField["DrawField_Dynamic"][i]->usable = false; // tell game engine that this item have been picked.
+					giveItem(charOnly(Obj->nowIs())); // give item to player.
 				}
-				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 200 && pickable(Obj)) {
-					const vector<float> moveVec = getHitVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), Obj->PosX(), Obj->PosY());
-					Obj->setOffsetPosX(Obj->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1));
-					Obj->setOffsetPosY(Obj->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1));
+				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 200 && pickable(Obj)) { // check if this object is item and it came close enough
+					const vector<float> moveVec = getVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), Obj->PosX(), Obj->PosY()); // get vector from item to player
+					Obj->setOffsetPosX(Obj->offsetPosX + 7 * moveVec[0] / abs(moveVec[0] + 1)); // use vector to move item along x axis.
+					Obj->setOffsetPosY(Obj->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1)); // use vector to move item along y axis.
 				}
 			}
 			// end
 /////////////////////////////////////////////////////////////////////////////////////////
 			// item dialog controlling unit
+			if (ObjectDis(this->Field["Dynamic"].object("Elon"), MiniElon) > 100) { // check if this object is item and it came close enough
+				const vector<float> moveVec = getVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), MiniElon->PosX(), MiniElon->PosY()); // get vector from item to player
+				MiniElon->setAnimationSeq("walk");
+				if (abs(moveVec[0]) > 10) {
+					if (moveVec[0] / abs(moveVec[0]) > 0) {
+						MiniElon->flipTexture(1);
+					}
+					else if (moveVec[0] / abs(moveVec[0]) < 0) {
+						MiniElon->flipTexture(-1);
+					}
+					MiniElon->setOffsetPosX(MiniElon->offsetPosX + moveVec[0]*0.03); // use vector to move item along x axis.
+				}
+				if (abs(moveVec[1]) > 10) {
+					MiniElon->setOffsetPosY(MiniElon->offsetPosY + moveVec[1]*0.03); // use vector to move item along y axis.
+				}
+				if (sqrt(pow(moveVec[0], 2) + pow(moveVec[1], 2)) > 150) {
+					MiniElon->UpdateAnimation(7);
+				}
+			}
+			else {
+				MiniElon->setAnimationSeq("idle");
+			}
 			for (int i = 0; i < 9; i++) {
 				if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
 					printf("Remove slot %d\n", i);
@@ -2383,6 +2435,9 @@ public:
 					//cout << this->DrawField["DrawField_BG"][i]->nowIs() << '\t' << this->DrawField["DrawField_BG"][i]->PosX() << ','<< this->DrawField["DrawField_BG"][i]->PosY() << '\t' << Elon->PosX() << ',' << Elon->PosY() << endl;
 					this->window->draw(this->DrawField["DrawField_BG"][i]->getSprite());
 				}
+				MiniElon->UpdateAnimation(2);
+				this->window->draw(MiniElon->getSprite());
+				printf("MiniElon is coming : %f, %f || %f %f\n", MiniElon->PosX(), MiniElon->PosY(), Elon->PosX(), Elon->PosY());
 				for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
 					this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
 				}
@@ -2552,10 +2607,11 @@ bool hitBoxhit(float x1, float y1, float x2, float y2, float x3, float y3, float
 	float setY2[2] = { y3,y4 };
 	return (anyBetween(setX1, setX2) || anyBetween(setX2, setX1)) && (anyBetween(setY1, setY2) || anyBetween(setY2, setY1));
 }
-
-const vector<float> getHitVector(float x1O, float y1O, float x2O, float y2O) {
+////////////////////////////////////////////////////////////////////////////////
+const vector<float> getVector(float x1O, float y1O, float x2O, float y2O) {
 	return { x1O - x2O, y1O - y2O };
 }
+///////////////////////////////////////////////////////////////////////////////
 
 float Distance(Object* A, Object* B) {
 	return sqrt(pow(A->PosX() - B->PosX(), 2) + pow(A->PosY() - B->PosY(), 2));
@@ -2589,7 +2645,7 @@ void isMovable() {
 				cout << "Out of Range error.";
 			}
 			if (!First_step.pause && First_step.DrawField["DrawField_Dynamic"][i]->usable && !First_step.DrawField["DrawField_Dynamic"][i]->passable && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], ObjHitBox[0], ObjHitBox[1], ObjHitBox[2], ObjHitBox[3])) {
-				HitVec = getHitVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
+				HitVec = getVector(ObjHitBox[4], ObjHitBox[5], ElonHitBox[4], ElonHitBox[5]);
 				printf("%.2f, %.2f\n", HitVec[0], HitVec[1]);
 				if (HitVec[1] < 0) {
 					W_isbump = true;
