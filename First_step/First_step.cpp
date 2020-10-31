@@ -2305,8 +2305,6 @@ public:
 				}
 			}
 			int maxParam = 0;
-/////////////////////////////////////////////////////////////////////////////////////////
-			// Item following player
 			for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) { // repeate for every object on the ground
 				Object* Obj = this->DrawField["DrawField_Dynamic"][i]; // get object to check
 				if (Obj->usable && Obj->tag == "fallItem" && ObjectDis(this->Field["Dynamic"].object("Elon"), Obj) <= 50 && pickable(Obj)) { // check if this object is item and it came close enough to pick
@@ -2319,9 +2317,7 @@ public:
 					Obj->setOffsetPosY(Obj->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1)); // use vector to move item along y axis.
 				}
 			}
-			// end
-/////////////////////////////////////////////////////////////////////////////////////////
-			// item dialog controlling unit
+//////////////////////////////////////////////////////////////////////
 			if (ObjectDis(this->Field["Dynamic"].object("Elon"), MiniElon) > 100) { // check if this object is item and it came close enough
 				const vector<float> moveVec = getVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), MiniElon->PosX(), MiniElon->PosY()); // get vector from item to player
 				MiniElon->setAnimationSeq("walk");
@@ -2344,6 +2340,7 @@ public:
 			else {
 				MiniElon->setAnimationSeq("idle");
 			}
+///////////////////////////////////////////////////////////////////////
 			for (int i = 0; i < 9; i++) {
 				if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
 					printf("Remove slot %d\n", i);
