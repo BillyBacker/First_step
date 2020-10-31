@@ -211,6 +211,12 @@ public:
 	void setOffsetPosY(float offy) {
 		this->offsetPosY = offy;
 	}
+	void MovePosX(float offx) {
+		this->offsetPosX += offx;
+	}
+	void MovePosY(float offy) {
+		this->offsetPosY += offy;
+	}
 	void setPosX(float x) {
 		this->posX = x;
 		this->sprite.setPosition(this->posX + this->offsetPosX, this->posY + this->offsetPosY);
@@ -1039,29 +1045,29 @@ private:
 
 		this->Field["MiniElon"].createTemplate("Blank");
 
-		this->Field["MiniElon"].registerObject("MiniElon", "Blank", "MiniElon");
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk5.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Idle.png", "idle", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying1.png", "dying", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying2.png", "dying", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying3.png", "dying", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying4.png", "dying", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 8);
-		this->Field["MiniElon"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
-		this->Field["MiniElon"].object("MiniElon")->loop = true;
-		this->Field["MiniElon"].object("MiniElon")->setSpriteSize(0.05, 0.05);
-		this->Field["MiniElon"].object("MiniElon")->setImgDim(1000, 1600);
-		this->Field["MiniElon"].object("MiniElon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
-		this->Field["MiniElon"].object("MiniElon")->setPosY(400);
-		this->Field["MiniElon"].object("MiniElon")->setType("Dynamic");
-		this->MiniElon = this->Field["MiniElon"].object("MiniElon");
+		this->Field["Dynamic"].registerObject("MiniElon", "Blank", "MiniElon");
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk1.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk5.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk4.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk3.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Walk2.png", "walk", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Idle.png", "idle", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying1.png", "dying", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying2.png", "dying", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying3.png", "dying", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying4.png", "dying", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 8);
+		this->Field["Dynamic"].object("MiniElon")->addTexture("assets\\Elon\\Elon_Dying5.png", "dying", 20000000);
+		this->Field["Dynamic"].object("MiniElon")->loop = true;
+		this->Field["Dynamic"].object("MiniElon")->setSpriteSize(0.05, 0.05);
+		this->Field["Dynamic"].object("MiniElon")->setImgDim(1000, 1600);
+		this->Field["Dynamic"].object("MiniElon")->setPosX(800 - 1000 * 0.1 * 1 / 2);
+		this->Field["Dynamic"].object("MiniElon")->setPosY(400);
+		this->Field["Dynamic"].object("MiniElon")->setType("Dynamic");
+		this->MiniElon = this->Field["Dynamic"].object("MiniElon");
 
 	}
 	void intitHUD() {
@@ -2317,7 +2323,8 @@ public:
 					Obj->setOffsetPosY(Obj->offsetPosY + 7 * moveVec[1] / abs(moveVec[1] + 1)); // use vector to move item along y axis.
 				}
 			}
-//////////////////////////////////////////////////////////////////////
+			MiniElon->setAnimationSeq("idle");
+			//////////////////////////////////////////////////////////////////////
 			if (ObjectDis(this->Field["Dynamic"].object("Elon"), MiniElon) > 100) { // check if this object is item and it came close enough
 				const vector<float> moveVec = getVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), MiniElon->PosX(), MiniElon->PosY()); // get vector from item to player
 				MiniElon->setAnimationSeq("walk");
@@ -2328,10 +2335,10 @@ public:
 					else if (moveVec[0] / abs(moveVec[0]) < 0) {
 						MiniElon->flipTexture(-1);
 					}
-					MiniElon->setOffsetPosX(MiniElon->offsetPosX + moveVec[0]*0.03); // use vector to move item along x axis.
+					MiniElon->setOffsetPosX(MiniElon->offsetPosX + moveVec[0] * 0.03); // use vector to move item along x axis.
 				}
 				if (abs(moveVec[1]) > 10) {
-					MiniElon->setOffsetPosY(MiniElon->offsetPosY + moveVec[1]*0.03); // use vector to move item along y axis.
+					MiniElon->setOffsetPosY(MiniElon->offsetPosY + moveVec[1] * 0.03); // use vector to move item along y axis.
 				}
 				if (sqrt(pow(moveVec[0], 2) + pow(moveVec[1], 2)) > 150) {
 					MiniElon->UpdateAnimation(7);
@@ -2340,7 +2347,8 @@ public:
 			else {
 				MiniElon->setAnimationSeq("idle");
 			}
-///////////////////////////////////////////////////////////////////////
+			///////////////////////////////////////////////////////////////////////
+			MiniElon->UpdateAnimation(1);
 			for (int i = 0; i < 9; i++) {
 				if (this->HotbarQuantity[i] == 0 && this->DrawField["Hotbar"][i]->nowIs() != "None") {
 					printf("Remove slot %d\n", i);
@@ -2432,12 +2440,10 @@ public:
 					//cout << this->DrawField["DrawField_BG"][i]->nowIs() << '\t' << this->DrawField["DrawField_BG"][i]->PosX() << ','<< this->DrawField["DrawField_BG"][i]->PosY() << '\t' << Elon->PosX() << ',' << Elon->PosY() << endl;
 					this->window->draw(this->DrawField["DrawField_BG"][i]->getSprite());
 				}
-				MiniElon->UpdateAnimation(2);
-				this->window->draw(MiniElon->getSprite());
-				printf("MiniElon is coming : %f, %f || %f %f\n", MiniElon->PosX(), MiniElon->PosY(), Elon->PosX(), Elon->PosY());
 				for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
 					this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
 				}
+				MiniElon->UpdateAnimation(2);
 				for (int i = 0; i < this->DrawField["DrawField_HUD"].size() && DrawField["DrawField_HUD"][i]; i++) {
 					this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
 				}
