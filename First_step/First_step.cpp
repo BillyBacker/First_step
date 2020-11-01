@@ -3,6 +3,7 @@
 #include<SFML/System.hpp>
 #include<SFML/Window.hpp>
 #include<SFML/OpenGL.hpp>
+#include <SFML/Audio.hpp>
 #include<thread>
 #include<math.h>
 #include<iostream>
@@ -467,6 +468,13 @@ private:
 	Map itemList;
 	RecipeTable Recipe;
 	ContextSettings settings;
+	template<typename T>
+	inline void freeContainer(T& p_container)
+	{
+		T empty;
+		using std::swap;
+		swap(p_container, empty);
+	}
 	void addItem(int x, int y, int amount, string name) {
 		*this->Backpack[x][y] = *itemList.object(name);
 		this->BackpackQuantity[x][y] = amount;
@@ -496,9 +504,6 @@ private:
 				this->CraftingHitbox[i][j][3] = round(260 + 1100 * 0.06 * i);
 			}
 		}
-		Object* ptr = new Object(54862);
-		this->DrawField["ItemOnMouse"].push_back(ptr);
-		this->DrawField["ItemOnMouse"][0]->Is("None");
 	}
 	void initWindow() {
 		this->mode.height = h;
@@ -510,48 +515,38 @@ private:
 		glMatrixMode(GL_PROJECTION);
 
 	}
+	void initSound() {
+		this->SoundRepo["POP"].loadFromFile("sound\\a.ogg");
+		this->SoundRepo["metalHit"].loadFromFile("sound\\crafting.ogg");
+		this->SoundRepo["metalHit2"].loadFromFile("sound\\building.ogg");
+		this->SoundRepo["Beep"].loadFromFile("sound\\BEEP_01.ogg");
+		this->SoundRepo["Pick"].loadFromFile("Sound\\b.ogg");
+		this->SoundRepo["Digging"].loadFromFile("Sound\\digging.ogg");
+		this->SoundRepo["Drink"].loadFromFile("Sound\\drink.ogg");
+		this->SoundRepo["Eat"].loadFromFile("Sound\\Eat.ogg");
+		this->SoundRepo["Fill"].loadFromFile("Sound\\Fill.ogg");
+		this->SoundRepo["Charge"].loadFromFile("Sound\\charge.ogg");
+
+		this->SoundFX["Click"].setBuffer(this->SoundRepo["POP"]);
+		this->SoundFX["Crafting"].setBuffer(this->SoundRepo["metalHit"]);
+		this->SoundFX["Building"].setBuffer(this->SoundRepo["metalHit2"]);
+		this->SoundFX["Open"].setBuffer(this->SoundRepo["Beep"]);
+		this->SoundFX["Pick"].setBuffer(this->SoundRepo["Pick"]);
+		this->SoundFX["Walking"].setBuffer(this->SoundRepo["Walk"]);
+		this->SoundFX["Digging"].setBuffer(this->SoundRepo["Digging"]);
+		this->SoundFX["Drinking"].setBuffer(this->SoundRepo["Drink"]);
+		this->SoundFX["Eat"].setBuffer(this->SoundRepo["Eat"]);
+		this->SoundFX["Fill"].setBuffer(this->SoundRepo["Fill"]);
+		this->SoundFX["Charge"].setBuffer(this->SoundRepo["Charge"]);
+
+		this->MusicFX["Walking"].openFromFile("Sound\\Walking.wav");
+		this->MusicFX["Walking"].setLoop(true);
+		this->MusicFX["Running"].openFromFile("Sound\\Running.ogg");
+		this->MusicFX["Running"].setLoop(true);
+		this->MusicFX["Wind"].openFromFile("Sound\\Wind.ogg");
+		this->MusicFX["Wind"].setLoop(true);
+	}
 	void initItem() {
-		for (int i = 0; i < 9; i++) {
-			Object* ptr = new Object(rand() % 10000);
-			ptr->setImgDim(1000, 1000);
-			ptr->setPosX(503 + 1100 * 0.06 * i);
-			ptr->setPosY(800);
-			ptr->Is("None");
-			this->DrawField["ItemUseSlot"].push_back(ptr); //old
-			this->DrawField["InventoryUseSlot"].push_back(ptr); //old
-			this->DrawField["Hotbar"].push_back(ptr);
-			this->DrawField["Hotbar_HUD"].push_back(ptr);
-			ItemUseSlotQuantity.push_back(0); //old
-			HotbarQuantity.push_back(0);
-		}
-		for (int i = 0; i < 3; i++) {
-			Backpack.push_back({});
-			BackpackQuantity.push_back({});
-			for (int j = 0; j < 9; j++) {
-				Object* ptr = new Object(rand() % 10000);
-				ptr->setImgDim(1000, 1000);
-				ptr->setPosX(200 + 1000 * 0.06 * i);
-				ptr->setPosY(503 + 1000 * 0.06 * j);
-				ptr->Is("None");
-				Backpack[i].push_back(ptr);
-				BackpackQuantity[i].push_back(0);
-			}
-		}
-		for (int i = 0; i < 3; i++) {
-			Crafting.push_back({});
-			CraftingQuantity.push_back({});
-			for (int j = 0; j < 3; j++) {
-				Object* ptr = new Object(rand() % 10000);
-				ptr->setImgDim(1000, 1000);
-				ptr->setPosX(1230 + 1100 * 0.06 * i);
-				ptr->setPosY(233 + 1100 * 0.06 * j);
-				ptr->Is("None");
-				Crafting[i].push_back(ptr);
-				CraftingQuantity[i].push_back(0);
-			}
-		}
-		this->itemOutput.setPosX(503 + 1100 * 0.06 * 9 + 100 + 1100 * 0.06);
-		this->itemOutput.setPosX(200 + 1100 * 0.06 * 4);
 
 		this->itemList.createTemplate("Item");
 		this->itemList.Template("Item")->setSpriteSize(0.06, 0.06);
@@ -733,11 +728,14 @@ private:
 		addItem(0, 2, 8, "Hammer");
 		addItem(0, 3, 1, "Drill");
 		addItem(0, 4, 8, "Composite Metal");
-		addItem(0, 5, 2, "Composite Metal");
+		addItem(0, 5, 8, "Composite Metal");
 		addItem(0, 6, 8, "Arclyic");
 		addItem(1, 0, 8, "Arclyic");
 		addItem(1, 1, 8, "Power Pack");
 		addItem(1, 2, 8, "Power Pack");
+		addItem(1, 3, 8, "Composite Metal");
+		addItem(1, 4, 8, "Composite Metal");
+		addItem(1, 5, 8, "Wiring Kit");
 		addItem(0, 7, 1, "Shovel");
 		addItem(0, 8, 8, "Carrot");
 	}
@@ -937,6 +935,50 @@ private:
 		}
 	}
 	void initObject() {
+		Object* ptr = new Object(54862);
+		this->DrawField["ItemOnMouse"].push_back(ptr);
+		this->DrawField["ItemOnMouse"][0]->Is("None");
+		for (int i = 0; i < 9; i++) {
+			Object* ptr = new Object(rand() % 10000);
+			ptr->setImgDim(1000, 1000);
+			ptr->setPosX(503 + 1100 * 0.06 * i);
+			ptr->setPosY(800);
+			ptr->Is("None");
+			this->DrawField["ItemUseSlot"].push_back(ptr); //old
+			this->DrawField["InventoryUseSlot"].push_back(ptr); //old
+			this->DrawField["Hotbar"].push_back(ptr);
+			this->DrawField["Hotbar_HUD"].push_back(ptr);
+			ItemUseSlotQuantity.push_back(0); //old
+			HotbarQuantity.push_back(0);
+		}
+		for (int i = 0; i < 3; i++) {
+			Backpack.push_back({});
+			BackpackQuantity.push_back({});
+			for (int j = 0; j < 9; j++) {
+				Object* ptr = new Object(rand() % 10000);
+				ptr->setImgDim(1000, 1000);
+				ptr->setPosX(200 + 1000 * 0.06 * i);
+				ptr->setPosY(503 + 1000 * 0.06 * j);
+				ptr->Is("None");
+				Backpack[i].push_back(ptr);
+				BackpackQuantity[i].push_back(0);
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			Crafting.push_back({});
+			CraftingQuantity.push_back({});
+			for (int j = 0; j < 3; j++) {
+				Object* ptr = new Object(rand() % 10000);
+				ptr->setImgDim(1000, 1000);
+				ptr->setPosX(1230 + 1100 * 0.06 * i);
+				ptr->setPosY(233 + 1100 * 0.06 * j);
+				ptr->Is("None");
+				Crafting[i].push_back(ptr);
+				CraftingQuantity[i].push_back(0);
+			}
+		}
+		this->itemOutput.setPosX(503 + 1100 * 0.06 * 9 + 100 + 1100 * 0.06);
+		this->itemOutput.setPosX(200 + 1100 * 0.06 * 4);
 
 		this->Field["Dynamic"].createTemplate("Blank");
 
@@ -1353,6 +1395,9 @@ public:
 	Object* MiniElon;
 	Object* NoneItem = new Object(45678);
 	Object itemOutput = *NoneItem;
+	unordered_map<string, Sound> SoundFX;
+	unordered_map<string, Music> MusicFX;
+	unordered_map<string, SoundBuffer> SoundRepo;
 	int itemOutoutQuantity = 0;
 	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4], CraftingOutputHitbox[4] = {1260,460,1330,530};
 	int maxItemStack = 8;
@@ -1367,10 +1412,11 @@ public:
 	bool paused = false, building = false, inventory = false;
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
 	bool OnMainMenu = true;
+	bool DynamicAck = false, FloorAck = false;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
 		srand(time_ui);
-		this->initItem();
+		this->initSound();
 		this->initVar();
 		this->initWindow();
 		this->intitDialog();
@@ -1399,20 +1445,22 @@ public:
 		this->manageLayer();
 		printf("Done\n");
 		this->pause = false;
+		this->MusicFX["Wind"].play();
 	}
 	void constructMainMenu() {
 		this->initMainMenu();
 	}
 	void destroy() {
+		this->MusicFX["Wind"].stop();
 		this->pause = true;
-		Sleep(500);
-		this->ItemUseSlotQuantity.clear();
-		this->HotbarQuantity.clear();
-		this->Backpack.clear();
-		this->BackpackQuantity.clear();
-		this->Dialog.clear();
-		this->DrawField.clear();
-		this->itemList.clear();
+		while (!FloorAck && !DynamicAck) {
+			Sleep(1);
+		}
+		Field = *new unordered_map<string, Map>;
+		DrawField = *new unordered_map<string, vector<Object*>>;
+		Field.rehash(0);
+		DrawField.rehash(0);
+		this->initMainMenu();
 		this->pause = false;
 	}
 	virtual ~gameEngine() {
@@ -1594,12 +1642,14 @@ public:
 								for (int i = 0; i < 4; i++) {
 									for (int j = 0; j < 9; j++) {
 										if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											this->SoundFX["Pick"].play();
 											this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
 											this->ItemOnMouseQuantity = ceil(this->BackpackQuantity[i][j]/2.0);
 											this->BackpackQuantity[i][j] = floor(this->BackpackQuantity[i][j]/2.0);
 											cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 										}
 										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											this->SoundFX["Pick"].play();
 											cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
 											*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
 											this->ItemOnMouseQuantity = ceil(this->HotbarQuantity[j]/2.0);
@@ -1607,6 +1657,7 @@ public:
 										}
 										else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
 											printf("6++6+6+6+6+6++6+6+6\n");
+											this->SoundFX["Pick"].play();
 											if (this->BackpackQuantity[i][j] < this->maxItemStack) {
 												
 												printf("%d,%d\n", 3, j);
@@ -1628,6 +1679,7 @@ public:
 											}
 										}
 										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack) {
+											this->SoundFX["Pick"].play();
 											if (this->HotbarQuantity[j] < this->maxItemStack) {
 												cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
 												Object A = *this->DrawField["ItemOnMouse"][0];
@@ -1651,6 +1703,7 @@ public:
 									for (int j = 0; j < 3; j++) {
 										if (clickHit(this->CraftingHitbox[j][i])) {
 											if (this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && this->Crafting[i][j]->nowIs() == "None") {
+												this->SoundFX["Pick"].play();
 												printf("Click Hit Crafting %d,%d\n", i, j);
 												float pos[] = { Crafting[i][j]->PosX(), Crafting[i][j]->PosY() };
 												*Crafting[i][j] = *this->DrawField["ItemOnMouse"][0];
@@ -1666,6 +1719,7 @@ public:
 												}
 											}
 											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" && this->Crafting[i][j]->nowIs() != "None") {
+												this->SoundFX["Pick"].play();
 												*this->DrawField["ItemOnMouse"][0] = *Crafting[i][j];
 												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0.06, 0.06);
 												this->ItemOnMouseQuantity = ceil(this->CraftingQuantity[i][j]/2.0);
@@ -1677,6 +1731,7 @@ public:
 												}
 											}
 											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == this->Crafting[i][j]->nowIs() && this->CraftingQuantity[i][j] < this->maxItemStack) {
+												this->SoundFX["Pick"].play();
 												if (this->ItemOnMouseQuantity < this->maxItemStack) {
 													this->CraftingQuantity[i][j] += 1;
 													this->ItemOnMouseQuantity--;
@@ -1705,6 +1760,7 @@ public:
 									}
 								}
 								if (clickHit(CraftingOutputHitbox) && this->DrawField["CraftingOutput"][0]->nowIs() != "None" && (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" || this->DrawField["CraftingOutput"][0]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->ItemOnMouseQuantity + this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs()) <= this->maxItemStack) {
+									this->SoundFX["Pick"].play();
 									cout << "Craftable : " << this->DrawField["CraftingOutput"][0]->nowIs() << '\t' << "X" << this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs()) << endl;
 									*this->DrawField["ItemOnMouse"][0] = *this->DrawField["CraftingOutput"][0];
 									this->ItemOnMouseQuantity += this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs());
@@ -1745,6 +1801,7 @@ public:
 									}
 								}
 								else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Food" && this->HotbarQuantity[this->selectingSlot] > 0 && Elon->getStat("Hunger") < 100) {
+									this->SoundFX["Eat"].play();
 									Elon->setStat("Hunger", Elon->getStat("Hunger") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
 									if (Elon->getStat("Hunger") > 100) {
 										Elon->setStat("Hunger", 100);
@@ -1752,15 +1809,18 @@ public:
 								}
 								else if (this->DrawField["Hotbar"][this->selectingSlot]->tag == "Tool" && this->HotbarQuantity[this->selectingSlot] > 0 && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") > 0) {
 									if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hammer") {
+										this->SoundFX["Open"].play();
 										this->building = true;
 									}
 									else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask") {
+										this->SoundFX["Drinking"].play();
 										Elon->setStat("Thirst", Elon->getStat("Thirst") + this->DrawField["Hotbar"][this->selectingSlot]->getStat("healAmount"));
 										if (Elon->getStat("Thirst") > 100) {
 											Elon->setStat("Thirst", 100);
 										}
 									}
 									else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Shovel") {
+										this->SoundFX["Digging"].play();
 										int num = rand() % 100;
 										if (Elon->getStat("Hunger") - 5 > 0) {
 											Elon->increase("Hunger", -5);
@@ -1831,10 +1891,12 @@ public:
 								int BacktoGameHitBox[] = { 250, 200, 600, 250 };
 								int ExitHitBox[] = { 250, 600, 600, 650 };
 								if (clickHit(BacktoGameHitBox)) {
+									this->SoundFX["Click"].play();
 									printf("Hit");
 									this->paused = false;
 								}
 								if (clickHit(ExitHitBox)) {
+									this->SoundFX["Click"].play();
 									printf("Hit");
 									this->destroy();
 									this->OnMainMenu = true;
@@ -1847,6 +1909,7 @@ public:
 								int PumpHitBox[] = { 330, 100, 470, 280 };
 								int SlolarHitBox[] = { 330, 340, 460, 480 };
 								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 5, false)) {
+									this->SoundFX["Building"].play();
 									hasEnoughItem("Composite Metal", 10, true);
 									hasEnoughItem("Arclyic", 5, true);
 									string ObjName = "Pump_" + to_string(rand() % 100000);
@@ -1857,6 +1920,7 @@ public:
 									this->building = false;
 								}
 								if (clickHit(SlolarHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 2, false) && hasEnoughItem("Wiring Kit", 1, false)) {
+									this->SoundFX["Building"].play();
 									hasEnoughItem("Composite Metal", 10, true);
 									hasEnoughItem("Arclyic", 2, true);
 									hasEnoughItem("Wiring Kit", 1, true);
@@ -1871,7 +1935,8 @@ public:
 							else if (this->inventory) {
 								for (int i = 0; i < 4; i++) {
 									for (int j = 0; j < 9; j++) {
-										if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+										if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None" && this->Backpack[i][j]->nowIs() != "None") {
+											this->SoundFX["Pick"].play();
 											this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
 											this->ItemOnMouseQuantity = this->BackpackQuantity[i][j];
 											this->BackpackQuantity[i][j] = 0;
@@ -1882,6 +1947,7 @@ public:
 											cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 										}
 										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
+											this->SoundFX["Pick"].play();
 											cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
 											*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
 											this->ItemOnMouseQuantity = this->HotbarQuantity[j];
@@ -1891,6 +1957,7 @@ public:
 											this->DrawField["Hotbar"][j]->setSpriteSize(0, 0);
 										}
 										else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
+											this->SoundFX["Pick"].play();
 											printf("6++6+6+6+6+6++6+6+6\n");
 											if (this->ItemOnMouseQuantity + this->BackpackQuantity[i][j] <= this->maxItemStack) {
 												printf("%d,%d\n", 3, j);
@@ -1914,6 +1981,7 @@ public:
 											}
 										}
 										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->DrawField["Hotbar"][j]->nowIs() == "None" || this->DrawField["Hotbar"][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->HotbarQuantity[j] < this->maxItemStack) {
+											this->SoundFX["Pick"].play();
 											if (this->ItemOnMouseQuantity + this->HotbarQuantity[j] <= this->maxItemStack) {
 												cout << DrawField["Hotbar"][j]->tag << "<<" << this->DrawField["ItemOnMouse"][0]->tag << endl;
 												Object A = *this->DrawField["ItemOnMouse"][0];
@@ -1938,6 +2006,7 @@ public:
 									for (int j = 0; j < 3; j++) {
 										if (clickHit(this->CraftingHitbox[j][i])) {
 											if (this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && this->Crafting[i][j]->nowIs() == "None") {
+												this->SoundFX["Pick"].play();
 												printf("Click Hit Crafting %d,%d\n", i, j);
 												float pos[] = { Crafting[i][j]->PosX(), Crafting[i][j]->PosY() };
 												*Crafting[i][j] = *this->DrawField["ItemOnMouse"][0];
@@ -1951,6 +2020,7 @@ public:
 												this->ItemOnMouseQuantity = 0;
 											}
 											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" && this->Crafting[i][j]->nowIs() != "None") {
+												this->SoundFX["Pick"].play();
 												*this->DrawField["ItemOnMouse"][0] = *Crafting[i][j];
 												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0.06, 0.06);
 												this->Crafting[i][j]->Is("None");
@@ -1960,6 +2030,7 @@ public:
 												this->CraftingQuantity[i][j] = 0;
 											}
 											else if (this->DrawField["ItemOnMouse"][0]->nowIs() == this->Crafting[i][j]->nowIs() && this->CraftingQuantity[i][j] < this->maxItemStack) {
+												this->SoundFX["Pick"].play();
 												if (this->CraftingQuantity[i][j] + this->ItemOnMouseQuantity <= 8) {
 													this->CraftingQuantity[i][j] += this->ItemOnMouseQuantity;
 													this->ItemOnMouseQuantity = 0;
@@ -1995,6 +2066,7 @@ public:
 									}
 								}
 								if (clickHit(CraftingOutputHitbox) && this->DrawField["CraftingOutput"][0]->nowIs() != "None" && (this->DrawField["ItemOnMouse"][0]->nowIs() == "None" || this->DrawField["CraftingOutput"][0]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->ItemOnMouseQuantity + this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs()) <= this->maxItemStack) {
+									this->SoundFX["Crafting"].play();
 									cout << "Craftable : " << this->DrawField["CraftingOutput"][0]->nowIs() << '\t' << "X" << this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs()) << endl;
 									*this->DrawField["ItemOnMouse"][0] = *this->DrawField["CraftingOutput"][0];
 									this->ItemOnMouseQuantity += this->Recipe.outputNum(this->DrawField["CraftingOutput"][0]->nowIs());
@@ -2044,12 +2116,14 @@ public:
 											cout << "Click hit : " << building->nowIs() << endl;
 											if (building->cat == "Pump") {
 												if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") < this->itemList.object("Hydro Flask")->getStat("MaxDurability")) {
+													this->SoundFX["Fill"].play(); 
 													this->DrawField["Hotbar"][this->selectingSlot]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
 													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
 													cout << this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") << endl;
 												}
 											}
 											else if (building->cat == "Solar") {
+												this->SoundFX["Charge"].play();
 												if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Power Pack" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") < this->itemList.object("Power Pack")->getStat("MaxDurability")) {
 													this->DrawField["Hotbar"][this->selectingSlot]->setStat("durability", this->itemList.object("Power Pack")->getStat("MaxDurability"));
 													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
@@ -2089,10 +2163,12 @@ public:
 					if (ev.mouseButton.button == Mouse::Left) {
 						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
 						if (clickHit(PlayHitBox)) {
+							this->SoundFX["Click"].play();
 							this->construct();
 							this->OnMainMenu = false;
 						}
 						else if (clickHit(ExitHitBox)) {
+							this->SoundFX["Click"].play();
 							this->window->close();
 							this->running = false;
 						}
@@ -2255,11 +2331,13 @@ public:
 			this->updateHUD();
 			if (this->escPressed && !this->escToggle) {
 				if (this->paused || this->building || this->inventory) {
+					this->SoundFX["Open"].play();
 					this->paused = false;
 					this->building = false;
 					this->inventory = false;
 				}
 				else {
+					this->SoundFX["Open"].play();
 					this->paused = true;
 				}
 				this->escToggle = true;
@@ -2269,10 +2347,13 @@ public:
 			}
 			if (this->E && !this->EToggle) {
 				if (this->inventory) {
+					this->SoundFX["Open"].play();
 					this->inventory = false;
 				}
 				else {
+					this->SoundFX["Open"].play();
 					this->inventory = true;
+					this->building = false;
 				}
 				this->EToggle = true;
 			}
@@ -2285,9 +2366,17 @@ public:
 				DecStat("Thirst", 0.0003);
 				DecStat("Air", 0.005);
 				if (shift) {
+					this->MusicFX["Walking"].stop();
+					this->MusicFX["Running"].pause();
+					this->MusicFX["Running"].play();
 					this->Elon->UpdateAnimation(2);
 					DecStat("Hunger", 0.002);
 					DecStat("Thirst", 0.003);
+				}
+				else {
+					this->MusicFX["Running"].stop();
+					this->MusicFX["Walking"].pause();
+					this->MusicFX["Walking"].play();
 				}
 				if (S && !W) {
 					if (!updated) {
@@ -2333,6 +2422,8 @@ public:
 				}
 			}
 			else if (Elon->getStat("Alive") == 1) {
+				this->MusicFX["Running"].stop();
+				this->MusicFX["Walking"].stop();
 				Idle();
 				this->Elon->resetTimeSeq();
 			}
@@ -2693,9 +2784,11 @@ void CheckInsight() {
 }
 void checkFloorInsight() {
 	while (First_step.isRuning()) {
+		First_step.FloorAck = false;
 		Sleep(1);
 		while (First_step.isRuning() && (First_step.DrawField["BG_repo"].size() == 0 || First_step.pause || First_step.OnMainMenu)) {
 			Sleep(1);
+			First_step.FloorAck = true;
 		}
 		if (!First_step.isRuning()) {
 			break;
@@ -2750,10 +2843,12 @@ void isMovable() {
 	bool W_isbump = false, A_isbump = false, S_isbump = false, D_isbump = false;
 	float hitBoxXoffset = 30;
 	while (First_step.isRuning()) {
+		First_step.DynamicAck = false;
 		Sleep(1);
 		bump = false;
 		while (First_step.isRuning() && (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu)) {
 			Sleep(1);
+			First_step.DynamicAck = true;
 		}
 		if (!First_step.isRuning()) {
 			break;
