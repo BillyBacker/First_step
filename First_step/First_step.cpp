@@ -829,11 +829,29 @@ private:
 		this->Dialog["itemUse"].object("metalUse_pump")->setString("10");
 		this->Dialog["itemUse"].object("metalUse_pump")->setPosition({ 550,210 });
 
-		this->Dialog["itemUse"].registerObject("metalUse_Arclyic", "BuildingMenu");
-		this->Dialog["itemUse"].object("metalUse_Arclyic")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
-		this->Dialog["itemUse"].object("metalUse_Arclyic")->setCharacterSize(50);
-		this->Dialog["itemUse"].object("metalUse_Arclyic")->setString("5");
-		this->Dialog["itemUse"].object("metalUse_Arclyic")->setPosition({ 650,210 });
+		this->Dialog["itemUse"].registerObject("ArclyicUse_pump", "BuildingMenu");
+		this->Dialog["itemUse"].object("ArclyicUse_pump")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("ArclyicUse_pump")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("ArclyicUse_pump")->setString("5");
+		this->Dialog["itemUse"].object("ArclyicUse_pump")->setPosition({ 650,210 });
+
+		this->Dialog["itemUse"].registerObject("metalUse_Solar", "BuildingMenu");
+		this->Dialog["itemUse"].object("metalUse_Solar")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("metalUse_Solar")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("metalUse_Solar")->setString("10");
+		this->Dialog["itemUse"].object("metalUse_Solar")->setPosition({ 550,410 });
+
+		this->Dialog["itemUse"].registerObject("ArclyicUse_Solar", "BuildingMenu");
+		this->Dialog["itemUse"].object("ArclyicUse_Solar")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("ArclyicUse_Solar")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("ArclyicUse_Solar")->setString("2");
+		this->Dialog["itemUse"].object("ArclyicUse_Solar")->setPosition({ 650,410 });
+
+		this->Dialog["itemUse"].registerObject("WiringKitUse_Solar", "BuildingMenu");
+		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setString("1");
+		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setPosition({ 750,410 });
 
 		for (int i = 0; i < 9; i++) {
 			this->Dialog["InventoryItem_hotbar"].registerObject("InventoryitemCountBG_hotbar" + to_string(i), "itemCountBG");
@@ -1213,6 +1231,7 @@ private:
 		this->Field["BuildUI"].createTemplate("ItemUse");
 		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\metalPlate.png", "CompositeMetal", 1000);
 		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\Arclyic.png", "Arclyic", 1000);
+		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\WiringKit.png", "WiringKit", 1000);
 		this->Field["BuildUI"].Template("ItemUse")->setSpriteSize(0.1, 0.1);
 		this->Field["BuildUI"].Template("ItemUse")->setImgDim(1000, 1000);
 		this->Field["BuildUI"].Template("ItemUse")->setType("Static");
@@ -1227,6 +1246,21 @@ private:
 		this->Field["BuildUI"].object("Pump_Arclyic")->setSpriteTexture("Arclyic", 0);
 		this->Field["BuildUI"].object("Pump_Arclyic")->setPosX(650);
 		this->Field["BuildUI"].object("Pump_Arclyic")->setPosY(220);
+
+		this->Field["BuildUI"].registerObject("Solar_metal", "ItemUse", "Solar_metal");
+		this->Field["BuildUI"].object("Solar_metal")->setSpriteTexture("CompositeMetal", 0);
+		this->Field["BuildUI"].object("Solar_metal")->setPosX(550);
+		this->Field["BuildUI"].object("Solar_metal")->setPosY(420);
+
+		this->Field["BuildUI"].registerObject("Solar_Arclyic", "ItemUse", "Solar_Arclyic");
+		this->Field["BuildUI"].object("Solar_Arclyic")->setSpriteTexture("Arclyic", 0);
+		this->Field["BuildUI"].object("Solar_Arclyic")->setPosX(650);
+		this->Field["BuildUI"].object("Solar_Arclyic")->setPosY(420);
+
+		this->Field["BuildUI"].registerObject("Solar_WiringKit", "ItemUse", "Solar_WiringKit");
+		this->Field["BuildUI"].object("Solar_WiringKit")->setSpriteTexture("WiringKit", 0);
+		this->Field["BuildUI"].object("Solar_WiringKit")->setPosX(750);
+		this->Field["BuildUI"].object("Solar_WiringKit")->setPosY(420);
 
 	}
 	void initMainMenu() {
@@ -1797,7 +1831,7 @@ public:
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
 									this->building = false;
 								}
-								if (clickHit(SlolarHitBox)) {
+								if (clickHit(SlolarHitBox) && hasEnoughItem("Composite Metal", 10, true) && hasEnoughItem("Arclyic", 2, true) && hasEnoughItem("Wiring Kit", 1, true)) {
 									string ObjName = "Solar_" + to_string(rand() % 100000);
 									this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
@@ -1978,14 +2012,16 @@ public:
 											printf("%d ", building->getHitBoxData()[i]);
 										}
 										printf("\n");
-										if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200 && building->cat == "Pump") {
+										if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200) {
 											cout << "Click hit : " << building->nowIs() << endl;
-											vector<int> flaskPos = searchFor("Hydro Flask");
-											if (flaskPos[0] == 1) {
-												cout << this->DrawField["Hotbar"][flaskPos[2]]->nowIs() << endl;
-												this->DrawField["Hotbar"][flaskPos[2]]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
-												this->DrawField["Hotbar"][flaskPos[2]]->setSpriteTexture("default", 0);
-												cout << this->DrawField["Hotbar"][flaskPos[2]]->getStat("durability") << endl;
+											if (building->cat == "Pump") {
+												vector<int> flaskPos = searchFor("Hydro Flask");
+												if (flaskPos[0] == 1) {
+													cout << this->DrawField["Hotbar"][flaskPos[2]]->nowIs() << endl;
+													this->DrawField["Hotbar"][flaskPos[2]]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
+													this->DrawField["Hotbar"][flaskPos[2]]->setSpriteTexture("default", 0);
+													cout << this->DrawField["Hotbar"][flaskPos[2]]->getStat("durability") << endl;
+												}
 											}
 										}
 									}
