@@ -70,7 +70,7 @@ public:
 	void remove(string keyIn) {
 		this->map.erase(keyIn);
 	}
-	void incread(string keyIn, float In) {
+	void increase(string keyIn, float In) {
 		this->map[keyIn] += In;
 	}
 	unsigned __int64 length() {
@@ -199,8 +199,8 @@ public:
 	void addStat(string KeyIn, float val) {
 		Stat.append(KeyIn, val);
 	}
-	void incread(string KeyIn, float amount) {
-		this->Stat.incread(KeyIn, amount);
+	void increase(string KeyIn, float amount) {
+		this->Stat.increase(KeyIn, amount);
 	}
 	float getStat(string KeyIn) {
 		return Stat.get(KeyIn);
@@ -579,9 +579,9 @@ private:
 		this->itemList.registerObject("Hydro Flask", "Tool", "Hydro Flask");
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask.png", "default", 1000);
 		this->itemList.object("Hydro Flask")->addTexture("assets\\Prop\\Item\\Hydro_Flask_Empty.png", "Empty", 1000);
-		this->itemList.object("Hydro Flask")->setSpriteTexture("default", 0);
+		this->itemList.object("Hydro Flask")->setSpriteTexture("Empty", 0);
 		this->itemList.object("Hydro Flask")->addStat("healAmount", 10);
-		this->itemList.object("Hydro Flask")->addStat("durability", 1);
+		this->itemList.object("Hydro Flask")->addStat("durability", 0);
 		this->itemList.object("Hydro Flask")->addStat("MaxDurability", 10);
 		this->itemList.object("Hydro Flask")->tag = "Tool";
 
@@ -716,6 +716,17 @@ private:
 		this->itemList.object("Hammer")->addStat("durability", 200);
 		this->itemList.object("Hammer")->tag = "Tool";
 
+		this->itemList.registerObject("Power Pack", "Tool", "Power Pack");
+		this->itemList.object("Power Pack")->addTexture("assets\\Prop\\Item\\Battery_100.png", "default", 1000);
+		this->itemList.object("Power Pack")->addTexture("assets\\Prop\\Item\\Battery_75.png", "default", 1000);
+		this->itemList.object("Power Pack")->addTexture("assets\\Prop\\Item\\Battery_50.png", "default", 1000);
+		this->itemList.object("Power Pack")->addTexture("assets\\Prop\\Item\\Battery_25.png", "default", 1000);
+		this->itemList.object("Power Pack")->addTexture("assets\\Prop\\Item\\Battery_0.png", "default", 1000);
+		this->itemList.object("Power Pack")->setSpriteTexture("default", 0);
+		this->itemList.object("Power Pack")->addStat("durability", 200);
+		this->itemList.object("Power Pack")->addStat("MaxDurability", 200);
+		this->itemList.object("Power Pack")->tag = "Tool";
+
 		// Default item
 		addItem(0, 0, 8, "MRE");
 		addItem(0, 1, 8, "Hydro Flask");
@@ -725,6 +736,8 @@ private:
 		addItem(0, 5, 2, "Composite Metal");
 		addItem(0, 6, 8, "Arclyic");
 		addItem(1, 0, 8, "Arclyic");
+		addItem(1, 1, 8, "Power Pack");
+		addItem(1, 2, 8, "Power Pack");
 		addItem(0, 7, 1, "Shovel");
 		addItem(0, 8, 8, "Carrot");
 	}
@@ -780,6 +793,16 @@ private:
 		this->Recipe.addedRequiredItem("Wiring Kit", "Copper Wire", 8);
 		this->Recipe.addedRequiredItem("Wiring Kit", "Gold Wire", 4);
 		this->Recipe.addedRequiredItem("Wiring Kit", "Gold Plate", 1);
+
+		this->Recipe.registerRecipe("Power Pack", 1);
+		this->Recipe.addedRequiredItem("Power Pack", "Wiring Kit", 1);
+		this->Recipe.addedRequiredItem("Power Pack", "Aluminium Plate", 4);
+		this->Recipe.addedRequiredItem("Power Pack", "Composite Metal", 2);
+		this->Recipe.addedRequiredItem("Power Pack", "Gold Plate", 1);
+
+		this->Recipe.registerRecipe("Hydro Flask", 1);
+		this->Recipe.addedRequiredItem("Hydro Flask", "Aluminium Plate", 4);
+		this->Recipe.addedRequiredItem("Hydro Flask", "Hammer", 1);
 
 		printf("Recipe Number = %d\n", this->Recipe.recipeNumber());
 	}
@@ -1740,18 +1763,18 @@ public:
 									else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Shovel") {
 										int num = rand() % 100;
 										if (Elon->getStat("Hunger") - 5 > 0) {
-											Elon->incread("Hunger", -5);
+											Elon->increase("Hunger", -5);
 										}
 										else {
 											Elon->setStat("Hunger", 0);
-											Elon->incread("Health", -5);
+											Elon->increase("Health", -5);
 										}
 										if (Elon->getStat("Thirst") - 7 > 0) {
-											Elon->incread("Thirst", -7);
+											Elon->increase("Thirst", -7);
 										}
 										else {
 											Elon->setStat("Thirst", 0);
-											Elon->incread("Health", -7);
+											Elon->increase("Health", -7);
 										}
 										if (boolRand(20)) {
 											int quant = rand() % 3 + 1;
@@ -1793,7 +1816,7 @@ public:
 									}
 								}
 								else {
-									this->DrawField["Hotbar"][this->selectingSlot]->incread("durability", -1);
+									this->DrawField["Hotbar"][this->selectingSlot]->increase("durability", -1);
 									if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") <= 0) {
 										this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("Empty", 0);
 									}
@@ -1823,7 +1846,9 @@ public:
 							else if (this->building) {
 								int PumpHitBox[] = { 330, 100, 470, 280 };
 								int SlolarHitBox[] = { 330, 340, 460, 480 };
-								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10, true) && hasEnoughItem("Arclyic", 5, true)) {
+								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 5, false)) {
+									hasEnoughItem("Composite Metal", 10, true);
+									hasEnoughItem("Arclyic", 5, true);
 									string ObjName = "Pump_" + to_string(rand() % 100000);
 									this->Field["Dynamic"].registerObject(ObjName, "Pump", "Pump");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
@@ -1831,7 +1856,10 @@ public:
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
 									this->building = false;
 								}
-								if (clickHit(SlolarHitBox) && hasEnoughItem("Composite Metal", 10, true) && hasEnoughItem("Arclyic", 2, true) && hasEnoughItem("Wiring Kit", 1, true)) {
+								if (clickHit(SlolarHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 2, false) && hasEnoughItem("Wiring Kit", 1, false)) {
+									hasEnoughItem("Composite Metal", 10, true);
+									hasEnoughItem("Arclyic", 2, true);
+									hasEnoughItem("Wiring Kit", 1, true);
 									string ObjName = "Solar_" + to_string(rand() % 100000);
 									this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
@@ -2008,19 +2036,24 @@ public:
 																	building->getHitBoxData()[1] - building->getImgHeight() * building->getSizeY()/2,
 																	building->getHitBoxData()[2],
 																	building->getHitBoxData()[3]+ building->getImgHeight() * building->getSizeY()*0.2, };
-										for (int i = 0; i < 4; i++) {
-											printf("%d ", building->getHitBoxData()[i]);
+										for (int j = 0; j < 4; j++) {
+											printf("%d ", building->getHitBoxData()[j]);
 										}
 										printf("\n");
 										if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200) {
 											cout << "Click hit : " << building->nowIs() << endl;
 											if (building->cat == "Pump") {
-												vector<int> flaskPos = searchFor("Hydro Flask");
-												if (flaskPos[0] == 1) {
-													cout << this->DrawField["Hotbar"][flaskPos[2]]->nowIs() << endl;
-													this->DrawField["Hotbar"][flaskPos[2]]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
-													this->DrawField["Hotbar"][flaskPos[2]]->setSpriteTexture("default", 0);
-													cout << this->DrawField["Hotbar"][flaskPos[2]]->getStat("durability") << endl;
+												if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") < this->itemList.object("Hydro Flask")->getStat("MaxDurability")) {
+													this->DrawField["Hotbar"][this->selectingSlot]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
+													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
+													cout << this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") << endl;
+												}
+											}
+											else if (building->cat == "Solar") {
+												if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Power Pack" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") < this->itemList.object("Power Pack")->getStat("MaxDurability")) {
+													this->DrawField["Hotbar"][this->selectingSlot]->setStat("durability", this->itemList.object("Power Pack")->getStat("MaxDurability"));
+													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
+													cout << this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") << endl;
 												}
 											}
 										}
@@ -2129,21 +2162,21 @@ public:
 		}
 		return false;
 	}
-	vector<int> searchFor(string item) {
+	vector<vector<int>> searchFor(string item) {
+		vector<vector<int>> out;
 		for (int i = 0; i < 9; i++) {
 			if (this->DrawField["Hotbar"][i]->nowIs() == item) {
-				vector<int> out = { 1,0,i };
-				return out;
+				out.push_back({ 1,0,i });
 			}
 		}
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
 				if (this->Backpack[i][j]->nowIs() == item) {
-					vector<int> out = { 0,i,j };
-					return out;
+					out.push_back({ 0,i,j });
 				}
 			}
 		}
+		return out;
 	}
 	void DecStat(string Stat, float amount) {
 		if (Elon->getStat(Stat) > 1) {
@@ -2344,6 +2377,57 @@ public:
 					Elon->setStat("Alive", 0);
 					Elon->setAnimationSeq("dying");
 					Elon->UpdateAnimation(1);
+				}
+				vector<vector<int>> power = searchFor("Power Pack");
+				bool foundPowerPack = false;
+				for (int i = 0; i < power.size(); i++) {
+					if (power[i][0] == 1 && this->DrawField["Hotbar"][power[i][2]]->getStat("durability") > 0) {
+						float powerPercent = 100*this->DrawField["Hotbar"][power[i][2]]->getStat("durability")/this->itemList.object("Power Pack")->getStat("MaxDurability");
+						this->DrawField["Hotbar"][power[i][2]]->increase("durability", -0.01);
+						if (powerPercent > 75) {
+							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 0);
+						}
+						else if (powerPercent > 50 && powerPercent <= 75) {
+							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 1);
+						}
+						else if (powerPercent > 25 && powerPercent <= 50) {
+							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 2);
+						}
+						else if (powerPercent > 0.1 && powerPercent <= 25) {
+							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 3);
+						}
+						else if (powerPercent <= 0.1) {
+							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 4);
+						}
+						foundPowerPack = true;
+						printf("Power Pack (1,0,%d) : %f\n", power[i][2], powerPercent);
+						break;
+					}
+					else if (power[i][0] == 0 && this->Backpack[power[i][1]][power[i][2]]->getStat("durability") > 0) {
+						this->Backpack[power[i][1]][power[i][2]]->increase("durability", -0.01);
+						float powerPercent = 100 * this->Backpack[power[i][1]][power[i][2]]->getStat("durability") / this->itemList.object("Power Pack")->getStat("MaxDurability");
+						if (powerPercent > 75) {
+							this->Backpack[power[i][1]][power[i][2]]->setSpriteTexture("default", 0);
+						}
+						else if (powerPercent > 50 && powerPercent <= 75) {
+							this->Backpack[power[i][1]][power[i][2]]->setSpriteTexture("default", 1);
+						}
+						else if (powerPercent > 25 && powerPercent <= 50) {
+							this->Backpack[power[i][1]][power[i][2]]->setSpriteTexture("default", 2);
+						}
+						else if (powerPercent > 0.1 && powerPercent <= 25) {
+							this->Backpack[power[i][1]][power[i][2]]->setSpriteTexture("default", 3);
+						}
+						else if (powerPercent <= 0.1) {
+							this->Backpack[power[i][1]][power[i][2]]->setSpriteTexture("default", 4);
+						}
+						foundPowerPack = true;
+						printf("Power Pack (0,%d,%d) : %f\n", power[i][1], power[i][2], powerPercent);
+						break;
+					}
+				}
+				if (!foundPowerPack) {
+					Elon->setStat("Air", 0);
 				}
 			}
 			int maxParam = 0;
