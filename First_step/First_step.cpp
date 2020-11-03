@@ -326,6 +326,16 @@ public:
 	unordered_map<string, Object*> getTuple() {
 		return this->Tuple;
 	}
+	void destroy() {
+		for (int i = 0; i < Tuplekey.size(); i++) {
+			cout << "Delete : " << Tuple[Tuplekey[i]]->nowIs() << endl;
+			delete Tuple[Tuplekey[i]];
+		}
+		Tuple = *new unordered_map<string, Object*>;
+		Templ = *new unordered_map<string, Object*>;
+		Tuplekey = *new unordered_map<unsigned __int64, string>;
+		Templkey = *new unordered_map<unsigned __int64, string>;
+	}
 
 };
 
@@ -722,6 +732,11 @@ private:
 		this->itemList.object("Power Pack")->addStat("MaxDurability", 200);
 		this->itemList.object("Power Pack")->tag = "Tool";
 
+		this->itemList.registerObject("Reasearch Document", "Item", "Reasearch Document");
+		this->itemList.object("Reasearch Document")->addTexture("assets\\Prop\\Item\\Doc.png", "default", 1000);
+		this->itemList.object("Reasearch Document")->setSpriteTexture("default", 0);
+		this->itemList.object("Reasearch Document")->tag = "QuestItem";
+
 		// Default item
 		addItem(0, 0, 8, "MRE");
 		addItem(0, 1, 8, "Hydro Flask");
@@ -733,9 +748,16 @@ private:
 		addItem(1, 0, 8, "Arclyic");
 		addItem(1, 1, 8, "Power Pack");
 		addItem(1, 2, 8, "Power Pack");
-		addItem(1, 3, 8, "Composite Metal");
-		addItem(1, 4, 8, "Composite Metal");
+		addItem(1, 3, 8, "Titanium Plate");
+		addItem(1, 4, 8, "Titanium Plate");
 		addItem(1, 5, 8, "Wiring Kit");
+		addItem(2, 1, 8, "Titanium Plate");
+		addItem(2, 2, 8, "Titanium Plate");
+		addItem(2, 3, 8, "Aluminium Plate");
+		addItem(2, 4, 8, "Aluminium Plate");
+		addItem(2, 5, 8, "Aluminium Plate");
+		addItem(2, 6, 8, "Gold Plate");
+		addItem(2, 7, 8, "Gold Plate");
 		addItem(0, 7, 1, "Shovel");
 		addItem(0, 8, 8, "Carrot");
 	}
@@ -874,6 +896,30 @@ private:
 		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setString("1");
 		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setPosition({ 750,410 });
 
+		this->Dialog["itemUse"].registerObject("TitaniumPlateUse_Rocket", "BuildingMenu");
+		this->Dialog["itemUse"].object("TitaniumPlateUse_Rocket")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("TitaniumPlateUse_Rocket")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("TitaniumPlateUse_Rocket")->setString("30");
+		this->Dialog["itemUse"].object("TitaniumPlateUse_Rocket")->setPosition({ 1150,210 });
+
+		this->Dialog["itemUse"].registerObject("AluminiumPlateUse_Rocket", "BuildingMenu");
+		this->Dialog["itemUse"].object("AluminiumPlateUse_Rocket")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("AluminiumPlateUse_Rocket")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("AluminiumPlateUse_Rocket")->setString("20");
+		this->Dialog["itemUse"].object("AluminiumPlateUse_Rocket")->setPosition({ 1250,210 });
+
+		this->Dialog["itemUse"].registerObject("GoldPlateUse_Rocket", "BuildingMenu");
+		this->Dialog["itemUse"].object("GoldPlateUse_Rocket")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("GoldPlateUse_Rocket")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("GoldPlateUse_Rocket")->setString("10");
+		this->Dialog["itemUse"].object("GoldPlateUse_Rocket")->setPosition({ 1350,210 });
+
+		this->Dialog["itemUse"].registerObject("WiringKitUse_Rocket", "BuildingMenu");
+		this->Dialog["itemUse"].object("WiringKitUse_Rocket")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("WiringKitUse_Rocket")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("WiringKitUse_Rocket")->setString("5");
+		this->Dialog["itemUse"].object("WiringKitUse_Rocket")->setPosition({ 1450,210 });
+
 		for (int i = 0; i < 9; i++) {
 			this->Dialog["InventoryItem_hotbar"].registerObject("InventoryitemCountBG_hotbar" + to_string(i), "itemCountBG");
 			this->Dialog["InventoryItem_hotbar"].registerObject("InventoryitemCount_hotbar" + to_string(i), "itemCount");
@@ -999,6 +1045,15 @@ private:
 		this->Field["Dynamic"].Template("Rocky")->isPassable(false);
 		this->Field["Dynamic"].Template("Rocky")->setType("Dynamic");
 
+		this->Field["Dynamic"].createTemplate("Doc");
+		this->Field["Dynamic"].Template("Doc")->addTexture("assets\\Prop\\Building\\DocumentCase.png", "default", 1000);
+		this->Field["Dynamic"].Template("Doc")->setSpriteTexture("default", 0);
+		this->Field["Dynamic"].Template("Doc")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("Doc")->setImgDim(1200, 1600);
+		this->Field["Dynamic"].Template("Doc")->isPassable(false);
+		this->Field["Dynamic"].Template("Doc")->setType("Dynamic");
+		this->Field["Dynamic"].Template("Doc")->tag = "Building";
+
 		this->Field["Dynamic"].createTemplate("BG_Element");
 		this->Field["Dynamic"].Template("BG_Element")->setType("Dynamic");
 		this->Field["Dynamic"].Template("BG_Element")->setPosX(0);
@@ -1038,6 +1093,17 @@ private:
 		this->Field["Dynamic"].Template("Structure")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
 		this->Field["Dynamic"].Template("Structure")->setType("Dynamic");
 		this->Field["Dynamic"].Template("Structure")->isPassable(false);
+
+		this->Field["Dynamic"].createTemplate("Rocket");
+		this->Field["Dynamic"].Template("Rocket")->addTexture("assets\\Prop\\Building\\Rocket.png", "Rocket", 1000);
+		this->Field["Dynamic"].Template("Rocket")->setSpriteTexture("Rocket", 0);
+		this->Field["Dynamic"].Template("Rocket")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("Rocket")->setImgDim(2400, 3200);
+		this->Field["Dynamic"].Template("Rocket")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["Dynamic"].Template("Rocket")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["Dynamic"].Template("Rocket")->setType("Dynamic");
+		this->Field["Dynamic"].Template("Rocket")->isPassable(false);
+		this->Field["Dynamic"].Template("Rocket")->tag = "Building";
 
 		this->Field["Dynamic"].createTemplate("Pump");
 		this->Field["Dynamic"].Template("Pump")->addTexture("assets\\Prop\\Building\\Pumpy.png", "pump", 1000);
@@ -1087,6 +1153,13 @@ private:
 			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setSpriteTexture("default" + to_string(rand() % 3), 0);
 			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 5000);
 			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 5000);
+		}
+
+		for (int j = 0; j < 50; j++) {
+			float size = rand() % 10;
+			this->Field["Dynamic"].registerObject("Doc" + to_string(j), "Doc", "Doc");
+			this->Field["Dynamic"].object("Doc" + to_string(j))->setOffsetPosX(rand() % 13000);
+			this->Field["Dynamic"].object("Doc" + to_string(j))->setOffsetPosY(rand() % 13000);
 		}
 
 		this->Field["Dynamic"].registerObject("Hut", "Structure", "Hut");
@@ -1278,6 +1351,7 @@ private:
 		this->Field["BuildUI"].createTemplate("BuildingSample");
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
+		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Rocket.png", "Rocket", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->setSpriteSize(0.1, 0.1);
 		this->Field["BuildUI"].Template("BuildingSample")->setImgDim(1200, 1600);
 		this->Field["BuildUI"].Template("BuildingSample")->setType("Static");
@@ -1293,10 +1367,22 @@ private:
 		this->Field["BuildUI"].object("SolarCellSample")->setPosX(400);
 		this->Field["BuildUI"].object("SolarCellSample")->setPosY(400);
 
+		this->Field["BuildUI"].registerObject("RocketSample", "BuildingSample", "RocketSample");
+		this->Field["BuildUI"].object("RocketSample")->setSpriteTexture("Rocket", 0);
+		this->Field["BuildUI"].object("RocketSample")->setPosX(1000);
+		this->Field["BuildUI"].object("RocketSample")->setPosY(200);
+		this->Field["BuildUI"].object("RocketSample")->setSpriteSize(0.05, 0.05);
+		this->Field["BuildUI"].object("RocketSample")->setImgDim(2400, 3200);
+
+
+
 		this->Field["BuildUI"].createTemplate("ItemUse");
 		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\metalPlate.png", "CompositeMetal", 1000);
 		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\Arclyic.png", "Arclyic", 1000);
 		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\WiringKit.png", "WiringKit", 1000);
+		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\GoldPlate.png", "GoldPlate", 1000);
+		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\titaniumPlate.png", "TitaniumPlate", 1000);
+		this->Field["BuildUI"].Template("ItemUse")->addTexture("assets\\Prop\\Item\\AluminiumPlate.png", "AluminiumPlate", 1000);
 		this->Field["BuildUI"].Template("ItemUse")->setSpriteSize(0.1, 0.1);
 		this->Field["BuildUI"].Template("ItemUse")->setImgDim(1000, 1000);
 		this->Field["BuildUI"].Template("ItemUse")->setType("Static");
@@ -1326,6 +1412,26 @@ private:
 		this->Field["BuildUI"].object("Solar_WiringKit")->setSpriteTexture("WiringKit", 0);
 		this->Field["BuildUI"].object("Solar_WiringKit")->setPosX(750);
 		this->Field["BuildUI"].object("Solar_WiringKit")->setPosY(420);
+
+		this->Field["BuildUI"].registerObject("Rocket_TitanuiumPlate", "ItemUse", "Rocket_TitanuiumPlate");
+		this->Field["BuildUI"].object("Rocket_TitanuiumPlate")->setSpriteTexture("TitaniumPlate", 0);
+		this->Field["BuildUI"].object("Rocket_TitanuiumPlate")->setPosX(1150);
+		this->Field["BuildUI"].object("Rocket_TitanuiumPlate")->setPosY(220);
+
+		this->Field["BuildUI"].registerObject("Rocket_AluminiumPlate", "ItemUse", "Rocket_AluminiumPlate");
+		this->Field["BuildUI"].object("Rocket_AluminiumPlate")->setSpriteTexture("AluminiumPlate", 0);
+		this->Field["BuildUI"].object("Rocket_AluminiumPlate")->setPosX(1250);
+		this->Field["BuildUI"].object("Rocket_AluminiumPlate")->setPosY(220);
+
+		this->Field["BuildUI"].registerObject("Rocket_GoldPlate", "ItemUse", "Rocket_GoldPlate");
+		this->Field["BuildUI"].object("Rocket_GoldPlate")->setSpriteTexture("GoldPlate", 0);
+		this->Field["BuildUI"].object("Rocket_GoldPlate")->setPosX(1350);
+		this->Field["BuildUI"].object("Rocket_GoldPlate")->setPosY(220);
+
+		this->Field["BuildUI"].registerObject("Rocket_WiringKit", "ItemUse", "Rocket_WiringKit");
+		this->Field["BuildUI"].object("Rocket_WiringKit")->setSpriteTexture("WiringKit", 0);
+		this->Field["BuildUI"].object("Rocket_WiringKit")->setPosX(1450);
+		this->Field["BuildUI"].object("Rocket_WiringKit")->setPosY(220);
 
 	}
 	void initMainMenu() {
@@ -1395,12 +1501,14 @@ public:
 	Object* MiniElon;
 	Object* NoneItem = new Object(45678);
 	Object itemOutput = *NoneItem;
+	Object* Rocket;
 	unordered_map<string, Sound> SoundFX;
 	unordered_map<string, Music> MusicFX;
 	unordered_map<string, SoundBuffer> SoundRepo;
 	int itemOutoutQuantity = 0;
 	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4], CraftingOutputHitbox[4] = {1260,460,1330,530};
 	int maxItemStack = 8;
+	int Rockettime = 0;
 	bool _time = true;
 	bool pass = true;
 	bool movable = true;
@@ -1413,6 +1521,7 @@ public:
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
 	bool OnMainMenu = true;
 	bool DynamicAck = false, FloorAck = false;
+	bool walk = true, idle = true, canMove = true, onRocket = false;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
 		srand(time_ui);
@@ -1456,10 +1565,11 @@ public:
 		while (!FloorAck && !DynamicAck) {
 			Sleep(1);
 		}
-		Field = *new unordered_map<string, Map>;
-		DrawField = *new unordered_map<string, vector<Object*>>;
-		Field.rehash(0);
-		DrawField.rehash(0);
+		Field["Dynamic"].destroy();
+		Field["GameBG"].destroy();
+		freeContainer(DrawField["BG_repo"]);
+		freeContainer(DrawField["DrawField_BG"]);
+		freeContainer(DrawField["DrawField_Dynamic"]);
 		this->initMainMenu();
 		this->pause = false;
 	}
@@ -1635,7 +1745,13 @@ public:
 					this->DrawField["ItemOnMouse"][0]->setPosY(this->mousePos[1]);
 				}
 				if (ev.type == Event::MouseButtonPressed) {
-					if (ev.mouseButton.button == Mouse::Right) {
+					if (ev.mouseButton.button == Mouse::Middle) {
+						this->DrawField["ItemOnMouse"][0]->Is("None");
+						this->DrawField["ItemOnMouse"][0]->tag = "None";
+						this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
+						this->ItemOnMouseQuantity = 0;
+					}
+					else if (ev.mouseButton.button == Mouse::Right) {
 						cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << endl;
 						if (this->Elon->getStat("Alive") == 1) {
 							if (this->inventory) {
@@ -1908,6 +2024,7 @@ public:
 							else if (this->building) {
 								int PumpHitBox[] = { 330, 100, 470, 280 };
 								int SlolarHitBox[] = { 330, 340, 460, 480 };
+								int RocketHitBox[] = { 940, 100, 1060,300 };
 								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 5, false)) {
 									this->SoundFX["Building"].play();
 									hasEnoughItem("Composite Metal", 10, true);
@@ -1926,6 +2043,24 @@ public:
 									hasEnoughItem("Wiring Kit", 1, true);
 									string ObjName = "Solar_" + to_string(rand() % 100000);
 									this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
+									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->building = false;
+								}
+								if (clickHit(RocketHitBox) && hasEnoughItem("Composite Metal", 15, false) 
+									&& hasEnoughItem("Titanium Plate", 30, false) 
+									&& hasEnoughItem("Aluminium Plate", 20, false)
+									&& hasEnoughItem("Gold Plate", 10, false)
+									&& hasEnoughItem("Wiring Kit", 5, false)) {
+									this->SoundFX["Building"].play();
+									hasEnoughItem("Composite Metal", 15, true);
+									hasEnoughItem("Titanium Plate", 30, true);
+									hasEnoughItem("Aluminium Plate", 20, true);
+									hasEnoughItem("Gold Plate", 10, true);
+									hasEnoughItem("Wiring Kit", 5, true);
+									string ObjName = "Rocket_" + to_string(rand() % 100000);
+									this->Field["Dynamic"].registerObject(ObjName, "Rocket", "Rocket");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
@@ -1999,6 +2134,24 @@ public:
 												this->ItemOnMouseQuantity -= this->maxItemStack - this->HotbarQuantity[j];
 												this->HotbarQuantity[j] = this->maxItemStack;
 											}
+										}
+										else if (i < 3 && clickHit(this->InventoryHitbox[i][j]) && this->Backpack[i][j]->nowIs() != "None" && this->DrawField["ItemOnMouse"][0]->nowIs() != "None") {
+											Object Buffer = *this->Backpack[i][j];
+											int BufferQ = this->BackpackQuantity[i][j];
+											this->SoundFX["Pick"].play();
+											*this->Backpack[i][j] = *this->DrawField["ItemOnMouse"][0];
+											*this->DrawField["ItemOnMouse"][0] = Buffer;
+											this->BackpackQuantity[i][j] = this->ItemOnMouseQuantity;
+											this->ItemOnMouseQuantity = BufferQ;
+										}
+										else if (i == 3 && clickHit(this->InventoryHitbox[3][j]) && DrawField["Hotbar"][j]->nowIs() != "None" && this->DrawField["ItemOnMouse"][0]->nowIs() != "None") {
+											Object Buffer = *DrawField["Hotbar"][j];
+											int BufferQ = this->HotbarQuantity[j];
+											this->SoundFX["Pick"].play();
+											*DrawField["Hotbar"][j] = *this->DrawField["ItemOnMouse"][0];
+											*this->DrawField["ItemOnMouse"][0] = Buffer;
+											this->HotbarQuantity[j] = this->ItemOnMouseQuantity;
+											this->ItemOnMouseQuantity = BufferQ;
 										}
 									}
 								}
@@ -2129,6 +2282,18 @@ public:
 													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
 													cout << this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") << endl;
 												}
+											}
+											else if (building->cat == "Doc") {
+												building->usable = false;
+												building->setSpriteSize(0, 0);
+												giveItem("Reasearch Document");
+											}
+											else if (building->cat == "Rocket") {
+												this->Elon->setSpriteSize(0,0);
+												this->MiniElon->setSpriteSize(0, 0);
+												this->canMove = false;
+												this->onRocket = true;
+												this->Rocket = building;
 											}
 										}
 									}
@@ -2360,7 +2525,7 @@ public:
 			else if (!this->E) {
 				this->EToggle = false;
 			}
-			if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && !this->paused) {
+			if ((W || A || S || D || shift) && this->Elon->getStat("Alive") == 1 && !this->paused && canMove) {
 				Elon->setAnimationSeq("walk");
 				DecStat("Hunger", 0.0002);
 				DecStat("Thirst", 0.0003);
@@ -2368,7 +2533,13 @@ public:
 				if (shift) {
 					this->MusicFX["Walking"].stop();
 					this->MusicFX["Running"].pause();
+					if (walk || idle) {
+						this->MusicFX["Running"].setPlayingOffset(Time(seconds(rand() % 10)));
+						walk = false;
+						idle = false;
+					}
 					this->MusicFX["Running"].play();
+					printf("Running\n");
 					this->Elon->UpdateAnimation(2);
 					DecStat("Hunger", 0.002);
 					DecStat("Thirst", 0.003);
@@ -2376,7 +2547,13 @@ public:
 				else {
 					this->MusicFX["Running"].stop();
 					this->MusicFX["Walking"].pause();
+					if (!walk || idle){
+						this->MusicFX["Walking"].setPlayingOffset(Time(seconds(rand() % 10)));
+						walk = true;
+						idle = false;
+				    }
 					this->MusicFX["Walking"].play();
+					printf("Walking\n");
 				}
 				if (S && !W) {
 					if (!updated) {
@@ -2425,6 +2602,7 @@ public:
 				this->MusicFX["Running"].stop();
 				this->MusicFX["Walking"].stop();
 				Idle();
+				idle = true;
 				this->Elon->resetTimeSeq();
 			}
 			//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
@@ -2491,7 +2669,7 @@ public:
 							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 4);
 						}
 						foundPowerPack = true;
-						printf("Power Pack (1,0,%d) : %f\n", power[i][2], powerPercent);
+						//printf("Power Pack (1,0,%d) : %f\n", power[i][2], powerPercent);
 						break;
 					}
 					else if (power[i][0] == 0 && this->Backpack[power[i][1]][power[i][2]]->getStat("durability") > 0) {
@@ -2513,7 +2691,7 @@ public:
 							this->Backpack[power[i][1]][power[i][2]]->setSpriteTexture("default", 4);
 						}
 						foundPowerPack = true;
-						printf("Power Pack (0,%d,%d) : %f\n", power[i][1], power[i][2], powerPercent);
+						//printf("Power Pack (0,%d,%d) : %f\n", power[i][1], power[i][2], powerPercent);
 						break;
 					}
 				}
@@ -2634,6 +2812,9 @@ public:
 					}
 				}
 			}
+			if (onRocket) {
+				this->Rocket->MovePosY(-400/(1+pow(1.1,150-Rockettime++)));
+			}
 			//end
 		}
 	}
@@ -2655,18 +2836,20 @@ public:
 					this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
 				}
 				MiniElon->UpdateAnimation(2);
-				for (int i = 0; i < this->DrawField["DrawField_HUD"].size() && DrawField["DrawField_HUD"][i]; i++) {
-					this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
-				}
-				for (int i = 0; i < this->DrawField["Hotbar_HUD"].size() && DrawField["Hotbar_HUD"][i]; i++) {
-					this->DrawField["Hotbar_HUD"][i]->setPosY(833);
-					this->window->draw(this->DrawField["Hotbar_HUD"][i]->getSprite());
-				}
-				for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
-					this->window->draw(*this->Dialog["itemCount"].objectAt(i));
-				}
-				if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
-					this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
+				if (!this->onRocket) {
+					for (int i = 0; i < this->DrawField["DrawField_HUD"].size() && DrawField["DrawField_HUD"][i]; i++) {
+						this->window->draw(this->DrawField["DrawField_HUD"][i]->getSprite());
+					}
+					for (int i = 0; i < this->DrawField["Hotbar_HUD"].size() && DrawField["Hotbar_HUD"][i]; i++) {
+						this->DrawField["Hotbar_HUD"][i]->setPosY(833);
+						this->window->draw(this->DrawField["Hotbar_HUD"][i]->getSprite());
+					}
+					for (int i = 0; i < Dialog["itemCount"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["itemCount"].objectAt(i));
+					}
+					if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() != "None") {
+						this->window->draw(*this->Dialog["InGameStatus"].object("ItemInHand"));
+					}
 				}
 				if (this->paused) {
 					for (int i = 0; i < this->DrawField["DrawField_pauseUI"].size(); i++) {
@@ -2846,7 +3029,7 @@ void isMovable() {
 		First_step.DynamicAck = false;
 		Sleep(1);
 		bump = false;
-		while (First_step.isRuning() && (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu)) {
+		while (First_step.isRuning() && (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.onRocket)) {
 			Sleep(1);
 			First_step.DynamicAck = true;
 		}
@@ -2930,8 +3113,15 @@ void isMovable() {
 
 void ShowDrawingStat() {
 	while (First_step.isRuning()) {
-		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause || First_step.OnMainMenu) {
+		while (First_step.Field["Dynamic"].entityNumber() == 0 || First_step.pause) {
 			Sleep(1);
+		}
+		if (First_step.OnMainMenu) {
+			First_step.DrawField["DrawField_Dynamic"] = *new vector<Object*>;
+			First_step.DrawField["DrawField_Static"] = *new vector<Object*>;
+			while (First_step.OnMainMenu) {
+				Sleep(1);
+			}
 		}
 		try {
 			for (int num = 0; num < First_step.DrawField["DrawField_Dynamic"].size(); num++) {
