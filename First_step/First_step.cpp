@@ -732,10 +732,10 @@ private:
 		this->itemList.object("Power Pack")->addStat("MaxDurability", 200);
 		this->itemList.object("Power Pack")->tag = "Tool";
 
-		this->itemList.registerObject("Reasearch Document", "Item", "Reasearch Document");
-		this->itemList.object("Reasearch Document")->addTexture("assets\\Prop\\Item\\Doc.png", "default", 1000);
-		this->itemList.object("Reasearch Document")->setSpriteTexture("default", 0);
-		this->itemList.object("Reasearch Document")->tag = "QuestItem";
+		this->itemList.registerObject("Research Document", "Item", "Research Document");
+		this->itemList.object("Research Document")->addTexture("assets\\Prop\\Item\\Doc.png", "default", 1000);
+		this->itemList.object("Research Document")->setSpriteTexture("default", 0);
+		this->itemList.object("Research Document")->tag = "QuestItem";
 
 		// Default item
 		addItem(0, 0, 8, "MRE");
@@ -2286,7 +2286,7 @@ public:
 											else if (building->cat == "Doc") {
 												building->usable = false;
 												building->setSpriteSize(0, 0);
-												giveItem("Reasearch Document");
+												giveItem("Research Document");
 											}
 											else if (building->cat == "Rocket") {
 												this->Elon->setSpriteSize(0,0);
