@@ -92,7 +92,6 @@ private:
 	int imgWidth;
 
 	int time = 0, Index = 0;
-	unordered_map<string, vector<Texture*>> textureArray;
 	unordered_map<string, vector<int>> duration;
 	string slot;
 public:
@@ -104,6 +103,7 @@ public:
 	string tag = "None", cat = "None";
 	bool usable = true;
 	Sprite sprite;
+	unordered_map<string, vector<Texture*>> textureArray;
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
 	}
@@ -173,13 +173,13 @@ public:
 		return this->ID;
 	}
 	void addTexture(string Path, string seqName, int durt) {
-		Texture* ptr = new Texture;
-		if (!(*ptr).loadFromFile(Path)) {
+		Texture* a = new Texture;
+		if (!(*a).loadFromFile(Path)) {
 			printf("Error");
 		}
-		ptr->setSmooth(true);
+		a->setSmooth(true);
 		int old_size = this->textureArray.size();
-		this->textureArray[seqName].push_back(ptr);
+		this->textureArray[seqName].push_back(a);
 		this->duration[seqName].push_back(durt);
 
 	}
@@ -327,6 +327,14 @@ public:
 		return this->Tuple;
 	}
 	void destroy() {
+		for (auto& Template : Templ) {
+			for (auto TextureVec : Template.second->textureArray) {
+				for (auto Texture : TextureVec.second) {
+					cout << "Deleting : "<< Template.first << '\t' << TextureVec.first << endl;
+					delete Texture;
+				}
+			}
+		}
 		for (int i = 0; i < Tuplekey.size(); i++) {
 			cout << "Delete : " << Tuple[Tuplekey[i]]->nowIs() << endl;
 			delete Tuple[Tuplekey[i]];
@@ -378,6 +386,11 @@ public:
 	}
 	unordered_map<string, Text*> getTuple() {
 		return this->Tuple;
+	}
+	void destroy() {
+		for (auto text : Tuple) {
+			delete text.second;
+		}
 	}
 
 };
@@ -1545,7 +1558,6 @@ public:
 		printf("Done\n");
 		printf("Initialing UI...\t");
 		this->intitUI();
-		this->intitDialog();
 		printf("Done\n");
 		printf("Initialing HUD...\t");
 		this->intitHUD();
@@ -1565,11 +1577,37 @@ public:
 		while (!FloorAck && !DynamicAck) {
 			Sleep(1);
 		}
+
 		Field["Dynamic"].destroy();
 		Field["GameBG"].destroy();
+		Field["HUD"].destroy();
+		Field["MiniElon"].destroy();
+		Field["PauseUI"].destroy();
+		Field["BuildUI"].destroy();
+		Field["InventoryUI"].destroy();
+		itemList.destroy();
 		freeContainer(DrawField["BG_repo"]);
 		freeContainer(DrawField["DrawField_BG"]);
 		freeContainer(DrawField["DrawField_Dynamic"]);
+		for (auto field : DrawField) {
+			field.second.clear();
+		}
+		itemOutoutQuantity = 0;
+		maxItemStack = 8;
+		Rockettime = 0;
+		_time = true;
+		pass = true;
+		movable = true;
+		move_speed = 3;
+		W = false, A = false, S = false, D = false, E = false, shift = false;
+		W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
+		pause = false;
+		escPressed = false, escToggle = false, EToggle = false;
+		paused = false, building = false, inventory = false;
+		selectingSlot = 0, ItemOnMouseQuantity = 0;
+		OnMainMenu = true;
+		DynamicAck = false, FloorAck = false;
+		walk = true, idle = true, canMove = true, onRocket = false;
 		this->initMainMenu();
 		this->pause = false;
 	}
