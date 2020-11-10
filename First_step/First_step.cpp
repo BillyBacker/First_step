@@ -330,7 +330,7 @@ public:
 		for (auto& Template : Templ) {
 			for (auto TextureVec : Template.second->textureArray) {
 				for (auto Texture : TextureVec.second) {
-					cout << "Deleting : "<< Template.first << '\t' << TextureVec.first << endl;
+					cout << "Deleting : " << Template.first << '\t' << TextureVec.first << endl;
 					delete Texture;
 				}
 			}
@@ -452,30 +452,30 @@ public:
 		}
 		return false;
 	}
-	bool _IsUse(int Index,int matIndex, string matName, int number) {
+	bool _IsUse(int Index, int matIndex, string matName, int number) {
 		if (this->itemRequiredName[RecipeAt(Index)][matIndex] == matName && this->itemRequiredQuantity[RecipeAt(Index)][matIndex] <= number) {
 			return true;
 		}
-	return false;
+		return false;
 	}
 	bool matIsReady(int itemIndex, vector<vector<Object*>> Crafting, vector<vector<int>> CraftingQuantity) {
 		int foundCount = 0;
 		bool foundOther = false;
 		for (int i = 0; i < this->itemRequiredName[RecipeAt(itemIndex)].size(); i++) { // for every material required list element
-			cout << this->RecipeAt(itemIndex)<< " Have to use "<< this->itemRequiredName[RecipeAt(itemIndex)].size() << " material. " << " Now search for : " << this->itemRequiredName[RecipeAt(itemIndex)][i] << endl;
+			cout << this->RecipeAt(itemIndex) << " Have to use " << this->itemRequiredName[RecipeAt(itemIndex)].size() << " material. " << " Now search for : " << this->itemRequiredName[RecipeAt(itemIndex)][i] << endl;
 			for (int j = 0; j < 3; j++) {
 				for (int k = 0; k < 3; k++) { // for every item on crafting slot
 					if (Crafting[j][k]->nowIs() != "None" && this->_IsUse(itemIndex, i, Crafting[j][k]->nowIs(), CraftingQuantity[j][k])) {
 						foundCount++;
 						cout << this->RecipeAt(itemIndex) << " -> Found : " << Crafting[j][k]->nowIs() << endl;
 					}
-					else if(Crafting[j][k]->nowIs() != "None" && !IsUse(itemIndex, Crafting[j][k]->nowIs(), CraftingQuantity[j][k])){
+					else if (Crafting[j][k]->nowIs() != "None" && !IsUse(itemIndex, Crafting[j][k]->nowIs(), CraftingQuantity[j][k])) {
 						foundOther = true;
 					}
 				}
 			}
 		}
-		cout << this->RecipeAt(itemIndex)<< " is craftable : " << ((this->itemRequiredName[RecipeAt(itemIndex)].size() == foundCount) && !foundOther) << endl << endl;
+		cout << this->RecipeAt(itemIndex) << " is craftable : " << ((this->itemRequiredName[RecipeAt(itemIndex)].size() == foundCount) && !foundOther) << endl << endl;
 		return (this->itemRequiredName[RecipeAt(itemIndex)].size() == foundCount) && !foundOther;
 	}
 };
@@ -782,7 +782,7 @@ private:
 		this->Recipe.addedRequiredItem("Gold Wire", "Gold Plate", 1);
 
 		this->Recipe.registerRecipe("Flour", 1);
-		this->Recipe.addedRequiredItem("Flour","Wheat Grain", 4);
+		this->Recipe.addedRequiredItem("Flour", "Wheat Grain", 4);
 
 		this->Recipe.registerRecipe("Bread", 1);
 		this->Recipe.addedRequiredItem("Bread", "Flour", 4);
@@ -992,6 +992,20 @@ private:
 				this->Dialog["CraftingItem"].object("CraftingItemCountBG" + to_string(i) + to_string(j))->setPosition({ x ,y });
 			}
 		}
+
+		this->Dialog["VictoryButton"].registerObject("Retry", "Victory");
+		this->Dialog["VictoryButton"].object("Retry")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["VictoryButton"].object("Retry")->setString("Retry");
+		this->Dialog["VictoryButton"].object("Retry")->setFillColor(Color::Black);
+		this->Dialog["VictoryButton"].object("Retry")->setCharacterSize(100);
+		this->Dialog["VictoryButton"].object("Retry")->setPosition({ 450,230 });
+
+		this->Dialog["VictoryButton"].registerObject("Exit", "Victory");
+		this->Dialog["VictoryButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["VictoryButton"].object("Exit")->setString("Exit");
+		this->Dialog["VictoryButton"].object("Exit")->setFillColor(Color::Black);
+		this->Dialog["VictoryButton"].object("Exit")->setCharacterSize(100);
+		this->Dialog["VictoryButton"].object("Exit")->setPosition({ 450,600 });
 	}
 	void initObject() {
 		Object* ptr = new Object(54862);
@@ -1446,6 +1460,14 @@ private:
 		this->Field["BuildUI"].object("Rocket_WiringKit")->setPosX(1450);
 		this->Field["BuildUI"].object("Rocket_WiringKit")->setPosY(220);
 
+		this->Field["Victory"].createTemplate("Blank");
+
+		this->Field["Victory"].registerObject("VictoryBG", "Blank", "VictoryBG");
+		this->Field["Victory"].object("VictoryBG")->addTexture("assets\\Prop\\Floor\\graph.jpg", "BG", 1000);
+		this->Field["Victory"].object("VictoryBG")->setSpriteTexture("BG", 0);
+		this->Field["Victory"].object("VictoryBG")->setSpriteSize(10, 10);
+
+
 	}
 	void initMainMenu() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -1487,6 +1509,9 @@ private:
 		for (int i = 0; i < this->Field["BuildUI"].entityNumber(); i++) {
 			this->DrawField["DrawField_buildingUI"].push_back(this->Field["BuildUI"].objectAt(i));
 		}
+		for (int i = 0; i < this->Field["Victory"].entityNumber(); i++) {
+			this->DrawField["Victory"].push_back(this->Field["Victory"].objectAt(i));
+		}
 		for (int i = 0; i < this->Field["InventoryUI"].entityNumber(); i++) {
 			this->DrawField["DrawField_inventoryUI"].push_back(this->Field["InventoryUI"].objectAt(i));
 		}
@@ -1519,7 +1544,7 @@ public:
 	unordered_map<string, Music> MusicFX;
 	unordered_map<string, SoundBuffer> SoundRepo;
 	int itemOutoutQuantity = 0;
-	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4], CraftingOutputHitbox[4] = {1260,460,1330,530};
+	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4], CraftingOutputHitbox[4] = { 1260,460,1330,530 };
 	int maxItemStack = 8;
 	int Rockettime = 0;
 	bool _time = true;
@@ -1530,7 +1555,7 @@ public:
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	bool pause = false;
 	bool escPressed = false, escToggle = false, EToggle = false;
-	bool paused = false, building = false, inventory = false;
+	bool paused = false, building = false, inventory = false, Victory = false;
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
 	bool OnMainMenu = true;
 	bool DynamicAck = false, FloorAck = false;
@@ -1586,9 +1611,20 @@ public:
 		Field["BuildUI"].destroy();
 		Field["InventoryUI"].destroy();
 		itemList.destroy();
+		freeContainer(DrawField["Hotbar"]);
+		freeContainer(DrawField["ItemOnMouse"]);
+		freeContainer(DrawField["InventoryUseSlot"]);
+		freeContainer(DrawField["Hotbar_HUD"]);
 		freeContainer(DrawField["BG_repo"]);
 		freeContainer(DrawField["DrawField_BG"]);
 		freeContainer(DrawField["DrawField_Dynamic"]);
+		freeContainer(DrawField["CraftingOutput"]);
+		Backpack.clear();
+		Crafting.clear();
+		ItemUseSlotQuantity.clear();
+		HotbarQuantity.clear();
+		BackpackQuantity.clear();
+		CraftingQuantity.clear();
 		for (auto field : DrawField) {
 			field.second.clear();
 		}
@@ -1730,51 +1766,53 @@ public:
 	void pollEvents() {
 		while (this->window->pollEvent(this->ev)) {
 			if (!this->OnMainMenu) {
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
-					this->escPressed = true;
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::Escape) {
-					this->escPressed = false;
-				}
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::E) {
-					this->E = true;
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::E) {
-					this->E = false;
-				}
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
-					W = true;
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::W) {
-					W = false;
-				}
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::A) {
-					A = true;
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::A) {
-					A = false;
-				}
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::S) {
-					S = true;
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::S) {
-					S = false;
-				}
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::D) {
-					D = true;
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
-					D = false;
-				}
-				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
-					shift = true;
-					this->move_speed = 3 * 2;
+				if (this->canMove) {
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
+						this->escPressed = true;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::Escape) {
+						this->escPressed = false;
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::E) {
+						this->E = true;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::E) {
+						this->E = false;
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::W) {
+						W = true;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::W) {
+						W = false;
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::A) {
+						A = true;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::A) {
+						A = false;
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::S) {
+						S = true;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::S) {
+						S = false;
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::D) {
+						D = true;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::D) {
+						D = false;
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::LShift) {
+						shift = true;
+						this->move_speed = 3 * 2;
 
-				}
-				if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
-					shift = false;
-					this->move_speed = 3;
+					}
+					if (ev.type == Event::KeyReleased && ev.key.code == Keyboard::LShift) {
+						shift = false;
+						this->move_speed = 3;
 
+					}
 				}
 				if (ev.type == Event::MouseMoved) {
 					this->mousePos[0] = ev.mouseMove.x;
@@ -1798,22 +1836,22 @@ public:
 										if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
 											this->SoundFX["Pick"].play();
 											this->DrawField["ItemOnMouse"][0]->useStatNoPos(*this->Backpack[i][j]);
-											this->ItemOnMouseQuantity = ceil(this->BackpackQuantity[i][j]/2.0);
-											this->BackpackQuantity[i][j] = floor(this->BackpackQuantity[i][j]/2.0);
+											this->ItemOnMouseQuantity = ceil(this->BackpackQuantity[i][j] / 2.0);
+											this->BackpackQuantity[i][j] = floor(this->BackpackQuantity[i][j] / 2.0);
 											cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 										}
 										else if (clickHit(this->InventoryHitbox[3][j]) && i == 3 && this->DrawField["ItemOnMouse"][0]->nowIs() == "None") {
 											this->SoundFX["Pick"].play();
 											cout << DrawField["Hotbar"][j]->tag << ">>" << this->DrawField["ItemOnMouse"][0]->tag << endl;
 											*DrawField["ItemOnMouse"][0] = *DrawField["Hotbar"][j];
-											this->ItemOnMouseQuantity = ceil(this->HotbarQuantity[j]/2.0);
-											this->HotbarQuantity[j] = floor(this->HotbarQuantity[j]/2.0);
+											this->ItemOnMouseQuantity = ceil(this->HotbarQuantity[j] / 2.0);
+											this->HotbarQuantity[j] = floor(this->HotbarQuantity[j] / 2.0);
 										}
 										else if (clickHit(this->InventoryHitbox[i][j]) && i < 3 && this->DrawField["ItemOnMouse"][0]->nowIs() != "None" && (this->Backpack[i][j]->nowIs() == "None" || this->Backpack[i][j]->nowIs() == this->DrawField["ItemOnMouse"][0]->nowIs()) && this->BackpackQuantity[i][j] < this->maxItemStack) {
 											printf("6++6+6+6+6+6++6+6+6\n");
 											this->SoundFX["Pick"].play();
 											if (this->BackpackQuantity[i][j] < this->maxItemStack) {
-												
+
 												printf("%d,%d\n", 3, j);
 												cout << this->DrawField["ItemOnMouse"][0]->nowIs() << endl;
 												this->Backpack[i][j]->useStatNoPos(*this->DrawField["ItemOnMouse"][0]);
@@ -1876,9 +1914,9 @@ public:
 												this->SoundFX["Pick"].play();
 												*this->DrawField["ItemOnMouse"][0] = *Crafting[i][j];
 												this->DrawField["ItemOnMouse"][0]->setSpriteSize(0.06, 0.06);
-												this->ItemOnMouseQuantity = ceil(this->CraftingQuantity[i][j]/2.0);
+												this->ItemOnMouseQuantity = ceil(this->CraftingQuantity[i][j] / 2.0);
 												this->CraftingQuantity[i][j] = floor(this->CraftingQuantity[i][j] / 2.0);
-												if(this->CraftingQuantity[i][j] == 0){
+												if (this->CraftingQuantity[i][j] == 0) {
 													this->Crafting[i][j]->Is("None");
 													this->Crafting[i][j]->tag = "None";
 													this->Crafting[i][j]->setSpriteSize(0, 0);
@@ -2041,7 +2079,25 @@ public:
 					if (ev.mouseButton.button == Mouse::Left) {
 						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
 						if (this->Elon->getStat("Alive") == 1) {
-							if (this->paused) {
+							if (this->Victory) {
+								int RetryHitBox[] = { 435,240,680,360 }, ExitHitBox[] = { 435,600,680,720 };
+								if (clickHit(RetryHitBox)) {
+									this->SoundFX["Click"].play();
+									printf("Hit");
+									this->Victory = false;
+									this->destroy();
+									this->construct();
+									this->OnMainMenu = false;
+								}
+								if (clickHit(ExitHitBox)) {
+									this->SoundFX["Click"].play();
+									printf("Hit");
+									this->destroy();
+									this->Victory = false;
+									this->constructMainMenu();
+								}
+							}
+							else if (this->paused) {
 								int BacktoGameHitBox[] = { 250, 200, 600, 250 };
 								int ExitHitBox[] = { 250, 600, 600, 650 };
 								if (clickHit(BacktoGameHitBox)) {
@@ -2086,8 +2142,8 @@ public:
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
 									this->building = false;
 								}
-								if (clickHit(RocketHitBox) && hasEnoughItem("Composite Metal", 15, false) 
-									&& hasEnoughItem("Titanium Plate", 30, false) 
+								if (clickHit(RocketHitBox) && hasEnoughItem("Composite Metal", 15, false)
+									&& hasEnoughItem("Titanium Plate", 30, false)
 									&& hasEnoughItem("Aluminium Plate", 20, false)
 									&& hasEnoughItem("Gold Plate", 10, false)
 									&& hasEnoughItem("Wiring Kit", 5, false)) {
@@ -2243,8 +2299,8 @@ public:
 											for (int i = 0; i < this->Recipe.recipeNumber(); i++) {
 												if (this->Recipe.matIsReady(i, this->Crafting, this->CraftingQuantity)) {
 													*this->DrawField["CraftingOutput"][0] = *itemList.object(this->Recipe.RecipeAt(i));
-													this->DrawField["CraftingOutput"][0]->setPosX(this->Field["InventoryUI"].object("craftingOutput")->PosX() + 1100*0.06/2);
-													this->DrawField["CraftingOutput"][0]->setPosY(this->Field["InventoryUI"].object("craftingOutput")->PosY() + 1100*0.06/2);
+													this->DrawField["CraftingOutput"][0]->setPosX(this->Field["InventoryUI"].object("craftingOutput")->PosX() + 1100 * 0.06 / 2);
+													this->DrawField["CraftingOutput"][0]->setPosY(this->Field["InventoryUI"].object("craftingOutput")->PosY() + 1100 * 0.06 / 2);
 													this->DrawField["CraftingOutput"][0]->setSpriteSize(0.06, 0.06);
 													foundAnyRecipe = true;
 													break;
@@ -2296,9 +2352,9 @@ public:
 										printf("66\n");
 										Object* building = this->DrawField["DrawField_Dynamic"][i];
 										int buildingHitbox[4] = { building->getHitBoxData()[0],
-																	building->getHitBoxData()[1] - building->getImgHeight() * building->getSizeY()/2,
+																	building->getHitBoxData()[1] - building->getImgHeight() * building->getSizeY() / 2,
 																	building->getHitBoxData()[2],
-																	building->getHitBoxData()[3]+ building->getImgHeight() * building->getSizeY()*0.2, };
+																	building->getHitBoxData()[3] + building->getImgHeight() * building->getSizeY() * 0.2, };
 										for (int j = 0; j < 4; j++) {
 											printf("%d ", building->getHitBoxData()[j]);
 										}
@@ -2307,7 +2363,7 @@ public:
 											cout << "Click hit : " << building->nowIs() << endl;
 											if (building->cat == "Pump") {
 												if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Hydro Flask" && this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") < this->itemList.object("Hydro Flask")->getStat("MaxDurability")) {
-													this->SoundFX["Fill"].play(); 
+													this->SoundFX["Fill"].play();
 													this->DrawField["Hotbar"][this->selectingSlot]->setStat("durability", this->itemList.object("Hydro Flask")->getStat("MaxDurability"));
 													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
 													cout << this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") << endl;
@@ -2327,7 +2383,7 @@ public:
 												giveItem("Research Document");
 											}
 											else if (building->cat == "Rocket") {
-												this->Elon->setSpriteSize(0,0);
+												this->Elon->setSpriteSize(0, 0);
 												this->MiniElon->setSpriteSize(0, 0);
 												this->canMove = false;
 												this->onRocket = true;
@@ -2585,11 +2641,11 @@ public:
 				else {
 					this->MusicFX["Running"].stop();
 					this->MusicFX["Walking"].pause();
-					if (!walk || idle){
+					if (!walk || idle) {
 						this->MusicFX["Walking"].setPlayingOffset(Time(seconds(rand() % 10)));
 						walk = true;
 						idle = false;
-				    }
+					}
 					this->MusicFX["Walking"].play();
 					printf("Walking\n");
 				}
@@ -2689,7 +2745,7 @@ public:
 				bool foundPowerPack = false;
 				for (int i = 0; i < power.size(); i++) {
 					if (power[i][0] == 1 && this->DrawField["Hotbar"][power[i][2]]->getStat("durability") > 0) {
-						float powerPercent = 100*this->DrawField["Hotbar"][power[i][2]]->getStat("durability")/this->itemList.object("Power Pack")->getStat("MaxDurability");
+						float powerPercent = 100 * this->DrawField["Hotbar"][power[i][2]]->getStat("durability") / this->itemList.object("Power Pack")->getStat("MaxDurability");
 						this->DrawField["Hotbar"][power[i][2]]->increase("durability", -0.01);
 						if (powerPercent > 75) {
 							this->DrawField["Hotbar"][power[i][2]]->setSpriteTexture("default", 0);
@@ -2851,7 +2907,13 @@ public:
 				}
 			}
 			if (onRocket) {
-				this->Rocket->MovePosY(-400/(1+pow(1.1,150-Rockettime++)));
+				this->Rocket->MovePosY(-400 / (1 + pow(1.1, 150 - Rockettime++)));
+				if (this->Rocket->PosY() < -1000) {
+					Sleep(3000);
+					this->Victory = true;
+					this->onRocket = false;
+					this->pause = true;
+				}
 			}
 			//end
 		}
@@ -2934,7 +2996,14 @@ public:
 					}
 					this->window->draw(this->DrawField["ItemOnMouse"][0]->getSprite());
 					this->window->draw(this->DrawField["CraftingOutput"][0]->getSprite());
-
+				}
+				else if (this->Victory) {
+					for (auto obj : this->DrawField["Victory"]) {
+						this->window->draw(obj->getSprite());
+					}
+					for (int i = 0; i < this->Dialog["VictoryButton"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["VictoryButton"].objectAt(i));
+					}
 				}
 			}
 			else {
