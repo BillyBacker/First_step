@@ -993,19 +993,27 @@ private:
 			}
 		}
 
-		this->Dialog["VictoryButton"].registerObject("Retry", "Victory");
-		this->Dialog["VictoryButton"].object("Retry")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
-		this->Dialog["VictoryButton"].object("Retry")->setString("Retry");
-		this->Dialog["VictoryButton"].object("Retry")->setFillColor(Color::Black);
-		this->Dialog["VictoryButton"].object("Retry")->setCharacterSize(100);
-		this->Dialog["VictoryButton"].object("Retry")->setPosition({ 450,230 });
+		this->Dialog["Victory"].registerObject("Retry", "Victory");
+		this->Dialog["Victory"].object("Retry")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["Victory"].object("Retry")->setString("Retry");
+		this->Dialog["Victory"].object("Retry")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Retry")->setCharacterSize(75);
+		this->Dialog["Victory"].object("Retry")->setPosition({ 300,750 });
 
-		this->Dialog["VictoryButton"].registerObject("Exit", "Victory");
-		this->Dialog["VictoryButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
-		this->Dialog["VictoryButton"].object("Exit")->setString("Exit");
-		this->Dialog["VictoryButton"].object("Exit")->setFillColor(Color::Black);
-		this->Dialog["VictoryButton"].object("Exit")->setCharacterSize(100);
-		this->Dialog["VictoryButton"].object("Exit")->setPosition({ 450,600 });
+		this->Dialog["Victory"].registerObject("Exit", "Victory");
+		this->Dialog["Victory"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["Victory"].object("Exit")->setString("Exit");
+		this->Dialog["Victory"].object("Exit")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Exit")->setCharacterSize(75);
+		this->Dialog["Victory"].object("Exit")->setPosition({ 1200,750 });
+
+		this->Dialog["Victory"].registerObject("Victory", "Victory");
+		this->Dialog["Victory"].object("Victory")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["Victory"].object("Victory")->setString("Mission Completed");
+		this->Dialog["Victory"].object("Victory")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Victory")->setCharacterSize(100);
+		this->Dialog["Victory"].object("Victory")->setPosition({ 350,50 });
+
 	}
 	void initObject() {
 		Object* ptr = new Object(54862);
@@ -2080,7 +2088,7 @@ public:
 						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
 						if (this->Elon->getStat("Alive") == 1) {
 							if (this->Victory) {
-								int RetryHitBox[] = { 435,240,680,360 }, ExitHitBox[] = { 435,600,680,720 };
+								int RetryHitBox[] = { 300,760,500,850 }, ExitHitBox[] = { 1180,760,1360,850 };
 								if (clickHit(RetryHitBox)) {
 									this->SoundFX["Click"].play();
 									printf("Hit");
@@ -3001,8 +3009,8 @@ public:
 					for (auto obj : this->DrawField["Victory"]) {
 						this->window->draw(obj->getSprite());
 					}
-					for (int i = 0; i < this->Dialog["VictoryButton"].entityNumber(); i++) {
-						this->window->draw(*this->Dialog["VictoryButton"].objectAt(i));
+					for (int i = 0; i < this->Dialog["Victory"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["Victory"].objectAt(i));
 					}
 				}
 			}
