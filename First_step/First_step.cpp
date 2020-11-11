@@ -90,8 +90,6 @@ private:
 	float Size[2];
 	int imgHeight;
 	int imgWidth;
-
-	int time = 0, Index = 0;
 	unordered_map<string, vector<int>> duration;
 	string slot;
 public:
@@ -100,6 +98,7 @@ public:
 	bool fliping = false;
 	float offsetPosX = 0;
 	float offsetPosY = 0;
+	int time = 0, Index = 0;
 	string tag = "None", cat = "None";
 	bool usable = true;
 	Sprite sprite;
@@ -1014,6 +1013,27 @@ private:
 		this->Dialog["Victory"].object("Victory")->setCharacterSize(100);
 		this->Dialog["Victory"].object("Victory")->setPosition({ 350,50 });
 
+		this->Dialog["GameOver"].registerObject("Retry", "GameOver");
+		this->Dialog["GameOver"].object("Retry")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["GameOver"].object("Retry")->setString("Retry");
+		this->Dialog["GameOver"].object("Retry")->setFillColor(Color::White);
+		this->Dialog["GameOver"].object("Retry")->setCharacterSize(75);
+		this->Dialog["GameOver"].object("Retry")->setPosition({ 300,750 });
+
+		this->Dialog["GameOver"].registerObject("Exit", "GameOver");
+		this->Dialog["GameOver"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["GameOver"].object("Exit")->setString("Exit");
+		this->Dialog["GameOver"].object("Exit")->setFillColor(Color::White);
+		this->Dialog["GameOver"].object("Exit")->setCharacterSize(75);
+		this->Dialog["GameOver"].object("Exit")->setPosition({ 1200,750 });
+
+		this->Dialog["GameOver"].registerObject("GameOver", "GameOver");
+		this->Dialog["GameOver"].object("GameOver")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["GameOver"].object("GameOver")->setString("Mission Failed");
+		this->Dialog["GameOver"].object("GameOver")->setFillColor(Color::White);
+		this->Dialog["GameOver"].object("GameOver")->setCharacterSize(100);
+		this->Dialog["GameOver"].object("GameOver")->setPosition({ 450,50 });
+
 	}
 	void initObject() {
 		Object* ptr = new Object(54862);
@@ -1475,6 +1495,19 @@ private:
 		this->Field["Victory"].object("VictoryBG")->setSpriteTexture("BG", 0);
 		this->Field["Victory"].object("VictoryBG")->setSpriteSize(10, 10);
 
+		this->Field["GameOver"].createTemplate("GameOver");
+		this->Field["GameOver"].Template("GameOver")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
+		this->Field["GameOver"].Template("GameOver")->setSpriteSize(0.5, 0.5);
+		this->Field["GameOver"].Template("GameOver")->setImgDim(3200, 1800);
+		this->Field["GameOver"].Template("GameOver")->setPosX(800);
+		this->Field["GameOver"].Template("GameOver")->setPosY(450);
+		this->Field["GameOver"].Template("GameOver")->setType("Static");
+		this->Field["GameOver"].Template("GameOver")->tag = "GameOverUI";
+
+		this->Field["GameOver"].registerObject("BG", "GameOver", "BG");
+		this->Field["GameOver"].object("BG")->setSpriteTexture("default", 0);
+
+
 
 	}
 	void initMainMenu() {
@@ -1520,6 +1553,9 @@ private:
 		for (int i = 0; i < this->Field["Victory"].entityNumber(); i++) {
 			this->DrawField["Victory"].push_back(this->Field["Victory"].objectAt(i));
 		}
+		for (int i = 0; i < this->Field["GameOver"].entityNumber(); i++) {
+			this->DrawField["GameOver"].push_back(this->Field["GameOver"].objectAt(i));
+		}
 		for (int i = 0; i < this->Field["InventoryUI"].entityNumber(); i++) {
 			this->DrawField["DrawField_inventoryUI"].push_back(this->Field["InventoryUI"].objectAt(i));
 		}
@@ -1563,7 +1599,7 @@ public:
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	bool pause = false;
 	bool escPressed = false, escToggle = false, EToggle = false;
-	bool paused = false, building = false, inventory = false, Victory = false;
+	bool paused = false, building = false, inventory = false, Victory = false, GameOver = false;
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
 	bool OnMainMenu = true;
 	bool DynamicAck = false, FloorAck = false;
@@ -2086,7 +2122,25 @@ public:
 					}
 					if (ev.mouseButton.button == Mouse::Left) {
 						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
-						if (this->Elon->getStat("Alive") == 1) {
+						if (this->GameOver) {
+							int RetryHitBox[] = { 300,760,500,850 }, ExitHitBox[] = { 1180,760,1360,850 };
+							if (clickHit(RetryHitBox)) {
+								this->SoundFX["Click"].play();
+								printf("Hit");
+								this->Victory = false;
+								this->destroy();
+								this->construct();
+								this->OnMainMenu = false;
+							}
+							if (clickHit(ExitHitBox)) {
+								this->SoundFX["Click"].play();
+								printf("Hit");
+								this->destroy();
+								this->Victory = false;
+								this->constructMainMenu();
+							}
+						}
+						else if (this->Elon->getStat("Alive") == 1) {
 							if (this->Victory) {
 								int RetryHitBox[] = { 300,760,500,850 }, ExitHitBox[] = { 1180,760,1360,850 };
 								if (clickHit(RetryHitBox)) {
@@ -2740,10 +2794,15 @@ public:
 				if (Elon->getStat("Air") <= 1) {
 					DecStat("Health", 0.05);
 				}
-				if (Elon->getStat("Health") <= 1) {
+				if (Elon->getStat("Health") <= 1 && !GameOver) {
 					if (_time) {
 						this->Elon->resetTimeSeq();
 						_time = false;
+					}
+					if (Elon->time > 40) {
+						Sleep(1000);
+						printf("Die\n");
+						GameOver = true;
 					}
 					Elon->setStat("Alive", 0);
 					Elon->setAnimationSeq("dying");
@@ -3011,6 +3070,14 @@ public:
 					}
 					for (int i = 0; i < this->Dialog["Victory"].entityNumber(); i++) {
 						this->window->draw(*this->Dialog["Victory"].objectAt(i));
+					}
+				}
+				else if (this->GameOver) {
+					for (auto obj : DrawField["GameOver"]) {
+						this->window->draw(obj->getSprite());
+					}
+					for (int i = 0; i < this->Dialog["GameOver"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["GameOver"].objectAt(i));
 					}
 				}
 			}
