@@ -2452,7 +2452,7 @@ public:
 												giveItem("Research Document");
 											}
 											else if (building->cat == "Rocket") {
-												this->Dialog["Victory"].object("Score")->setString(to_string(itemNumber("Research Document") * 20));
+												this->Dialog["Victory"].object("Score")->setString(to_string(int(itemNumber("Research Document") * 20 + ceil(Elon->getStat("Health"))*10)));
 												this->Elon->setSpriteSize(0, 0);
 												this->MiniElon->setSpriteSize(0, 0);
 												this->canMove = false;
