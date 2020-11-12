@@ -1013,6 +1013,13 @@ private:
 		this->Dialog["Victory"].object("Victory")->setCharacterSize(100);
 		this->Dialog["Victory"].object("Victory")->setPosition({ 350,50 });
 
+		this->Dialog["Victory"].registerObject("Score", "Victory");
+		this->Dialog["Victory"].object("Score")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["Victory"].object("Score")->setString("0");
+		this->Dialog["Victory"].object("Score")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Score")->setCharacterSize(100);
+		this->Dialog["Victory"].object("Score")->setPosition({ 800,450 });
+
 		this->Dialog["GameOver"].registerObject("Retry", "GameOver");
 		this->Dialog["GameOver"].object("Retry")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["GameOver"].object("Retry")->setString("Retry");
@@ -2445,6 +2452,7 @@ public:
 												giveItem("Research Document");
 											}
 											else if (building->cat == "Rocket") {
+												this->Dialog["Victory"].object("Score")->setString(to_string(itemNumber("Research Document") * 20));
 												this->Elon->setSpriteSize(0, 0);
 												this->MiniElon->setSpriteSize(0, 0);
 												this->canMove = false;
@@ -2558,6 +2566,22 @@ public:
 			}
 		}
 		return false;
+	}
+	int itemNumber(string item) {
+		int itemcount = 0;
+		for (int i = 0; i < 9; i++) {
+			if (this->DrawField["Hotbar"][i]->nowIs() == item) {
+				itemcount += this->HotbarQuantity[i];
+			}
+		}
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				if (this->Backpack[i][j]->nowIs() == item) {
+					itemcount += this->BackpackQuantity[i][j];
+				}
+			}
+		}
+		return itemcount;
 	}
 	vector<vector<int>> searchFor(string item) {
 		vector<vector<int>> out;
