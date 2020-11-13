@@ -995,28 +995,28 @@ private:
 		this->Dialog["Victory"].registerObject("Retry", "Victory");
 		this->Dialog["Victory"].object("Retry")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["Victory"].object("Retry")->setString("Retry");
-		this->Dialog["Victory"].object("Retry")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Retry")->setFillColor(Color::White);
 		this->Dialog["Victory"].object("Retry")->setCharacterSize(75);
 		this->Dialog["Victory"].object("Retry")->setPosition({ 300,750 });
 
 		this->Dialog["Victory"].registerObject("Exit", "Victory");
 		this->Dialog["Victory"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["Victory"].object("Exit")->setString("Exit");
-		this->Dialog["Victory"].object("Exit")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Exit")->setFillColor(Color::White);
 		this->Dialog["Victory"].object("Exit")->setCharacterSize(75);
 		this->Dialog["Victory"].object("Exit")->setPosition({ 1200,750 });
 
 		this->Dialog["Victory"].registerObject("Victory", "Victory");
 		this->Dialog["Victory"].object("Victory")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["Victory"].object("Victory")->setString("Mission Completed");
-		this->Dialog["Victory"].object("Victory")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Victory")->setFillColor(Color::White);
 		this->Dialog["Victory"].object("Victory")->setCharacterSize(100);
 		this->Dialog["Victory"].object("Victory")->setPosition({ 350,50 });
 
 		this->Dialog["Victory"].registerObject("Score", "Victory");
 		this->Dialog["Victory"].object("Score")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["Victory"].object("Score")->setString("0");
-		this->Dialog["Victory"].object("Score")->setFillColor(Color::Black);
+		this->Dialog["Victory"].object("Score")->setFillColor(Color::White);
 		this->Dialog["Victory"].object("Score")->setCharacterSize(100);
 		this->Dialog["Victory"].object("Score")->setPosition({ 800,450 });
 
@@ -1498,9 +1498,12 @@ private:
 		this->Field["Victory"].createTemplate("Blank");
 
 		this->Field["Victory"].registerObject("VictoryBG", "Blank", "VictoryBG");
-		this->Field["Victory"].object("VictoryBG")->addTexture("assets\\Prop\\Floor\\graph.jpg", "BG", 1000);
+		this->Field["Victory"].object("VictoryBG")->addTexture("assets\\Prop\\UI\\Victory.png", "BG", 1000);
 		this->Field["Victory"].object("VictoryBG")->setSpriteTexture("BG", 0);
-		this->Field["Victory"].object("VictoryBG")->setSpriteSize(10, 10);
+		this->Field["Victory"].object("VictoryBG")->setImgDim(1920, 1080);
+		this->Field["Victory"].object("VictoryBG")->setPosX(960 * 0.83);
+		this->Field["Victory"].object("VictoryBG")->setPosY(540 * 0.83);
+		this->Field["Victory"].object("VictoryBG")->setSpriteSize(0.83, 0.83);
 
 		this->Field["GameOver"].createTemplate("GameOver");
 		this->Field["GameOver"].Template("GameOver")->addTexture("assets\\Prop\\HUD\\Pause.png", "default", 1000);
@@ -1524,25 +1527,37 @@ private:
 		this->Dialog["MainMenuButton"].registerObject("Play", "MainMenu");
 		this->Dialog["MainMenuButton"].object("Play")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["MainMenuButton"].object("Play")->setString("Play");
-		this->Dialog["MainMenuButton"].object("Play")->setFillColor(Color::Black);
+		this->Dialog["MainMenuButton"].object("Play")->setFillColor(Color::White);
 		this->Dialog["MainMenuButton"].object("Play")->setCharacterSize(100);
-		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 450,230 });
+		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 350,230 });
 
 		this->Dialog["MainMenuButton"].registerObject("Exit", "MainMenu");
 		this->Dialog["MainMenuButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["MainMenuButton"].object("Exit")->setString("Exit");
-		this->Dialog["MainMenuButton"].object("Exit")->setFillColor(Color::Black);
+		this->Dialog["MainMenuButton"].object("Exit")->setFillColor(Color::White);
 		this->Dialog["MainMenuButton"].object("Exit")->setCharacterSize(100);
-		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 450,600 });
+		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 350,600 });
 
 		this->Field["MainMenu"].createTemplate("MainMenuBG");
-		this->Field["MainMenu"].Template("MainMenuBG")->setImgDim(1600, 1900);
-		this->Field["MainMenu"].Template("MainMenuBG")->addTexture("assets\\Prop\\Floor\\Graph.jpg", "ProtoPlate", 1000);
-		this->Field["MainMenu"].Template("MainMenuBG")->setImgDim(800, 800);
-		this->Field["MainMenu"].Template("MainMenuBG")->setSpriteSize(10, 10);
+		this->Field["MainMenu"].Template("MainMenuBG")->addTexture("assets\\Prop\\UI\\MainMenu.png", "MainMenuBG", 1000);
+		this->Field["MainMenu"].Template("MainMenuBG")->setImgDim(1920, 1080);
+		this->Field["MainMenu"].Template("MainMenuBG")->setPosX(960*0.83);
+		this->Field["MainMenu"].Template("MainMenuBG")->setPosY(540*0.83);
+		this->Field["MainMenu"].Template("MainMenuBG")->setSpriteSize(0.83, 0.83);
+
+		this->Field["MainMenu"].createTemplate("MainMenuMask");
+		this->Field["MainMenu"].Template("MainMenuMask")->addTexture("assets\\Prop\\UI\\mask.png", "Mask", 1000);
+		this->Field["MainMenu"].Template("MainMenuMask")->setImgDim(576, 1080);
+		this->Field["MainMenu"].Template("MainMenuMask")->setPosX(288 * 0.83);
+		this->Field["MainMenu"].Template("MainMenuMask")->setPosY(540 * 0.83);
+		this->Field["MainMenu"].Template("MainMenuMask")->setSpriteSize(1.3, 0.83);
 
 		this->Field["MainMenu"].registerObject("_MainMenuBG", "MainMenuBG", "_MainMenuBG");
-		this->Field["MainMenu"].object("_MainMenuBG")->setSpriteTexture("ProtoPlate", 0);
+		this->Field["MainMenu"].object("_MainMenuBG")->setSpriteTexture("MainMenuBG", 0);
+
+		this->Field["MainMenu"].registerObject("_MainMenuMask", "MainMenuMask", "_MainMenuMask");
+		this->Field["MainMenu"].object("_MainMenuMask")->setSpriteTexture("Mask", 0);
+
 		for (int i = 0; i < this->Field["MainMenu"].entityNumber(); i++) {
 			this->DrawField["MainMenu"].push_back(this->Field["MainMenu"].objectAt(i));
 		}
@@ -2193,10 +2208,15 @@ public:
 									hasEnoughItem("Composite Metal", 10, true);
 									hasEnoughItem("Arclyic", 5, true);
 									string ObjName = "Pump_" + to_string(rand() % 100000);
+									this->pause = true;
+									while (!FloorAck && !DynamicAck) {
+										Sleep(1);
+									}
 									this->Field["Dynamic"].registerObject(ObjName, "Pump", "Pump");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->pause = false;
 									this->building = false;
 								}
 								if (clickHit(SlolarHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 2, false) && hasEnoughItem("Wiring Kit", 1, false)) {
@@ -2205,10 +2225,15 @@ public:
 									hasEnoughItem("Arclyic", 2, true);
 									hasEnoughItem("Wiring Kit", 1, true);
 									string ObjName = "Solar_" + to_string(rand() % 100000);
+									this->pause = true;
+									while (!FloorAck && !DynamicAck) {
+										Sleep(1);
+									}
 									this->Field["Dynamic"].registerObject(ObjName, "SolarCell", "Solar");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->pause = false;
 									this->building = false;
 								}
 								if (clickHit(RocketHitBox) && hasEnoughItem("Composite Metal", 15, false)
@@ -2223,10 +2248,15 @@ public:
 									hasEnoughItem("Gold Plate", 10, true);
 									hasEnoughItem("Wiring Kit", 5, true);
 									string ObjName = "Rocket_" + to_string(rand() % 100000);
+									this->pause = true;
+									while (!FloorAck && !DynamicAck) {
+										Sleep(1);
+									}
 									this->Field["Dynamic"].registerObject(ObjName, "Rocket", "Rocket");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->pause = false;
 									this->building = false;
 								}
 							}
@@ -2483,7 +2513,7 @@ public:
 				}
 			}
 			else {
-				int PlayHitBox[] = { 435,240,680,360 }, ExitHitBox[] = { 435,600,680,720 };
+				int PlayHitBox[] = { 335,240,580,360 }, ExitHitBox[] = { 335,600,580,720 };
 				if (ev.type == Event::MouseMoved) {
 					this->mousePos[0] = ev.mouseMove.x;
 					this->mousePos[1] = ev.mouseMove.y;
