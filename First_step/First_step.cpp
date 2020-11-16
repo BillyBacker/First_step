@@ -1887,7 +1887,7 @@ public:
 					this->DrawField["ItemOnMouse"][0]->setPosY(this->mousePos[1]);
 				}
 				if (ev.type == Event::MouseButtonPressed) {
-					if (ev.mouseButton.button == Mouse::Middle) {
+					if (ev.mouseButton.button == Mouse::Middle && this->inventory && this->DrawField["ItemOnMouse"][0]->tag != "Tool") {
 						this->DrawField["ItemOnMouse"][0]->Is("None");
 						this->DrawField["ItemOnMouse"][0]->tag = "None";
 						this->DrawField["ItemOnMouse"][0]->setSpriteSize(0, 0);
