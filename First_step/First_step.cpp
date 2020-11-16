@@ -2119,6 +2119,50 @@ public:
 											}
 										}
 									}
+									else if (this->DrawField["Hotbar"][this->selectingSlot]->nowIs() == "Drill") {
+										for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size(); i++) {
+											if (this->DrawField["DrawField_Dynamic"][i]->cat == "Rock") {
+												printf("66\n");
+												Object* building = this->DrawField["DrawField_Dynamic"][i];
+												int buildingHitbox[4] = { building->getHitBoxData()[0],
+																			building->getHitBoxData()[1] - building->getImgHeight() * building->getSizeY() / 2,
+																			building->getHitBoxData()[2],
+																			building->getHitBoxData()[3] + building->getImgHeight() * building->getSizeY() * 0.2, };
+												for (int j = 0; j < 4; j++) {
+													printf("%f ", building->getHitBoxData()[j]);
+												}
+												if (clickHit(buildingHitbox) && ObjectDis(this->Elon, building) <= 200) {
+													this->SoundFX["Building"].play();
+													if (boolRand(40)) {
+														int quant = rand() % 7 + 1;
+														for (int i = 0; i < 1; i++) {
+															giveItem("Gold Nugget");
+														}
+													}
+													if (boolRand(100)) {
+														int quant = rand() % 10 + 1;
+														for (int i = 0; i < 1; i++) {
+															giveItem("Titanium Nugget");
+														}
+													}
+													if (boolRand(200)) {
+														int quant = rand() % 12 + 1;
+														for (int i = 0; i < 1; i++) {
+															giveItem("Aluminium Nugget");
+														}
+													}
+													if (boolRand(400)) {
+														int quant = rand() % 15 + 1;
+														for (int i = 0; i < 1; i++) {
+															giveItem("Copper Nugget");
+														}
+													}
+													building->usable = false;
+													building->setSpriteSize(0, 0);
+												}
+											}
+										}
+									}
 								}
 								else {
 									continue;
