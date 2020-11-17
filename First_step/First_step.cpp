@@ -7,6 +7,8 @@
 #include<thread>
 #include<math.h>
 #include<iostream>
+#include <fstream>
+#include<stdio.h>
 #include<string>
 #include<vector>
 #include<algorithm>
@@ -1525,7 +1527,6 @@ private:
 		this->Field["GameOver"].object("BG")->setSpriteTexture("default", 0);
 
 
-
 	}
 	void initMainMenu() {
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
@@ -1565,8 +1566,50 @@ private:
 		this->Field["MainMenu"].registerObject("_MainMenuMask", "MainMenuMask", "_MainMenuMask");
 		this->Field["MainMenu"].object("_MainMenuMask")->setSpriteTexture("Mask", 0);
 
+		this->Field["EnterName"].createTemplate("Blank");
+
+		this->Field["EnterName"].registerObject("BG", "Blank", "BG");
+		this->Field["EnterName"].object("BG")->addTexture("assets\\Prop\\UI\\MainMenu.png", "default", 1000);
+		this->Field["EnterName"].object("BG")->setSpriteTexture("default", 0);
+		this->Field["EnterName"].object("BG")->setSpriteSize(0.84, 0.84);
+		this->Field["EnterName"].object("BG")->setImgDim(1920, 1080);
+		this->Field["EnterName"].object("BG")->setPosX(960 * 0.83);
+		this->Field["EnterName"].object("BG")->setPosY(540 * 0.83);
+		this->Field["EnterName"].object("BG")->tag = "EnterNameUI";
+
+		this->Dialog["EnterName"].registerObject("EnterName", "EnterName");
+		this->Dialog["EnterName"].object("EnterName")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["EnterName"].object("EnterName")->setString("Enter your name");
+		this->Dialog["EnterName"].object("EnterName")->setFillColor(Color::White);
+		this->Dialog["EnterName"].object("EnterName")->setCharacterSize(100);
+		this->Dialog["EnterName"].object("EnterName")->setPosition({ 420,50 });
+
+		this->Dialog["EnterName"].registerObject("Name", "EnterName");
+		this->Dialog["EnterName"].object("Name")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["EnterName"].object("Name")->setString("");
+		this->Dialog["EnterName"].object("Name")->setFillColor(Color::White);
+		this->Dialog["EnterName"].object("Name")->setCharacterSize(75);
+		this->Dialog["EnterName"].object("Name")->setPosition({ 800,450 });
+
+		this->Dialog["EnterName"].registerObject("Back", "EnterName");
+		this->Dialog["EnterName"].object("Back")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["EnterName"].object("Back")->setString("Back");
+		this->Dialog["EnterName"].object("Back")->setFillColor(Color::White);
+		this->Dialog["EnterName"].object("Back")->setCharacterSize(75);
+		this->Dialog["EnterName"].object("Back")->setPosition({ 300,750 });
+
+		this->Dialog["EnterName"].registerObject("Enter", "EnterName");
+		this->Dialog["EnterName"].object("Enter")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["EnterName"].object("Enter")->setString("Start");
+		this->Dialog["EnterName"].object("Enter")->setFillColor(Color::White);
+		this->Dialog["EnterName"].object("Enter")->setCharacterSize(75);
+		this->Dialog["EnterName"].object("Enter")->setPosition({ 1200,750 });
+
 		for (int i = 0; i < this->Field["MainMenu"].entityNumber(); i++) {
 			this->DrawField["MainMenu"].push_back(this->Field["MainMenu"].objectAt(i));
+		}
+		for (int i = 0; i < this->Field["EnterName"].entityNumber(); i++) {
+			this->DrawField["EnterName"].push_back(this->Field["EnterName"].objectAt(i));
 		}
 	}
 	void manageLayer() {
@@ -1616,6 +1659,7 @@ public:
 	unordered_map<string, Sound> SoundFX;
 	unordered_map<string, Music> MusicFX;
 	unordered_map<string, SoundBuffer> SoundRepo;
+	string InputText, PlayerName;
 	int itemOutoutQuantity = 0;
 	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4], CraftingOutputHitbox[4] = { 1260,460,1330,530 };
 	int maxItemStack = 8;
@@ -1632,7 +1676,8 @@ public:
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
 	bool OnMainMenu = true;
 	bool DynamicAck = false, FloorAck = false;
-	bool walk = true, idle = true, canMove = true, onRocket = false;
+	bool walk = true, idle = true, canMove = true, onRocket = false, EnteringName = false;
+	vector<string*> leaderBoard;
 	gameEngine() {
 		unsigned int time_ui = unsigned int(time(NULL));
 		srand(time_ui);
@@ -1642,6 +1687,31 @@ public:
 		this->intitDialog();
 		this->intiRecipe();
 		this->initMainMenu();
+		loadScore("LeaderBoard.board");
+	}
+	virtual ~gameEngine() {
+		delete this->window;
+	}
+	void loadScore(string path) {
+		ifstream scoreBoard;
+		string data[2] = {"",""}, score, name;
+		scoreBoard.open(path);
+		while (scoreBoard >> name >> score) {
+			leaderBoard.push_back(new string[2]);
+			leaderBoard[leaderBoard.size() - 1][0] = name;
+			leaderBoard[leaderBoard.size() - 1][1] = score;
+		}
+		for (int i = 0; i < leaderBoard.size(); i++) {
+			cout << leaderBoard[i][0] << "\t" << leaderBoard[i][1] << endl;
+		}
+	}
+	void saveScore(string path) {
+		ofstream scoreBoard;
+		scoreBoard.open(path);
+		for (auto log : leaderBoard) {
+			scoreBoard << log[0] << " " << log[1] << endl;
+		}
+		scoreBoard.close();
 	}
 	void construct() {
 		this->pause = true;
@@ -1719,9 +1789,6 @@ public:
 		walk = true, idle = true, canMove = true, onRocket = false;
 		this->initMainMenu();
 		this->pause = false;
-	}
-	virtual ~gameEngine() {
-		delete this->window;
 	}
 	const bool ObjIsOnSight(Object* charactor, Object* B, double range) {
 		if (pow(charactor->PosX() - B->PosX(), 2) + pow(charactor->PosY() - B->PosY(), 2) < pow(range, 2)) {
@@ -2563,7 +2630,7 @@ public:
 					cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << "     " << this->HotbarQuantity[this->selectingSlot] << endl;
 				}
 			}
-			else {
+			else if(!EnteringName){
 				int PlayHitBox[] = { 335,240,580,360 }, ExitHitBox[] = { 335,600,580,720 };
 				if (ev.type == Event::MouseMoved) {
 					this->mousePos[0] = ev.mouseMove.x;
@@ -2574,8 +2641,8 @@ public:
 						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
 						if (clickHit(PlayHitBox)) {
 							this->SoundFX["Click"].play();
-							this->construct();
-							this->OnMainMenu = false;
+							this->EnteringName = true;
+							this->OnMainMenu = true;
 						}
 						else if (clickHit(ExitHitBox)) {
 							this->SoundFX["Click"].play();
@@ -2583,6 +2650,52 @@ public:
 							this->running = false;
 						}
 					}
+				}
+			}
+			else if (EnteringName) {
+				int BackHitBox[] = { 300,760,500,850 }, StartHitBox[] = { 1180,760,1360,850 };
+				if (ev.type == Event::MouseMoved) {
+					this->mousePos[0] = ev.mouseMove.x;
+					this->mousePos[1] = ev.mouseMove.y;
+				}
+				if (ev.type == Event::MouseButtonPressed) {
+					if (ev.mouseButton.button == Mouse::Left) {
+						printf("%d %d ||\n", this->mousePos[0], this->mousePos[1]);
+						if (clickHit(StartHitBox)) {
+							this->PlayerName = this->InputText;
+							this->SoundFX["Click"].play();
+							this->construct();
+							this->OnMainMenu = false;
+							this->EnteringName = false;
+						}
+						else if (clickHit(BackHitBox)) {
+							this->SoundFX["Click"].play();
+							this->EnteringName = false;
+							this->InputText = "";
+							this->Dialog["EnterName"].object("Name")->setString(this->InputText);
+						}
+					}
+				}
+				if (ev.type == Event::TextEntered) {
+					if (ev.text.unicode == 8) {// 8 = backspace
+						this->InputText = this->InputText.substr(0, this->InputText.size() - 1);
+						this->Dialog["EnterName"].object("Name")->setString(this->InputText);
+					}
+					else if (ev.text.unicode == 27) {
+						this->SoundFX["Click"].play();
+						this->EnteringName = false;
+						this->InputText = "";
+						this->Dialog["EnterName"].object("Name")->setString(this->InputText);
+					}
+					else{
+						this->InputText += ev.text.unicode;
+						printf("%d\n", ev.text.unicode);
+						this->Dialog["EnterName"].object("Name")->setString(this->InputText);
+					}
+					Vector2f textPos;
+					textPos.x = 800 - this->InputText.size() * 75 / 4;
+					textPos.y = 450;
+					this->Dialog["EnterName"].object("Name")->setPosition(textPos);
 				}
 			}
 		}
@@ -3084,6 +3197,10 @@ public:
 				this->Rocket->MovePosY(-400 / (1 + pow(1.1, 150 - Rockettime++)));
 				if (this->Rocket->PosY() < -1000) {
 					Sleep(3000);
+					leaderBoard.push_back(new string[2]);
+					leaderBoard[leaderBoard.size() - 1][0] = this->PlayerName;
+					leaderBoard[leaderBoard.size() - 1][1] = to_string(int(itemNumber("Research Document") * 20 + ceil(Elon->getStat("Health")) * 10));
+					saveScore("LeaderBoard.board");
 					this->Victory = true;
 					this->onRocket = false;
 					this->pause = true;
@@ -3194,6 +3311,14 @@ public:
 				}
 				for (int i = 0; i < this->Dialog["MainMenuButton"].entityNumber(); i++) {
 					this->window->draw(*this->Dialog["MainMenuButton"].objectAt(i));
+				}
+				if (this->EnteringName) {
+					for (auto obj : this->DrawField["EnterName"]) {
+						this->window->draw(obj->getSprite());
+					}
+					for (int i = 0; i < this->Dialog["EnterName"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["EnterName"].objectAt(i));
+					}
 				}
 			}
 		}
@@ -3456,7 +3581,7 @@ void ShowDrawingStat3() {
 int main() { // Game loop
 	Thread CheckInsight_Thread1(&CheckInsight), CheckBump(&isMovable), CheckFloor(&checkFloorInsight), monitor(&ShowDrawingStat3);
 	CheckBump.launch();
-	//CheckFloor.launch();
+	CheckFloor.launch();
 	while (First_step.isRuning()) {
 		First_step.update();
 		First_step.render();
