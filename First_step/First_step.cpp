@@ -1217,19 +1217,19 @@ private:
 		this->Field["GameBG"].object("Floor")->sprite.setTextureRect(IntRect(0, 0, 500000, 5000));
 		this->Field["GameBG"].object("Floor")->sprite.setTexture(a);
 		*/
-		for (int j = 0; j < 50; j++) {
+		for (int j = 0; j < 200; j++) {
 			float size = rand() % 10;
 			this->Field["Dynamic"].registerObject(to_string(i) + to_string(j), "Rocky", "Rock");
 			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setSpriteTexture("default" + to_string(rand() % 3), 0);
-			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 13000);
-			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 13000);
+			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosX(rand() % 8500);
+			this->Field["Dynamic"].object(to_string(i) + to_string(j))->setOffsetPosY(rand() % 8500);
 		}
 
 		for (int j = 0; j < 50; j++) {
 			float size = rand() % 10;
 			this->Field["Dynamic"].registerObject("Doc" + to_string(j), "Doc", "Doc");
-			this->Field["Dynamic"].object("Doc" + to_string(j))->setOffsetPosX(rand() % 13000);
-			this->Field["Dynamic"].object("Doc" + to_string(j))->setOffsetPosY(rand() % 13000);
+			this->Field["Dynamic"].object("Doc" + to_string(j))->setOffsetPosX(rand() % 8500);
+			this->Field["Dynamic"].object("Doc" + to_string(j))->setOffsetPosY(rand() % 8500);
 		}
 
 		this->Field["Dynamic"].registerObject("Hut", "Structure", "Hut");
