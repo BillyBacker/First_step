@@ -1536,15 +1536,22 @@ private:
 		this->Dialog["MainMenuButton"].object("Play")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["MainMenuButton"].object("Play")->setString("Play");
 		this->Dialog["MainMenuButton"].object("Play")->setFillColor(Color::White);
-		this->Dialog["MainMenuButton"].object("Play")->setCharacterSize(100);
-		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 350,230 });
+		this->Dialog["MainMenuButton"].object("Play")->setCharacterSize(75);
+		this->Dialog["MainMenuButton"].object("Play")->setPosition({ 400,230 });
+
+		this->Dialog["MainMenuButton"].registerObject("HOF", "MainMenu");
+		this->Dialog["MainMenuButton"].object("HOF")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["MainMenuButton"].object("HOF")->setString("Hall of fame");
+		this->Dialog["MainMenuButton"].object("HOF")->setFillColor(Color::White);
+		this->Dialog["MainMenuButton"].object("HOF")->setCharacterSize(75);
+		this->Dialog["MainMenuButton"].object("HOF")->setPosition({ 100,415 });
 
 		this->Dialog["MainMenuButton"].registerObject("Exit", "MainMenu");
 		this->Dialog["MainMenuButton"].object("Exit")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["MainMenuButton"].object("Exit")->setString("Exit");
 		this->Dialog["MainMenuButton"].object("Exit")->setFillColor(Color::White);
-		this->Dialog["MainMenuButton"].object("Exit")->setCharacterSize(100);
-		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 350,600 });
+		this->Dialog["MainMenuButton"].object("Exit")->setCharacterSize(75);
+		this->Dialog["MainMenuButton"].object("Exit")->setPosition({ 410,600 });
 
 		this->Field["MainMenu"].createTemplate("MainMenuBG");
 		this->Field["MainMenu"].Template("MainMenuBG")->addTexture("assets\\Prop\\UI\\MainMenu.png", "MainMenuBG", 1000);
@@ -1612,6 +1619,88 @@ private:
 			this->DrawField["EnterName"].push_back(this->Field["EnterName"].objectAt(i));
 		}
 	}
+	void intitHOF() {
+		loadScore("LeaderBoard.board");
+
+		this->Field["HOF"].createTemplate("Blank");
+
+		this->Field["HOF"].createTemplate("Condition_Image");
+		this->Field["HOF"].Template("Condition_Image")->addTexture("assets\\Prop\\UI\\Elon_icon0.png", "Normal", 1000);
+		this->Field["HOF"].Template("Condition_Image")->addTexture("assets\\Prop\\UI\\Elon_icon1.png", "Excellent", 1000);
+		this->Field["HOF"].Template("Condition_Image")->addTexture("assets\\Prop\\UI\\Elon_icon2.png", "Poor", 1000);
+		this->Field["HOF"].Template("Condition_Image")->setSpriteSize(0.1, 0.1);
+		this->Field["HOF"].Template("Condition_Image")->setImgDim(512, 512);
+
+		this->Field["HOF"].registerObject("BG", "Blank", "BG");
+		this->Field["HOF"].object("BG")->addTexture("assets\\Prop\\UI\\MainMenu.png", "default", 1000);
+		this->Field["HOF"].object("BG")->setSpriteTexture("default", 0);
+		this->Field["HOF"].object("BG")->setSpriteSize(0.84, 0.84);
+		this->Field["HOF"].object("BG")->setImgDim(1920, 1080);
+		this->Field["HOF"].object("BG")->setPosX(960 * 0.83);
+		this->Field["HOF"].object("BG")->setPosY(540 * 0.83);
+		this->Field["HOF"].object("BG")->tag = "EnterNameUI";
+
+		this->Dialog["HOF"].registerObject("Back", "HOF");
+		this->Dialog["HOF"].object("Back")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["HOF"].object("Back")->setString("Back");
+		this->Dialog["HOF"].object("Back")->setFillColor(Color::White);
+		this->Dialog["HOF"].object("Back")->setCharacterSize(75);
+		this->Dialog["HOF"].object("Back")->setPosition({ 300,750 });
+
+		for (int i = 0; i < this->leaderBoard.size(); i++) {
+			if (i >= 5) {
+				break;
+			}
+			string Name = "Name_" + to_string(i), Score = "Score_" + to_string(i), Pic = "Pic_" + to_string(i);
+			Vector2f PosName, PosScore;
+			PosName.x = 300;
+			PosName.y = 200 + 75 * i;
+			PosScore.x = 800;
+			PosScore.y = 200 + 75 * i;
+
+			this->Field["HOF"].registerObject(Pic, "Condition_Image", "Pic");
+			if (stoi(this->leaderBoard[i][1]) >= 800) {
+				this->Field["HOF"].object(Pic)->setSpriteTexture("Excellent", 0);
+			}
+			else if (stoi(this->leaderBoard[i][1]) >= 500) {
+				this->Field["HOF"].object(Pic)->setSpriteTexture("Normal", 0);
+			}
+			else if (stoi(this->leaderBoard[i][1]) < 500) {
+				this->Field["HOF"].object(Pic)->setSpriteTexture("Poor", 0);
+			}
+			this->Field["HOF"].object(Pic)->setPosX(PosName.x - 50);
+			this->Field["HOF"].object(Pic)->setPosY(PosName.y + 51);
+
+			this->Dialog["HOF"].registerObject(Name, "Name");
+			this->Dialog["HOF"].object(Name)->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+			this->Dialog["HOF"].object(Name)->setString(this->leaderBoard[i][0]);
+			this->Dialog["HOF"].object(Name)->setFillColor(Color::White);
+			this->Dialog["HOF"].object(Name)->setCharacterSize(75);
+			this->Dialog["HOF"].object(Name)->setPosition(PosName);
+
+			this->Dialog["HOF"].registerObject(Score, "Score");
+			this->Dialog["HOF"].object(Score)->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+			this->Dialog["HOF"].object(Score)->setString(this->leaderBoard[i][1]);
+			this->Dialog["HOF"].object(Score)->setFillColor(Color::White);
+			this->Dialog["HOF"].object(Score)->setCharacterSize(75);
+			this->Dialog["HOF"].object(Score)->setPosition(PosScore);
+
+			cout << PosName.y << endl;
+			
+		}
+		for (int i = 0; i < this->Field["HOF"].entityNumber(); i++) {
+			this->DrawField["HOF"].push_back(this->Field["HOF"].objectAt(i));
+		}
+		saveScore("LeaderBoard.board");
+	}
+	void destroyHOF() {
+		for (int i = 0; i < this->leaderBoard.size(); i++) {
+			freeContainer(this->leaderBoard[i]);
+		}
+		freeContainer(this->leaderBoard);
+		freeContainer(this->DrawField["HOF"]);
+		freeContainer(this->Field["HOF"]);
+	}
 	void manageLayer() {
 		for (int i = 0; i < this->Field["GameBG"].entityNumber(); i++) {
 			this->DrawField["DrawField_BG"].push_back(this->Field["GameBG"].objectAt(i));
@@ -1672,9 +1761,8 @@ public:
 	bool W_moveable = true, A_moveable = true, S_moveable = true, D_moveable = true;
 	bool pause = false;
 	bool escPressed = false, escToggle = false, EToggle = false;
-	bool paused = false, building = false, inventory = false, Victory = false, GameOver = false;
+	bool paused = false, building = false, inventory = false, Victory = false, GameOver = false, OnMainMenu = true, OnHOF = false;
 	int selectingSlot = 0, ItemOnMouseQuantity = 0;
-	bool OnMainMenu = true;
 	bool DynamicAck = false, FloorAck = false;
 	bool walk = true, idle = true, canMove = true, onRocket = false, EnteringName = false;
 	vector<string*> leaderBoard;
@@ -1687,7 +1775,6 @@ public:
 		this->intitDialog();
 		this->intiRecipe();
 		this->initMainMenu();
-		loadScore("LeaderBoard.board");
 	}
 	virtual ~gameEngine() {
 		delete this->window;
@@ -1712,8 +1799,13 @@ public:
 			scoreBoard << log[0] << " " << log[1] << endl;
 		}
 		scoreBoard.close();
+		for (int i = 0; i < this->leaderBoard.size(); i++) {
+			freeContainer(this->leaderBoard[i]);
+		}
+		freeContainer(this->leaderBoard);
 	}
 	void construct() {
+		loadScore("LeaderBoard.board");
 		this->pause = true;
 		Sleep(500);
 		unsigned int time_ui = unsigned int(time(NULL));
@@ -2630,8 +2722,9 @@ public:
 					cout << this->DrawField["Hotbar"][this->selectingSlot]->tag << "     " << this->HotbarQuantity[this->selectingSlot] << endl;
 				}
 			}
-			else if(!EnteringName){
-				int PlayHitBox[] = { 335,240,580,360 }, ExitHitBox[] = { 335,600,580,720 };
+			else if(!EnteringName && !OnHOF){
+				//int PlayHitBox[] = { 335,240,580,360 }, ExitHitBox[] = { 335,600,580,720 };
+				int PlayHitBox[] = { 390,240,560,325 }, ExitHitBox[] = { 400,600,570,680 }, HOFHitBox[] = {85,420,570,500};
 				if (ev.type == Event::MouseMoved) {
 					this->mousePos[0] = ev.mouseMove.x;
 					this->mousePos[1] = ev.mouseMove.y;
@@ -2643,6 +2736,11 @@ public:
 							this->SoundFX["Click"].play();
 							this->EnteringName = true;
 							this->OnMainMenu = true;
+						}
+						else if (clickHit(HOFHitBox)) {
+							this->SoundFX["Click"].play();
+							intitHOF();
+							this->OnHOF = true;
 						}
 						else if (clickHit(ExitHitBox)) {
 							this->SoundFX["Click"].play();
@@ -2696,6 +2794,27 @@ public:
 					textPos.x = 800 - this->InputText.size() * 75 / 4;
 					textPos.y = 450;
 					this->Dialog["EnterName"].object("Name")->setPosition(textPos);
+				}
+			}
+			else if (OnHOF) {
+				int BackHitBox[] = { 300,760,500,850 };
+				if (ev.type == Event::MouseMoved) {
+					this->mousePos[0] = ev.mouseMove.x;
+					this->mousePos[1] = ev.mouseMove.y;
+				}
+				if (ev.type == Event::MouseButtonPressed) {
+					if (ev.mouseButton.button == Mouse::Left) {
+						if (clickHit(BackHitBox)) {
+							this->SoundFX["Click"].play();
+							destroyHOF();
+							this->OnHOF = false;
+						}
+					}
+				}
+				if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
+					this->SoundFX["Click"].play();
+					destroyHOF();
+					this->OnHOF = false;
 				}
 			}
 		}
@@ -3318,6 +3437,14 @@ public:
 					}
 					for (int i = 0; i < this->Dialog["EnterName"].entityNumber(); i++) {
 						this->window->draw(*this->Dialog["EnterName"].objectAt(i));
+					}
+				}
+				else if (this->OnHOF) {
+					for (auto obj : this->DrawField["HOF"]) {
+						this->window->draw(obj->getSprite());
+					}
+					for (int i = 0; i < this->Dialog["HOF"].entityNumber(); i++) {
+						this->window->draw(*this->Dialog["HOF"].objectAt(i));
 					}
 				}
 			}
