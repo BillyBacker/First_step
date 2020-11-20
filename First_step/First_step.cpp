@@ -1621,6 +1621,7 @@ private:
 	}
 	void intitHOF() {
 		loadScore("LeaderBoard.board");
+		sortScore();
 
 		this->Field["HOF"].createTemplate("Blank");
 
@@ -1630,6 +1631,13 @@ private:
 		this->Field["HOF"].Template("Condition_Image")->addTexture("assets\\Prop\\UI\\Elon_icon2.png", "Poor", 1000);
 		this->Field["HOF"].Template("Condition_Image")->setSpriteSize(0.1, 0.1);
 		this->Field["HOF"].Template("Condition_Image")->setImgDim(512, 512);
+
+		this->Field["HOF"].createTemplate("Medal");
+		this->Field["HOF"].Template("Medal")->addTexture("assets\\Prop\\UI\\N1.png", "1", 1000);
+		this->Field["HOF"].Template("Medal")->addTexture("assets\\Prop\\UI\\N2.png", "2", 1000);
+		this->Field["HOF"].Template("Medal")->addTexture("assets\\Prop\\UI\\N3.png", "3", 1000);
+		this->Field["HOF"].Template("Medal")->setSpriteSize(0.1, 0.1);
+		this->Field["HOF"].Template("Medal")->setImgDim(512, 512);
 
 		this->Field["HOF"].registerObject("BG", "Blank", "BG");
 		this->Field["HOF"].object("BG")->addTexture("assets\\Prop\\UI\\MainMenu.png", "default", 1000);
@@ -1650,6 +1658,16 @@ private:
 		for (int i = 0; i < this->leaderBoard.size(); i++) {
 			if (i >= 5) {
 				break;
+			}
+			if (i < 3) {
+				string Medal = "Medal_" + to_string(i);
+				Vector2f PosMedal;
+				PosMedal.x = 250;
+				PosMedal.y = 305 + 75 * i;
+				this->Field["HOF"].registerObject(Medal, "Medal", "Medal");
+				this->Field["HOF"].object(Medal)->setSpriteTexture(to_string(i+1), 0);
+				this->Field["HOF"].object(Medal)->setPosX(PosMedal.x - 50);
+				this->Field["HOF"].object(Medal)->setPosY(PosMedal.y - 51);
 			}
 			string Name = "Name_" + to_string(i), Score = "Score_" + to_string(i), Pic = "Pic_" + to_string(i);
 			Vector2f PosName, PosScore;
@@ -1778,6 +1796,25 @@ public:
 	}
 	virtual ~gameEngine() {
 		delete this->window;
+	}
+	void swapScore(int index1, int index2) {
+		string buffer[2];
+		buffer[0] = this->leaderBoard[index1][0];
+		buffer[1] = this->leaderBoard[index1][1];
+		this->leaderBoard[index1][0] = this->leaderBoard[index2][0];
+		this->leaderBoard[index1][1] = this->leaderBoard[index2][1];
+		this->leaderBoard[index2][0] = buffer[0];
+		this->leaderBoard[index2][1] = buffer[1];
+	}
+	void sortScore() {
+		for (int i1 = 0; i1 < this->leaderBoard.size() * this->leaderBoard.size(); i1++) {
+			for (int i = 0; i < this->leaderBoard.size()-1; i++) {
+				if (stoi(this->leaderBoard[i][1]) < stoi(this->leaderBoard[i + 1][1])) {
+					swapScore(i, i + 1);
+					printf("%d %d %d\n",i , stoi(this->leaderBoard[i][1]), stoi(this->leaderBoard[i+1][1]));
+				}
+			}
+		}
 	}
 	void loadScore(string path) {
 		ifstream scoreBoard;
