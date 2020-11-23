@@ -569,6 +569,13 @@ private:
 		this->MusicFX["Running"].setLoop(true);
 		this->MusicFX["Wind"].openFromFile("Sound\\Wind.ogg");
 		this->MusicFX["Wind"].setLoop(true);
+		this->MusicFX["Mainmenu"].openFromFile("Sound\\Menu.ogg");
+		this->MusicFX["Mainmenu"].setLoop(true);
+		//this->MusicFX["Mainmenu"].setVolume(10);
+		this->MusicFX["BG_0"].openFromFile("Sound\\Lightless Dawn.ogg");
+		this->MusicFX["BG_1"].openFromFile("Sound\\Wholesome.ogg");
+		this->MusicFX["BG_2"].openFromFile("Sound\\Expeditionary.ogg");
+		this->MusicFX["BG_3"].openFromFile("Sound\\Air Prelude.ogg");
 	}
 	void initItem() {
 
@@ -1201,6 +1208,7 @@ private:
 		this->Field["GameBG"].Template("Floor")->setType("Dynamic");
 		this->Field["GameBG"].Template("Floor")->isPassable(true);
 		this->Field["GameBG"].Template("Floor")->tag = "BG";
+
 		for (int i = 0; i < 20; i++) {
 			for (int j = 0; j < 20; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
@@ -1771,6 +1779,7 @@ public:
 	int InventoryHitbox[4][9][4], CraftingHitbox[3][3][4], CraftingOutputHitbox[4] = { 1260,460,1330,530 };
 	int maxItemStack = 8;
 	int Rockettime = 0;
+	int nowPlaying = -1;
 	bool _time = true;
 	bool pass = true;
 	bool movable = true;
@@ -1793,6 +1802,7 @@ public:
 		this->intitDialog();
 		this->intiRecipe();
 		this->initMainMenu();
+		this->MusicFX["Mainmenu"].play();
 	}
 	virtual ~gameEngine() {
 		delete this->window;
@@ -1866,6 +1876,7 @@ public:
 		this->MusicFX["Wind"].play();
 	}
 	void constructMainMenu() {
+		this->MusicFX["Mainmenu"].play();
 		this->initMainMenu();
 	}
 	void destroy() {
@@ -2036,6 +2047,22 @@ public:
 		while (this->window->pollEvent(this->ev)) {
 			if (!this->OnMainMenu) {
 				if (this->canMove) {
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::C) {
+						if (this->nowPlaying != -1) {
+							this->MusicFX["BG_" + to_string(this->nowPlaying)].stop();
+							this->nowPlaying = -1;
+							this->pickBGMusic(true);
+						}
+						else {
+							this->pickBGMusic(true);
+						}
+					}
+					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::V) {
+						if (this->nowPlaying != -1) {
+							this->MusicFX["BG_" + to_string(this->nowPlaying)].stop();
+							this->nowPlaying = -1;
+						}
+					}
 					if (ev.type == Event::KeyPressed && ev.key.code == Keyboard::Escape) {
 						this->escPressed = true;
 					}
@@ -2422,6 +2449,10 @@ public:
 								}
 								if (clickHit(ExitHitBox)) {
 									this->SoundFX["Click"].play();
+									if (this->nowPlaying != -1) {
+										this->MusicFX["BG_" + to_string(this->nowPlaying)].stop();
+										this->nowPlaying = -1;
+									}
 									printf("Hit");
 									this->destroy();
 									this->Victory = false;
@@ -2438,6 +2469,9 @@ public:
 								}
 								if (clickHit(ExitHitBox)) {
 									this->SoundFX["Click"].play();
+									if (this->nowPlaying != -1) {
+										this->MusicFX["BG_" + to_string(this->nowPlaying)].stop();
+									}
 									printf("Hit");
 									this->destroy();
 									this->OnMainMenu = true;
@@ -2781,6 +2815,7 @@ public:
 						}
 						else if (clickHit(ExitHitBox)) {
 							this->SoundFX["Click"].play();
+							this->MusicFX["Mainmenu"].stop();
 							this->window->close();
 							this->running = false;
 						}
@@ -2799,6 +2834,7 @@ public:
 						if (clickHit(StartHitBox)) {
 							this->PlayerName = this->InputText;
 							this->SoundFX["Click"].play();
+							this->MusicFX["Mainmenu"].stop();
 							this->construct();
 							this->OnMainMenu = false;
 							this->EnteringName = false;
@@ -2821,6 +2857,14 @@ public:
 						this->EnteringName = false;
 						this->InputText = "";
 						this->Dialog["EnterName"].object("Name")->setString(this->InputText);
+					}
+					else if (ev.text.unicode == 13) {
+						this->PlayerName = this->InputText;
+						this->SoundFX["Click"].play();
+						this->MusicFX["Mainmenu"].stop();
+						this->construct();
+						this->OnMainMenu = false;
+						this->EnteringName = false;
 					}
 					else{
 						this->InputText += ev.text.unicode;
@@ -3019,10 +3063,25 @@ public:
 		}
 		return false;
 	}
+	void pickBGMusic(bool PlayNow) {
+		if ((!this->OnMainMenu && rand()%1000 == 0 || PlayNow) && this->nowPlaying == -1) {
+			this->nowPlaying = rand() % 4;
+			this->MusicFX["BG_" + to_string(this->nowPlaying)].play();
+			printf("Now playing : track_%d\n", this->nowPlaying);
+		}
+		if (this->nowPlaying != -1) {
+			if (this->MusicFX["BG_" + to_string(this->nowPlaying)].getStatus() == Music::Status::Stopped) {
+				this->nowPlaying = -1;
+			}
+		}
+
+	}
 	void update() {
 		int updated = false;
 		this->pollEvents();
 		if (!this->OnMainMenu) {
+			printf("Pos : %.2f %.2f\n", Anchor->PosX(), Anchor->PosY());
+			this->pickBGMusic(false);
 			this->updateHUD();
 			if (this->escPressed && !this->escToggle) {
 				if (this->paused || this->building || this->inventory) {
@@ -3640,6 +3699,30 @@ void isMovable() {
 				printf("************************************ with ");
 				cout << First_step.DrawField["DrawField_Dynamic"][i]->nowIs() << endl;
 				break;
+			}
+			if (-First_step.Anchor->PosX() < -950) {
+				A_isbump = true;
+				First_step.move_speed /= 5;
+				First_step.D_key(false);
+				First_step.move_speed *= 5;
+			}
+			if (-First_step.Anchor->PosX() > 8060) {
+				D_isbump = true;
+				First_step.move_speed /= 5;
+				First_step.A_key(false);
+				First_step.move_speed *= 5;
+			}
+			if (-First_step.Anchor->PosY() < -600) {
+				W_isbump = true;
+				First_step.move_speed /= 5;
+				First_step.S_key();
+				First_step.move_speed *= 5;
+			}
+			if (-First_step.Anchor->PosY() > 8400) {
+				S_isbump = true;
+				First_step.move_speed /= 5;
+				First_step.W_key();
+				First_step.move_speed *= 5;
 			}
 		}
 		if (W_isbump) {
