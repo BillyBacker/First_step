@@ -1131,8 +1131,8 @@ private:
 		this->Field["Dynamic"].Template("BG_Element")->setPosY(0);
 
 		this->Field["Dynamic"].registerObject("Anchor", "BG_Element", "Anchor");
-		this->Field["Dynamic"].object("Anchor")->setPosX(-3000);
-		this->Field["Dynamic"].object("Anchor")->setPosY(-3000);
+		this->Field["Dynamic"].object("Anchor")->setPosX(-8100);
+		this->Field["Dynamic"].object("Anchor")->setPosY(-100);
 		this->Field["Dynamic"].object("Anchor")->isPassable(true);
 		this->Anchor = this->Field["Dynamic"].object("Anchor");
 
@@ -1209,7 +1209,95 @@ private:
 		this->Field["GameBG"].Template("Floor")->isPassable(true);
 		this->Field["GameBG"].Template("Floor")->tag = "BG";
 
-		for (int i = 0; i < 20; i++) {
+		this->Field["GameBG"].createTemplate("LBorder");
+		this->Field["GameBG"].Template("LBorder")->addTexture("assets\\Prop\\Floor\\LBorder.png", "default", 1000);
+		this->Field["GameBG"].Template("LBorder")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("LBorder")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("LBorder")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("LBorder")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("LBorder")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("LBorder")->setType("Dynamic");
+		this->Field["GameBG"].Template("LBorder")->isPassable(true);
+		this->Field["GameBG"].Template("LBorder")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("RBorder");
+		this->Field["GameBG"].Template("RBorder")->addTexture("assets\\Prop\\Floor\\RBorder.png", "default", 1000);
+		this->Field["GameBG"].Template("RBorder")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("RBorder")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("RBorder")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("RBorder")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("RBorder")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("RBorder")->setType("Dynamic");
+		this->Field["GameBG"].Template("RBorder")->isPassable(true);
+		this->Field["GameBG"].Template("RBorder")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("TBorder");
+		this->Field["GameBG"].Template("TBorder")->addTexture("assets\\Prop\\Floor\\TBorder.png", "default", 1000);
+		this->Field["GameBG"].Template("TBorder")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("TBorder")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("TBorder")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("TBorder")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("TBorder")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("TBorder")->setType("Dynamic");
+		this->Field["GameBG"].Template("TBorder")->isPassable(true);
+		this->Field["GameBG"].Template("TBorder")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("BBorder");
+		this->Field["GameBG"].Template("BBorder")->addTexture("assets\\Prop\\Floor\\BBorder.png", "default", 1000);
+		this->Field["GameBG"].Template("BBorder")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("BBorder")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("BBorder")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("BBorder")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("BBorder")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("BBorder")->setType("Dynamic");
+		this->Field["GameBG"].Template("BBorder")->isPassable(true);
+		this->Field["GameBG"].Template("BBorder")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("SWCorner");
+		this->Field["GameBG"].Template("SWCorner")->addTexture("assets\\Prop\\Floor\\SWCorner.png", "default", 1000);
+		this->Field["GameBG"].Template("SWCorner")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("SWCorner")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("SWCorner")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("SWCorner")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("SWCorner")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("SWCorner")->setType("Dynamic");
+		this->Field["GameBG"].Template("SWCorner")->isPassable(true);
+		this->Field["GameBG"].Template("SWCorner")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("NWCorner");
+		this->Field["GameBG"].Template("NWCorner")->addTexture("assets\\Prop\\Floor\\NWCorner.png", "default", 1000);
+		this->Field["GameBG"].Template("NWCorner")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("NWCorner")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("NWCorner")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("NWCorner")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("NWCorner")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("NWCorner")->setType("Dynamic");
+		this->Field["GameBG"].Template("NWCorner")->isPassable(true);
+		this->Field["GameBG"].Template("NWCorner")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("SECorner");
+		this->Field["GameBG"].Template("SECorner")->addTexture("assets\\Prop\\Floor\\SECorner.png", "default", 1000);
+		this->Field["GameBG"].Template("SECorner")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("SECorner")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("SECorner")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("SECorner")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("SECorner")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("SECorner")->setType("Dynamic");
+		this->Field["GameBG"].Template("SECorner")->isPassable(true);
+		this->Field["GameBG"].Template("SECorner")->tag = "BG";
+
+		this->Field["GameBG"].createTemplate("NECorner");
+		this->Field["GameBG"].Template("NECorner")->addTexture("assets\\Prop\\Floor\\NECorner.png", "default", 1000);
+		this->Field["GameBG"].Template("NECorner")->setSpriteTexture("default", 0);
+		this->Field["GameBG"].Template("NECorner")->setSpriteSize(0.1, 0.1);
+		this->Field["GameBG"].Template("NECorner")->setImgDim(5000, 5000);
+		this->Field["GameBG"].Template("NECorner")->setPosX(this->Field["Dynamic"].object("Anchor")->PosX());
+		this->Field["GameBG"].Template("NECorner")->setPosY(this->Field["Dynamic"].object("Anchor")->PosY());
+		this->Field["GameBG"].Template("NECorner")->setType("Dynamic");
+		this->Field["GameBG"].Template("NECorner")->isPassable(true);
+		this->Field["GameBG"].Template("NECorner")->tag = "BG";
+
+		for (int i = 0; i < 21; i++) {
 			for (int j = 0; j < 20; j++) {
 				string ObjName = "Floor" + to_string(i) + "*" + to_string(j);
 				this->Field["GameBG"].registerObject(ObjName, "Floor", "Floor");
@@ -1217,6 +1305,65 @@ private:
 				this->Field["GameBG"].object(ObjName)->setOffsetPosY(j * 5000 * 0.1 / 1.1);
 			}
 		}
+		for (int i = 0; i < 19; i++) {
+			string ObjName = "TBorder_" + to_string(i);
+			this->Field["GameBG"].registerObject(ObjName, "TBorder", "TBorder");
+			this->Field["GameBG"].object(ObjName)->setOffsetPosX(i * 5000 * 0.1);
+			this->Field["GameBG"].object(ObjName)->setOffsetPosY(-5000 * 0.1 / 1.1);
+			this->Field["GameBG"].object(ObjName)->setSpriteSize(0.1, 0.1 / 1.1);
+
+			ObjName = "BBorder_" + to_string(i);
+			this->Field["GameBG"].registerObject(ObjName, "BBorder", "BBorder");
+			this->Field["GameBG"].object(ObjName)->setOffsetPosX(i * 5000 * 0.1);
+			this->Field["GameBG"].object(ObjName)->setOffsetPosY(20 * 5000 * 0.1 / 1.1);
+			this->Field["GameBG"].object(ObjName)->setSpriteSize(0.1, 0.1 / 1.1);
+
+		}
+		for (int i = 0; i < 20; i++) {
+			string ObjName = "Lborder_" + to_string(i);
+			this->Field["GameBG"].registerObject(ObjName, "LBorder", "Lborder");
+			this->Field["GameBG"].object(ObjName)->setOffsetPosX(-5000 * 0.1 + 100);
+			this->Field["GameBG"].object(ObjName)->setOffsetPosY(i * 5000 * 0.1 / 1.1);
+			this->Field["GameBG"].object(ObjName)->setSpriteSize(0.1, 0.1 / 1.1);
+
+			ObjName = "Rborder_" + to_string(i);
+			this->Field["GameBG"].registerObject(ObjName, "RBorder", "Rborder");
+			this->Field["GameBG"].object(ObjName)->setOffsetPosX(20 * 5000 * 0.1 / 1.1 + 300);
+			this->Field["GameBG"].object(ObjName)->setOffsetPosY(i * 5000 * 0.1 / 1.1);
+			this->Field["GameBG"].object(ObjName)->setSpriteSize(0.1, 0.1 / 1.1);
+
+		}
+		for (int i = 0; i < 22; i++) {
+			string ObjName = "FloorL" + to_string(i);
+			this->Field["GameBG"].registerObject(ObjName, "Floor", "Floor");
+			this->Field["GameBG"].object(ObjName)->setOffsetPosX(-2 * 5000 * 0.1 + 102);
+			this->Field["GameBG"].object(ObjName)->setOffsetPosY((i-1) * 5000 * 0.1 / 1.1);
+
+			ObjName = "FloorR" + to_string(i);
+			this->Field["GameBG"].registerObject(ObjName, "Floor", "Floor");
+			this->Field["GameBG"].object(ObjName)->setOffsetPosX(20 * 5000 * 0.1 - 110);
+			this->Field["GameBG"].object(ObjName)->setOffsetPosY((i - 1) * 5000 * 0.1 / 1.1);
+		}
+
+		this->Field["GameBG"].registerObject("NWCorner", "NWCorner", "NWCorner");
+		this->Field["GameBG"].object("NWCorner")->setOffsetPosX(-5000 * 0.1 + 101);
+		this->Field["GameBG"].object("NWCorner")->setOffsetPosY(-5000 * 0.1 / 1.1);
+		this->Field["GameBG"].object("NWCorner")->setSpriteSize(0.1, 0.1 / 1.1);
+
+		this->Field["GameBG"].registerObject("SWCorner", "SWCorner", "SWCorner");
+		this->Field["GameBG"].object("SWCorner")->setOffsetPosX(-5000 * 0.1 + 101);
+		this->Field["GameBG"].object("SWCorner")->setOffsetPosY(20 * 5000 * 0.1 / 1.1);
+		this->Field["GameBG"].object("SWCorner")->setSpriteSize(0.1, 0.1 / 1.1);
+
+		this->Field["GameBG"].registerObject("NECorner", "NECorner", "NECorner");
+		this->Field["GameBG"].object("NECorner")->setOffsetPosX(19 * 5000 * 0.1 - 110);
+		this->Field["GameBG"].object("NECorner")->setOffsetPosY(-5000 * 0.1 / 1.1);
+		this->Field["GameBG"].object("NECorner")->setSpriteSize(0.1, 0.1 / 1.1);
+
+		this->Field["GameBG"].registerObject("SECorner", "SECorner", "SECorner");
+		this->Field["GameBG"].object("SECorner")->setOffsetPosX(20 * 5000 * 0.1 / 1.1 + 300);
+		this->Field["GameBG"].object("SECorner")->setOffsetPosY(20 * 5000 * 0.1 / 1.1);
+		this->Field["GameBG"].object("SECorner")->setSpriteSize(0.1, 0.1 / 1.1);
 		/*
 		Texture a;
 		a.loadFromFile("assets\\Prop\\Floor\\Floor11.png");
@@ -3064,7 +3211,7 @@ public:
 		return false;
 	}
 	void pickBGMusic(bool PlayNow) {
-		if ((!this->OnMainMenu && rand()%1000 == 0 || PlayNow) && this->nowPlaying == -1) {
+		if ((!this->OnMainMenu && rand()%2000 == 0 || PlayNow) && this->nowPlaying == -1) {
 			this->nowPlaying = rand() % 4;
 			this->MusicFX["BG_" + to_string(this->nowPlaying)].play();
 			printf("Now playing : track_%d\n", this->nowPlaying);
@@ -3706,13 +3853,13 @@ void isMovable() {
 				First_step.D_key(false);
 				First_step.move_speed *= 5;
 			}
-			if (-First_step.Anchor->PosX() > 8060) {
+			if (-First_step.Anchor->PosX() > 8370) {
 				D_isbump = true;
 				First_step.move_speed /= 5;
 				First_step.A_key(false);
 				First_step.move_speed *= 5;
 			}
-			if (-First_step.Anchor->PosY() < -600) {
+			if (-First_step.Anchor->PosY() < -670) {
 				W_isbump = true;
 				First_step.move_speed /= 5;
 				First_step.S_key();
