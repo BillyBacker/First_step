@@ -917,6 +917,18 @@ private:
 		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setString("1");
 		this->Dialog["itemUse"].object("WiringKitUse_Solar")->setPosition({ 750,410 });
 
+		this->Dialog["itemUse"].registerObject("metalUse_O2Generator", "BuildingMenu");
+		this->Dialog["itemUse"].object("metalUse_O2Generator")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("metalUse_O2Generator")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("metalUse_O2Generator")->setString("10");
+		this->Dialog["itemUse"].object("metalUse_O2Generator")->setPosition({ 550,610 });
+
+		this->Dialog["itemUse"].registerObject("ArclyicUse_O2Generator", "BuildingMenu");
+		this->Dialog["itemUse"].object("ArclyicUse_O2Generator")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["itemUse"].object("ArclyicUse_O2Generator")->setCharacterSize(50);
+		this->Dialog["itemUse"].object("ArclyicUse_O2Generator")->setString("5");
+		this->Dialog["itemUse"].object("ArclyicUse_O2Generator")->setPosition({ 650,610 });
+
 		this->Dialog["itemUse"].registerObject("TitaniumPlateUse_Rocket", "BuildingMenu");
 		this->Dialog["itemUse"].object("TitaniumPlateUse_Rocket")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["itemUse"].object("TitaniumPlateUse_Rocket")->setCharacterSize(50);
@@ -1124,6 +1136,15 @@ private:
 		this->Field["Dynamic"].Template("Doc")->isPassable(false);
 		this->Field["Dynamic"].Template("Doc")->setType("Dynamic");
 		this->Field["Dynamic"].Template("Doc")->tag = "Building";
+
+		this->Field["Dynamic"].createTemplate("O2_Generator");
+		this->Field["Dynamic"].Template("O2_Generator")->addTexture("assets\\Prop\\Building\\O2Generator.png", "default", 1000);
+		this->Field["Dynamic"].Template("O2_Generator")->setSpriteTexture("default", 0);
+		this->Field["Dynamic"].Template("O2_Generator")->setSpriteSize(0.1, 0.1);
+		this->Field["Dynamic"].Template("O2_Generator")->setImgDim(1200, 1600);
+		this->Field["Dynamic"].Template("O2_Generator")->isPassable(false);
+		this->Field["Dynamic"].Template("O2_Generator")->setType("Dynamic");
+		this->Field["Dynamic"].Template("O2_Generator")->tag = "Building";
 
 		this->Field["Dynamic"].createTemplate("BG_Element");
 		this->Field["Dynamic"].Template("BG_Element")->setType("Dynamic");
@@ -1577,6 +1598,7 @@ private:
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Pumpy.png", "Pump", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Solarcell.png", "SolarCell", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\Rocket.png", "Rocket", 1000);
+		this->Field["BuildUI"].Template("BuildingSample")->addTexture("assets\\Prop\\Building\\O2Generator.png", "O2Generator", 1000);
 		this->Field["BuildUI"].Template("BuildingSample")->setSpriteSize(0.1, 0.1);
 		this->Field["BuildUI"].Template("BuildingSample")->setImgDim(1200, 1600);
 		this->Field["BuildUI"].Template("BuildingSample")->setType("Static");
@@ -1591,6 +1613,11 @@ private:
 		this->Field["BuildUI"].object("SolarCellSample")->setSpriteTexture("SolarCell", 0);
 		this->Field["BuildUI"].object("SolarCellSample")->setPosX(400);
 		this->Field["BuildUI"].object("SolarCellSample")->setPosY(400);
+
+		this->Field["BuildUI"].registerObject("O2GeneratorSample", "BuildingSample", "O2GeneratorSample");
+		this->Field["BuildUI"].object("O2GeneratorSample")->setSpriteTexture("O2Generator", 0);
+		this->Field["BuildUI"].object("O2GeneratorSample")->setPosX(400);
+		this->Field["BuildUI"].object("O2GeneratorSample")->setPosY(600);
 
 		this->Field["BuildUI"].registerObject("RocketSample", "BuildingSample", "RocketSample");
 		this->Field["BuildUI"].object("RocketSample")->setSpriteTexture("Rocket", 0);
@@ -1637,6 +1664,18 @@ private:
 		this->Field["BuildUI"].object("Solar_WiringKit")->setSpriteTexture("WiringKit", 0);
 		this->Field["BuildUI"].object("Solar_WiringKit")->setPosX(750);
 		this->Field["BuildUI"].object("Solar_WiringKit")->setPosY(420);
+
+	this->Field["BuildUI"].registerObject("O2Generator_metal", "ItemUse", "O2Generator_metal");
+		this->Field["BuildUI"].object("O2Generator_metal")->setSpriteTexture("CompositeMetal", 0);
+		this->Field["BuildUI"].object("O2Generator_metal")->setPosX(550);
+		this->Field["BuildUI"].object("O2Generator_metal")->setPosY(620);
+
+		this->Field["BuildUI"].registerObject("O2Generator_Arclyic", "ItemUse", "O2Generator_Arclyic");
+		this->Field["BuildUI"].object("O2Generator_Arclyic")->setSpriteTexture("Arclyic", 0);
+		this->Field["BuildUI"].object("O2Generator_Arclyic")->setPosX(650);
+		this->Field["BuildUI"].object("O2Generator_Arclyic")->setPosY(620);
+
+		
 
 		this->Field["BuildUI"].registerObject("Rocket_TitanuiumPlate", "ItemUse", "Rocket_TitanuiumPlate");
 		this->Field["BuildUI"].object("Rocket_TitanuiumPlate")->setSpriteTexture("TitaniumPlate", 0);
@@ -2631,6 +2670,7 @@ public:
 								int PumpHitBox[] = { 330, 100, 470, 280 };
 								int SlolarHitBox[] = { 330, 340, 460, 480 };
 								int RocketHitBox[] = { 940, 100, 1060,300 };
+								int O2GeneratorHitBox[] = { 340, 500, 470,700 };
 								if (clickHit(PumpHitBox) && hasEnoughItem("Composite Metal", 10, false) && hasEnoughItem("Arclyic", 5, false)) {
 									this->SoundFX["Building"].play();
 									hasEnoughItem("Composite Metal", 10, true);
@@ -2681,6 +2721,24 @@ public:
 										Sleep(1);
 									}
 									this->Field["Dynamic"].registerObject(ObjName, "Rocket", "Rocket");
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
+									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
+									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
+									this->pause = false;
+									this->building = false;
+								}
+								if (clickHit(O2GeneratorHitBox)
+									&& hasEnoughItem("Composite Metal", 10, false)
+									&& hasEnoughItem("Arclyic", 5, false)) {
+									this->SoundFX["Building"].play();
+									hasEnoughItem("Composite Metal", 10, true);
+									hasEnoughItem("Arclyic", 5, true);
+									string ObjName = "O2Generator_" + to_string(rand() % 100000);
+									this->pause = true;
+									while (!FloorAck && !DynamicAck) {
+										Sleep(1);
+									}
+									this->Field["Dynamic"].registerObject(ObjName, "O2_Generator", "O2Generator");
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosX(this->Field["Dynamic"].object("Elon")->PosX() - this->Field["Dynamic"].object("Anchor")->PosX());
 									this->Field["Dynamic"].object(ObjName)->setOffsetPosY(this->Field["Dynamic"].object("Elon")->PosY() - this->Field["Dynamic"].object("Anchor")->PosY());
 									this->DrawField["DrawField_Dynamic"].push_back(this->Field["Dynamic"].object(ObjName));
@@ -2895,6 +2953,10 @@ public:
 													this->DrawField["Hotbar"][this->selectingSlot]->setSpriteTexture("default", 0);
 													cout << this->DrawField["Hotbar"][this->selectingSlot]->getStat("durability") << endl;
 												}
+											}
+											if (building->cat == "O2Generator") {
+													//this->SoundFX["Fill"].play();
+												this->Elon->setStat("Air", 100);
 											}
 											else if (building->cat == "Solar") {
 												this->SoundFX["Charge"].play();
@@ -3227,7 +3289,6 @@ public:
 		int updated = false;
 		this->pollEvents();
 		if (!this->OnMainMenu) {
-			printf("Pos : %.2f %.2f\n", Anchor->PosX(), Anchor->PosY());
 			this->pickBGMusic(false);
 			this->updateHUD();
 			if (this->escPressed && !this->escToggle) {
