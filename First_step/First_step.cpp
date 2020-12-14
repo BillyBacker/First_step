@@ -1742,6 +1742,13 @@ private:
 		this->Dialog["Font"].addFont("Mitr-Regular", "assets\\font\\Mitr-Regular.ttf");
 		this->Dialog["Font"].addFont("Mitr-Bold", "assets\\font\\Mitr-Bold.ttf");
 
+		this->Dialog["MainMenuButton"].registerObject("Name", "MainMenu");
+		this->Dialog["MainMenuButton"].object("Name")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
+		this->Dialog["MainMenuButton"].object("Name")->setString("Weelapat Umarsa 63010895");
+		this->Dialog["MainMenuButton"].object("Name")->setFillColor(Color::White);
+		this->Dialog["MainMenuButton"].object("Name")->setCharacterSize(25);
+		this->Dialog["MainMenuButton"].object("Name")->setPosition({ 1200,850 });
+
 		this->Dialog["MainMenuButton"].registerObject("Play", "MainMenu");
 		this->Dialog["MainMenuButton"].object("Play")->setFont(this->Dialog["Font"].font["Mitr-Regular"]);
 		this->Dialog["MainMenuButton"].object("Play")->setString("Play");
