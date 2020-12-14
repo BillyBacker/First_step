@@ -92,8 +92,6 @@ private:
 	float Size[2];
 	int imgHeight;
 	int imgWidth;
-	unordered_map<string, vector<int>> duration;
-	string slot;
 public:
 	bool loop = false;
 	bool passable = true;
@@ -102,9 +100,11 @@ public:
 	float offsetPosY = 0;
 	int time = 0, Index = 0;
 	string tag = "None", cat = "None";
+	string slot;
 	bool usable = true;
 	Sprite sprite;
 	unordered_map<string, vector<Texture*>> textureArray;
+	unordered_map<string, vector<int>> duration;
 	Object(unsigned __int64 ID) {
 		this->ID = ID;
 	}
@@ -1471,6 +1471,22 @@ private:
 		this->Field["Dynamic"].object("MiniElon")->setType("Dynamic");
 		this->MiniElon = this->Field["Dynamic"].object("MiniElon");
 
+		this->Field["Enermy"].createTemplate("Blank");
+
+		for (int i = 0; i < 5; i++) {
+			this->Field["Enermy"].registerObject("Ghost_" + to_string(i), "Blank", "Ghost");
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->addTexture("assets\\Elon\\ElonGhost1.png", "default", 8);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->addTexture("assets\\Elon\\ElonGhost2.png", "default", 8);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->addTexture("assets\\Elon\\ElonGhost3.png", "default", 8);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->setSpriteTexture("default", 0);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->addStat("MaxOutTime", 500);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->addStat("Time", 0);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->loop = true;
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->setSpriteSize(0.1, 0.1);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->setImgDim(1000, 1600);
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->setType("Dynamic");
+			this->Field["Enermy"].object("Ghost_" + to_string(i))->usable = false;
+		}
 	}
 	void intitHUD() {
 		this->Field["HUD"].createTemplate("Blank");
@@ -1935,6 +1951,9 @@ private:
 		for (int i = 0; i < this->Field["HUD"].entityNumber(); i++) {
 			this->DrawField["DrawField_HUD"].push_back(this->Field["HUD"].objectAt(i));
 		}
+		for (int i = 0; i < this->Field["Enermy"].entityNumber(); i++) {
+			this->DrawField["Enermy"].push_back(this->Field["Enermy"].objectAt(i));
+		}
 	}
 	double ObjectDis(Object* A, Object* B) {
 		return sqrt(pow((A->PosX() - B->PosX()), 2) + pow((A->PosY() - B->PosY()), 2));
@@ -2079,6 +2098,7 @@ public:
 		Field["PauseUI"].destroy();
 		Field["BuildUI"].destroy();
 		Field["InventoryUI"].destroy();
+		Field["Enermy"].destroy();
 		itemList.destroy();
 		freeContainer(DrawField["Hotbar"]);
 		freeContainer(DrawField["ItemOnMouse"]);
@@ -2088,6 +2108,7 @@ public:
 		freeContainer(DrawField["DrawField_BG"]);
 		freeContainer(DrawField["DrawField_Dynamic"]);
 		freeContainer(DrawField["CraftingOutput"]);
+		freeContainer(DrawField["Enermy"]);
 		Backpack.clear();
 		Crafting.clear();
 		ItemUseSlotQuantity.clear();
@@ -3403,6 +3424,7 @@ public:
 				this->Elon->resetTimeSeq();
 			}
 			//printf("%d | %.0llf, %.0llf | %.0llf, %.0llf |  \n", this->DrawField.size(), Elon->PosX(), Elon->PosY(), this->Field.object("0")->PosX(), this->Field.object("0")->PosY());
+			// Move Object
 			try {
 				for (int i = 0; i < this->Field["Dynamic"].entityNumber(); i++) {
 					if (this->Field["Dynamic"].objectAt(i)->type() == "Dynamic" && i < this->Field["Dynamic"].entityNumber() && this->Field["Dynamic"].objectAt(i)->usable) {
@@ -3414,6 +3436,42 @@ public:
 					this->Field["GameBG"].objectAt(i)->setPosX(this->Anchor->PosX());
 					this->Field["GameBG"].objectAt(i)->setPosY(this->Anchor->PosY());
 				}
+				for (int i = 0; i < this->Field["Enermy"].entityNumber(); i++) {
+					if (this->DrawField["Enermy"][i]->usable && Elon->getStat("Alive") && !this->paused) {
+						this->Field["Enermy"].objectAt(i)->UpdateAnimation(2);
+						this->Field["Enermy"].objectAt(i)->setPosX(this->Anchor->PosX());
+						this->Field["Enermy"].objectAt(i)->setPosY(this->Anchor->PosY());
+
+						const vector<float> moveVec = getVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), this->Field["Enermy"].objectAt(i)->PosX(), this->Field["Enermy"].objectAt(i)->PosY()); // get vector from item to player
+						this->DrawField["Enermy"][i]->setAnimationSeq("walk");
+						if (abs(moveVec[0]) > 10) {
+							if (moveVec[0] / abs(moveVec[0]) > 0) {
+								this->Field["Enermy"].objectAt(i)->flipTexture(1);
+							}
+							else if (moveVec[0] / abs(moveVec[0]) < 0) {
+								this->Field["Enermy"].objectAt(i)->flipTexture(-1);
+							}
+							this->Field["Enermy"].objectAt(i)->setOffsetPosX(this->Field["Enermy"].objectAt(i)->offsetPosX + moveVec[0]*0.005 + 1.5*(moveVec[0] / abs(moveVec[0]))); // use vector to move item along x axis.
+						}
+						if (abs(moveVec[1]) > 10) {
+							this->Field["Enermy"].objectAt(i)->setOffsetPosY(this->Field["Enermy"].objectAt(i)->offsetPosY + moveVec[1]*0.005 + 1.5*(moveVec[1] / abs(moveVec[1]))); // use vector to move item along y axis.
+						}
+						if (sqrt(pow(moveVec[0], 2) + pow(moveVec[1], 2)) > 150) {
+							this->Field["Enermy"].objectAt(i)->UpdateAnimation(7);
+						}
+					}
+					if (this->Field["Enermy"].objectAt(i)->usable && !ObjIsOnSight(this->Field["Dynamic"].object("Elon"), this->DrawField["Enermy"][i], 800)) {
+						this->Field["Enermy"].objectAt(i)->increase("Time", 1);
+						cout << "Ghost " + to_string(i) + " : " + to_string(this->Field["Enermy"].objectAt(i)->getStat("Time")) << endl;
+						if (this->Field["Enermy"].objectAt(i)->getStat("Time") >= this->Field["Enermy"].objectAt(i)->getStat("MaxOutTime")) {
+							printf("Ghost is gone\n");
+							this->Field["Enermy"].objectAt(i)->setSpriteSize(0, 0);
+							this->Field["Enermy"].objectAt(i)->usable = false;
+							this->Field["Enermy"].objectAt(i)->setStat("Time", 0);
+						}
+					}
+				}
+
 			}
 			catch (const std::out_of_range& e) {
 				printf("%d\n", e);
@@ -3517,6 +3575,18 @@ public:
 			}
 			*/
 			MiniElon->setAnimationSeq("idle");
+			if (rand() % 2000 == 0 && !this->paused) {
+				for (int i = 0; i < this->Field["Enermy"].entityNumber(); i++) {
+					if (!this->Field["Enermy"].objectAt(i)->usable) {
+						printf("Ghost incomimg\n");
+						this->Field["Enermy"].objectAt(i)->setOffsetPosX(rand() % 5000);
+						this->Field["Enermy"].objectAt(i)->setOffsetPosY(rand() % 5000);
+						this->Field["Enermy"].objectAt(i)->usable = true;
+						this->Field["Enermy"].objectAt(i)->setSpriteSize(0.1, 0.1);
+						break;
+					}
+				}
+			}
 			//////////////////////////////////////////////////////////////////////
 			if (ObjectDis(this->Field["Dynamic"].object("Elon"), MiniElon) > 100) { // check if this object is item and it came close enough
 				const vector<float> moveVec = getVector(this->Field["Dynamic"].object("Elon")->PosX(), this->Field["Dynamic"].object("Elon")->PosY(), MiniElon->PosX(), MiniElon->PosY()); // get vector from item to player
@@ -3648,6 +3718,11 @@ public:
 				}
 				for (int i = 0; i < this->DrawField["DrawField_Dynamic"].size() && this->DrawField["DrawField_Dynamic"][i]->tag != "BG"; i++) {
 					this->window->draw(this->DrawField["DrawField_Dynamic"][i]->getSprite());
+				}
+				for (int i = 0; i < this->Field["Enermy"].entityNumber(); i++) {
+					if (this->Field["Enermy"].objectAt(i)->usable) {
+						this->window->draw(this->Field["Enermy"].objectAt(i)->getSprite());
+					}
 				}
 				MiniElon->UpdateAnimation(2);
 				if (!this->onRocket) {
@@ -3842,7 +3917,7 @@ void isMovable() {
 	Event ev;
 	vector<float> HitVec;
 	float AnchorX, AnchorY;
-	vector<float>ElonHitBox;
+	vector<float>ElonHitBox, GhostHitBox;
 	vector<float>ObjHitBox;
 	bool bump = false;
 	bool W_isbump = false, A_isbump = false, S_isbump = false, D_isbump = false;
@@ -3859,6 +3934,16 @@ void isMovable() {
 			break;
 		}
 		CheckInsight();
+		for (int i = 0; i < First_step.Field["Enermy"].entityNumber(); i++) {
+			GhostHitBox = First_step.Field["Enermy"].objectAt(i)->getHitBoxData();
+			ElonHitBox = First_step.Elon->getHitBoxData();
+			if (!First_step.pause && hitBoxhit(ElonHitBox[0] + hitBoxXoffset, ElonHitBox[1], ElonHitBox[2] - hitBoxXoffset, ElonHitBox[3], GhostHitBox[0], GhostHitBox[1], GhostHitBox[2], GhostHitBox[3])) {
+				HitVec = getVector(GhostHitBox[4], GhostHitBox[5], ElonHitBox[4], ElonHitBox[5]);
+				First_step.Anchor->moveX(HitVec[0]*0.1);
+				First_step.Anchor->moveY(HitVec[1]*0.1);
+				First_step.Elon->increase("Health", -1);
+			}
+		}
 		for (int i = 0; i < First_step.DrawField["DrawField_Dynamic"].size(); i++) {
 			try {
 				ElonHitBox = First_step.Elon->getHitBoxData();
