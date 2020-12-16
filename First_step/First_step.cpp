@@ -759,28 +759,20 @@ private:
 		this->itemList.object("Research Document")->tag = "QuestItem";
 
 		// Default item
-		addItem(0, 0, 8, "MRE");
-		addItem(0, 1, 8, "Hydro Flask");
-		addItem(0, 2, 8, "Hammer");
-		addItem(0, 3, 1, "Drill");
-		addItem(0, 4, 8, "Composite Metal");
-		addItem(0, 5, 8, "Composite Metal");
-		addItem(0, 6, 8, "Arclyic");
-		addItem(1, 0, 8, "Arclyic");
-		addItem(1, 1, 8, "Power Pack");
-		addItem(1, 2, 8, "Power Pack");
-		addItem(1, 3, 8, "Titanium Plate");
-		addItem(1, 4, 8, "Titanium Plate");
-		addItem(1, 5, 8, "Wiring Kit");
-		addItem(2, 1, 8, "Titanium Plate");
-		addItem(2, 2, 8, "Titanium Plate");
-		addItem(2, 3, 8, "Aluminium Plate");
-		addItem(2, 4, 8, "Aluminium Plate");
-		addItem(2, 5, 8, "Aluminium Plate");
-		addItem(2, 6, 8, "Gold Plate");
-		addItem(2, 7, 8, "Gold Plate");
-		addItem(0, 7, 1, "Shovel");
-		addItem(0, 8, 8, "Carrot");
+		addItem(0, 0, 8, "Hydro Flask");
+		addItem(0, 1, 8, "Hammer");
+		addItem(0, 2, 1, "Drill");
+		addItem(0, 3, 8, "Arclyic");
+		addItem(0, 4, 8, "Arclyic");
+		addItem(0, 5, 8, "Arclyic");
+		addItem(0, 6, 8, "Power Pack");
+		addItem(0, 7, 8, "Power Pack");
+		addItem(0, 8, 1, "Shovel");
+		addItem(1, 0, 8, "MRE");
+		addItem(1, 1, 8, "MRE");
+		addItem(1, 2, 8, "Bread");
+		addItem(1, 3, 8, "Bread");
+		addItem(1, 4, 8, "Herb");
 	}
 	void intiRecipe() {
 		this->Recipe.registerRecipe("Copper Wire", 1);
@@ -794,12 +786,6 @@ private:
 
 		this->Recipe.registerRecipe("Bread", 1);
 		this->Recipe.addedRequiredItem("Bread", "Flour", 4);
-
-		this->Recipe.registerRecipe("Carrot Seed", 4);
-		this->Recipe.addedRequiredItem("Carrot Seed", "Carrot", 1);
-
-		this->Recipe.registerRecipe("Wheat Seed", 4);
-		this->Recipe.addedRequiredItem("Wheat Seed", "Wheat", 1);
 
 		this->Recipe.registerRecipe("Wheat Grain", 1);
 		this->Recipe.addedRequiredItem("Wheat Grain", "Wheat Grain", 1);
@@ -1188,6 +1174,7 @@ private:
 
 		this->Field["Dynamic"].createTemplate("Rocket");
 		this->Field["Dynamic"].Template("Rocket")->addTexture("assets\\Prop\\Building\\Rocket.png", "Rocket", 1000);
+		this->Field["Dynamic"].Template("Rocket")->addTexture("assets\\Prop\\Building\\Rocket_launched.png", "Rocket_launched", 1000);
 		this->Field["Dynamic"].Template("Rocket")->setSpriteTexture("Rocket", 0);
 		this->Field["Dynamic"].Template("Rocket")->setSpriteSize(0.1, 0.1);
 		this->Field["Dynamic"].Template("Rocket")->setImgDim(2400, 3200);
@@ -2074,6 +2061,22 @@ public:
 		this->DrawField["CraftingOutput"].push_back(new Object(1216543));
 		this->initObject();
 		this->initItem();
+		if (this->PlayerName == "_Dev") {
+			addItem(1, 4, 8, "Titanium Plate");
+			addItem(1, 5, 8, "Titanium Plate");
+			addItem(1, 6, 8, "Titanium Plate");
+			addItem(1, 7, 8, "Titanium Plate");
+			addItem(1, 8, 8, "Gold Plate");
+			addItem(2, 0, 8, "Composite Metal");
+			addItem(2, 1, 8, "Composite Metal");
+			addItem(2, 2, 8, "Composite Metal");
+			addItem(2, 3, 8, "Composite Metal");
+			addItem(2, 4, 8, "Aluminium Plate");
+			addItem(2, 5, 8, "Aluminium Plate");
+			addItem(2, 6, 8, "Aluminium Plate");
+			addItem(2, 7, 8, "Gold Plate");
+			addItem(2, 8, 8, "Wiring Kit");
+		}
 		printf("Done\n");
 		printf("Initialing UI...\t");
 		this->intitUI();
@@ -2143,6 +2146,7 @@ public:
 		walk = true, idle = true, canMove = true, onRocket = false;
 		this->initMainMenu();
 		this->pause = false;
+		this->PlayerName = "";
 	}
 	const bool ObjIsOnSight(Object* charactor, Object* B, double range) {
 		if (pow(charactor->PosX() - B->PosX(), 2) + pow(charactor->PosY() - B->PosY(), 2) < pow(range, 2)) {
@@ -3000,7 +3004,13 @@ public:
 												giveItem("Research Document");
 											}
 											else if (building->cat == "Rocket") {
-												this->Dialog["Victory"].object("Score")->setString(to_string(int(itemNumber("Research Document") * 20 + ceil(Elon->getStat("Health"))*10)));
+												building->setSpriteTexture("Rocket_launched", 0);
+												string Score = to_string(int(itemNumber("Research Document") * 20 + ceil(Elon->getStat("Health")) * 10));
+												this->Dialog["Victory"].object("Score")->setString(Score);
+												Vector2f textPos;
+												textPos.x = 750 - Score.size() * 75 / 4;
+												textPos.y = 450;
+												this->Dialog["Victory"].object("Score")->setPosition(textPos);
 												this->Elon->setSpriteSize(0, 0);
 												this->MiniElon->setSpriteSize(0, 0);
 												this->canMove = false;
